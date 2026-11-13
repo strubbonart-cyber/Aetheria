@@ -1,5 +1,7 @@
-name: Build Fabric 1.21
-
+      - name: Build Fabric mod
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build --no-daemon
 on:
   push:
     branches: [fabric-1.21-port]
