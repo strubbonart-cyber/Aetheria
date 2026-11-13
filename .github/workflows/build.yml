@@ -1,6 +1,7 @@
 name: Build Fabric 1.21 port
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - fabric-1.21-port
