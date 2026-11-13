@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "skyblockqol",
+  "version": "${version}",
+  "name": "Skyblock QoL Port",
+  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. The first port stage provides a toggleable performance HUD.",
+  "authors": [
+    "Original Aetheria contributors",
+    "strubbonart-cyber"
+  ],
+  "contact": {
+    "sources": "https://github.com/strubbonart-cyber/Aetheria",
+    "issues": "https://github.com/strubbonart-cyber/Aetheria/issues"
+  },
+  "license": "AML-1.0",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "dev.strubbonart.skyblockqol.SkyblockQolClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

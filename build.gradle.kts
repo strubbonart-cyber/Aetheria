@@ -1,165 +1,72 @@
-import org.apache.commons.lang3.SystemUtils
-
 plugins {
-    idea
-    java
-    id("gg.essential.loom") version "0.10.0.5"
-    kotlin("jvm") version "1.8.21"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("net.fabricmc.fabric-loom-remap") version "1.19-SNAPSHOT"
 }
 
-//Constants:
+group = providers.gradleProperty("maven_group").get()
+version = providers.gradleProperty("mod_version").get()
 
-val baseGroup: String by project
-val mcVersion: String by project
-val version: String by project
-val mixinGroup = "$baseGroup.mixin"
-val modid: String by project
-val transformerFile = file("src/main/resources/accesstransformer.cfg")
-
-// Toolchains:
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+base {
+    archivesName.set(providers.gradleProperty("archives_base_name").get())
 }
-
-// Minecraft configuration:
-loom {
-    log4jConfigs.from(file("log4j2.xml"))
-    launchConfigs {
-        "client" {
-            property("mixin.debug", "true")
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
-        }
-    }
-    runConfigs {
-        "client" {
-            if (SystemUtils.IS_OS_MAC_OSX) {
-                vmArgs.remove("-XstartOnFirstThread")
-            }
-        }
-        remove(getByName("server"))
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        mixinConfig("mixins.$modid.json")
-        if (transformerFile.exists()) {
-            println("Installing access transformer")
-            accessTransformer(transformerFile)
-        }
-    }
-    mixin {
-        defaultRefmapName.set("mixins.$modid.refmap.json")
-    }
-}
-
-sourceSets.main {
-    java.srcDirs("src/main/java", "src/main/kotlin")
-    output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
-}
-
-// Dependencies:
 
 repositories {
     mavenCentral()
-    maven("https://repo.spongepowered.org/maven/")
-    maven("https://maven.minecraftforge.net/")
-    maven("https://files.minecraftforge.net/maven/")
-    maven("https://repo.essential.gg/repository/maven-public/")
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1")
-}
-
-val shadowImpl: Configuration by configurations.creating {
-    configurations.implementation.get().extendsFrom(this)
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
+    minecraft("com.mojang:minecraft:${providers.gradleProperty("minecraft_version").get()}")
+    mappings("net.fabricmc:yarn:${providers.gradleProperty("yarn_mappings").get()}:v2")
+    modImplementation("net.fabricmc:fabric-loader:${providers.gradleProperty("loader_version").get()}")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+}
 
-    shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        isTransitive = false
+/*
+ * Legacy Forge sources remain in src/main/java and src/main/kotlin for reference.
+ * Only src/fabric/java is compiled for this Fabric port.
+ * Compatible original assets and data are shared.
+ */
+sourceSets {
+    named("main") {
+        java.setSrcDirs(listOf("src/fabric/java"))
+        resources.setSrcDirs(listOf("src/fabric/resources", "src/main/resources"))
+        resources.exclude(
+            "mcmod.info",
+            "mixins.aetheria.json",
+            "accesstransformer.cfg",
+            "META-INF/**"
+        )
     }
-    shadowImpl("org.java-websocket:Java-WebSocket:1.6.0") { isTransitive = false }
-    shadowImpl("org.slf4j:slf4j-api:1.7.36"){ isTransitive = false }
-    annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-
-    // Kotlin standard library, must be shadowed into the JAR
-    shadowImpl(kotlin("stdlib"))
-    shadowImpl("com.tianscar.imageio:imageio-apng:1.0.1") { isTransitive = false }
-    shadowImpl("dev.matrixlab.webp4j:webp4j-core:2.5.0") { isTransitive = false }
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-    runtimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
-    shadowImpl("com.google.code.gson:gson:2.10.1") { isTransitive = false }
-    shadowImpl("com.fifesoft:rsyntaxtextarea:3.3.3") { isTransitive = false }
 }
 
-// Tasks:
-
-tasks.withType(JavaCompile::class) {
-    options.encoding = "UTF-8"
-}
-
-tasks.withType(org.gradle.jvm.tasks.Jar::class) {
-    archiveBaseName.set(modid)
-    manifest.attributes.run {
-        this["Main-Class"] = "io.hamlook.aetheria.ModInstaller"
-        this["FMLCorePluginContainsFMLMod"] = "true"
-        this["ForceLoadAsMod"] = "true"
-
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
-        this["MixinConfigs"] = "mixins.$modid.json"
-        if (transformerFile.exists())
-            this["FMLAT"] = "${modid}_at.cfg"
+loom {
+    mods {
+        create("skyblockqol") {
+            sourceSet(sourceSets.main.get())
+        }
     }
 }
 
 tasks.processResources {
     inputs.property("version", project.version)
-    inputs.property("mcversion", mcVersion)
-    inputs.property("modid", modid)
-    inputs.property("basePackage", baseGroup)
-
-    filesMatching(listOf("mcmod.info", "mixins.$modid.json")) {
-        expand(inputs.properties)
+    filesMatching("fabric.mod.json") {
+        expand(mapOf("version" to project.version))
     }
-
-    rename("accesstransformer.cfg", "META-INF/${modid}_at.cfg")
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.release.set(21)
+    options.encoding = "UTF-8"
+}
 
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    archiveClassifier.set("")
-    from(tasks.shadowJar)
-    input.set(tasks.shadowJar.get().archiveFile)
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+    withSourcesJar()
 }
 
 tasks.jar {
-    archiveClassifier.set("without-deps")
-    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
-}
-
-tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("intermediates"))
-    archiveClassifier.set("non-obfuscated-with-deps")
-    configurations = listOf(shadowImpl)
-    from(rootProject.file("LICENSE.txt"))
-    mergeServiceFiles()
-    doLast {
-        configurations.forEach {
-            println("Copying dependencies into mod: ${it.files}")
-        }
+    from("LICENSE.txt") {
+        rename { "LICENSE_${project.name}" }
     }
-
-    fun relocate(name: String) = relocate(name, "$baseGroup.deps.$name")
-    relocate("kotlin")
-    relocate("com.google.gson")
-    relocate("org.java_websocket")
-    relocate("org.slf4j")
-    relocate("com.tianscar.imageio")
-    relocate("org.fife")
 }
-
-tasks.assemble.get().dependsOn(tasks.remapJar)
