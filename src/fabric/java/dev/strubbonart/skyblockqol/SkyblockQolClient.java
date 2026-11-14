@@ -1,6 +1,7 @@
 package dev.strubbonart.skyblockqol;
 
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
+import dev.strubbonart.skyblockqol.features.calculator.CalculatorCommand;
 import dev.strubbonart.skyblockqol.features.roman.RomanNumeralCommands;
 import dev.strubbonart.skyblockqol.features.timer.CountdownTimer;
 import net.fabricmc.api.ClientModInitializer;
@@ -26,6 +27,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         PerformanceHud.initialize();
         CountdownTimer.initialize();
         RomanNumeralCommands.register();
+        CalculatorCommand.register();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleHudKey.wasPressed()) {
