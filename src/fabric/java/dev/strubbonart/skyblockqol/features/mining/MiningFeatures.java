@@ -172,6 +172,39 @@ public final class MiningFeatures {
         save();
     }
 
+    public static int getPowderThreshold() {
+        return powderThreshold;
+    }
+
+    public static int getEssenceThreshold() {
+        return essenceThreshold;
+    }
+
+    public static void adjustPowderThreshold(int delta) {
+        powderThreshold = Math.max(0, Math.min(60_000, powderThreshold + delta));
+        save();
+    }
+
+    public static void adjustEssenceThreshold(int delta) {
+        essenceThreshold = Math.max(0, Math.min(20, essenceThreshold + delta));
+        save();
+    }
+
+    public static boolean isTrackerPaused() {
+        return trackerPaused;
+    }
+
+    public static void setTrackerPaused(boolean value) {
+        trackerPaused = value;
+        long now = System.currentTimeMillis();
+        lastTickTime = now;
+        if (!value) {
+            sessionStarted = true;
+            lastActivityTime = now;
+        }
+        save();
+    }
+
     public static boolean isPowderFilterEnabled() {
         return powderFilterEnabled;
     }

@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 public final class SkyblockQolSettingsScreen extends Screen {
     private enum Page { HOME, MINING, FILTER, DUNGEONS }
-    private enum LayoutTarget { MINING, MAP, TIMER, SPLITS, BREAKER }
+    private enum LayoutTarget { MINING, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
     private final Page page;
@@ -88,6 +88,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("hotm", !HotmPowderTooltip.isEnabled()));
                 addButton("CHAT FILTER OPTIONS", right, y, colWidth, 20,
                         () -> open(Page.FILTER, LayoutTarget.MINING));
+                y += 24;
+                addToggle("Mining active timer", !MiningFeatures.isTrackerPaused(),
+                        left, y, colWidth, () -> MiningFeatures.setTrackerPaused(!MiningFeatures.isTrackerPaused()));
 
                 y += 32;
                 addLayoutControlRow(left, y, LayoutTarget.MINING);
@@ -111,6 +114,14 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 int tierY = y + 5 * 24 + 4;
                 addButton("Gemstone tiers: " + MiningFeatures.getGemstoneTierFilter(),
                         left, tierY, 300, 22, MiningFeatures::cycleGemstoneTierFilter);
+                addButton("Powder -100  [" + MiningFeatures.getPowderThreshold() + "]",
+                        left, tierY + 26, 146, 20, () -> MiningFeatures.adjustPowderThreshold(-100));
+                addButton("Powder +100  [" + MiningFeatures.getPowderThreshold() + "]",
+                        right, tierY + 26, 146, 20, () -> MiningFeatures.adjustPowderThreshold(100));
+                addButton("Essence -1  [" + MiningFeatures.getEssenceThreshold() + "]",
+                        left, tierY + 50, 146, 20, () -> MiningFeatures.adjustEssenceThreshold(-1));
+                addButton("Essence +1  [" + MiningFeatures.getEssenceThreshold() + "]",
+                        right, tierY + 50, 146, 20, () -> MiningFeatures.adjustEssenceThreshold(1));
             }
             case DUNGEONS -> {
                 addToggle("Hide blessing messages", DungeonFeatures.isHideBlessingMessagesEnabled(),
@@ -140,13 +151,13 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         right, y, colWidth, () -> DungeonRoomScanner.setSecretFinderEnabled(!DungeonRoomScanner.isSecretFinderEnabled()));
 
                 y += 31;
-                String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER"};
+                String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER", "ROOM"};
                 int bx = left;
                 for (String option : options) {
                     LayoutTarget selected = LayoutTarget.valueOf(option);
                     String label = target == selected ? "[" + option + "]" : option;
-                    addButton(label, bx, y, 71, 20, () -> open(Page.DUNGEONS, selected));
-                    bx += 76;
+                    addButton(label, bx, y, 56, 20, () -> open(Page.DUNGEONS, selected));
+                    bx += 60;
                 }
                 addLayoutControlRow(left, y + 26, target);
                 addButton("RESET SELECTED LAYOUT", left, y + 52, 300, 20,
@@ -194,6 +205,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case TIMER -> DungeonOverlaySettings.Widget.TIMER;
             case SPLITS -> DungeonOverlaySettings.Widget.SPLITS;
             case BREAKER -> DungeonOverlaySettings.Widget.BREAKER;
+            case ROOM -> DungeonOverlaySettings.Widget.ROOM;
             default -> DungeonOverlaySettings.Widget.TIMER;
         };
         int x = DungeonOverlaySettings.x(widget) + dx;
@@ -225,6 +237,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 case TIMER -> 156;
                 case SPLITS -> 178;
                 case BREAKER -> 112;
+                case ROOM -> 212;
                 default -> 156;
             };
             DungeonOverlaySettings.set(widget, x, y, 1.0F);

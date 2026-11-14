@@ -311,25 +311,35 @@ public final class DungeonRoomScanner {
         if (!roomOverlayEnabled || currentRoom == null || !DungeonRunOverlay.isInDungeon()) return;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.options.hudHidden) return;
-        int y = 212;
+
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(
+                DungeonOverlaySettings.x(DungeonOverlaySettings.Widget.ROOM),
+                DungeonOverlaySettings.y(DungeonOverlaySettings.Widget.ROOM), 0.0F);
+        float scale = DungeonOverlaySettings.scale(DungeonOverlaySettings.Widget.ROOM);
+        matrices.scale(scale, scale, 1.0F);
+
+        int y = 0;
         String title = currentRoom.name == null
                 ? "Unknown room (" + shortHash(currentRoom.hash) + ")"
                 : currentRoom.category + " | " + currentRoom.name;
-        context.drawTextWithShadow(client.textRenderer, title, 8, y, 0xFF55FFFF);
+        context.drawTextWithShadow(client.textRenderer, title, 0, y, 0xFF55FFFF);
         if (currentRoom.alias != null && currentRoom.name != null) {
-            context.drawTextWithShadow(client.textRenderer, "Alias: " + currentRoom.alias, 8, y + 11, 0xFFFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, "Alias: " + currentRoom.alias, 0, y + 11, 0xFFFFFFFF);
         }
         if (currentRoom.relativeX != Integer.MIN_VALUE) {
             context.drawTextWithShadow(client.textRenderer,
                     "Relative: (" + currentRoom.relativeX + ", " + currentRoom.relativeZ + ")",
-                    8, y + 22, 0xFFB8B8B8);
+                    0, y + 22, 0xFFB8B8B8);
         }
         if (secretFinderEnabled) {
             int count = getActiveSecretCount();
             context.drawTextWithShadow(client.textRenderer,
                     count < 0 ? "Secrets: waiting for room match" : "Secrets remaining: " + count,
-                    8, y + 33, count > 0 ? 0xFF55FF55 : 0xFFFFAA55);
+                    0, y + 33, count > 0 ? 0xFF55FF55 : 0xFFFFAA55);
         }
+        matrices.pop();
     }
 
     private static void renderWorld(WorldRenderContext context) {

@@ -6,7 +6,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 - Open the dedicated Mining/Dungeon settings screen with **Right Shift** or the client command `/skyblockqol`.
 - Mining and Dungeon tabs expose individual feature toggles. Mining includes a separate Powder Chat Filter options page.
-- Mining HUD panels share an adjustable saved position and scale. Dungeon map, timer, splits, and breaker overlays each have independent saved layout controls.
+- Mining HUD panels share an adjustable saved position and scale; tracker pause and powder/essence thresholds are configurable in the GUI. Dungeon map, timer, splits, breaker, and room-status overlays each have independent saved layout controls.
 - Changes are wired to the live feature settings and saved where the feature has persistent settings.
 
 ## Target

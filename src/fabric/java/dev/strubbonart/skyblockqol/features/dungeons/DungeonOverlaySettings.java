@@ -12,7 +12,7 @@ import java.util.Properties;
 
 /** Saved independent layout settings for the Dungeon HUD overlays. */
 public final class DungeonOverlaySettings {
-    public enum Widget { TIMER, SPLITS, BREAKER }
+    public enum Widget { TIMER, SPLITS, BREAKER, ROOM }
 
     private static final Path FILE = FabricLoader.getInstance().getConfigDir()
             .resolve("skyblockqol-dungeon-layout.properties");
@@ -20,7 +20,8 @@ public final class DungeonOverlaySettings {
     private static int timerX = 8, timerY = 156;
     private static int splitsX = 8, splitsY = 178;
     private static int breakerX = 8, breakerY = 112;
-    private static float timerScale = 1.0F, splitsScale = 1.0F, breakerScale = 1.0F;
+    private static float timerScale = 1.0F, splitsScale = 1.0F, breakerScale = 1.0F, roomScale = 1.0F;
+    private static int roomX = 8, roomY = 212;
     private static boolean timerEnabled = true;
     private static boolean splitsEnabled = true;
     private static boolean loaded;
@@ -43,6 +44,9 @@ public final class DungeonOverlaySettings {
             timerScale = decimal(p, "timerScale", 1F);
             splitsScale = decimal(p, "splitsScale", 1F);
             breakerScale = decimal(p, "breakerScale", 1F);
+            roomX = integer(p, "roomX", 8);
+            roomY = integer(p, "roomY", 212);
+            roomScale = decimal(p, "roomScale", 1F);
             timerEnabled = Boolean.parseBoolean(p.getProperty("timerEnabled", "true"));
             splitsEnabled = Boolean.parseBoolean(p.getProperty("splitsEnabled", "true"));
         } catch (IOException ignored) {
@@ -68,6 +72,7 @@ public final class DungeonOverlaySettings {
             case TIMER -> timerX;
             case SPLITS -> splitsX;
             case BREAKER -> breakerX;
+            case ROOM -> roomX;
         };
     }
 
@@ -77,6 +82,7 @@ public final class DungeonOverlaySettings {
             case TIMER -> timerY;
             case SPLITS -> splitsY;
             case BREAKER -> breakerY;
+            case ROOM -> roomY;
         };
     }
 
@@ -86,6 +92,7 @@ public final class DungeonOverlaySettings {
             case TIMER -> timerScale;
             case SPLITS -> splitsScale;
             case BREAKER -> breakerScale;
+            case ROOM -> roomScale;
         };
     }
 
@@ -95,6 +102,7 @@ public final class DungeonOverlaySettings {
             case TIMER -> { timerX = x; timerY = y; timerScale = scale; }
             case SPLITS -> { splitsX = x; splitsY = y; splitsScale = scale; }
             case BREAKER -> { breakerX = x; breakerY = y; breakerScale = scale; }
+            case ROOM -> { roomX = x; roomY = y; roomScale = scale; }
         }
         save();
     }
@@ -108,7 +116,8 @@ public final class DungeonOverlaySettings {
         timerX = 8; timerY = 156;
         splitsX = 8; splitsY = 178;
         breakerX = 8; breakerY = 112;
-        timerScale = splitsScale = breakerScale = 1.0F;
+        roomX = 8; roomY = 212;
+        timerScale = splitsScale = breakerScale = roomScale = 1.0F;
     }
 
     private static int integer(Properties p, String key, int fallback) {
@@ -133,9 +142,12 @@ public final class DungeonOverlaySettings {
         p.setProperty("splitsY", Integer.toString(splitsY));
         p.setProperty("breakerX", Integer.toString(breakerX));
         p.setProperty("breakerY", Integer.toString(breakerY));
+        p.setProperty("roomX", Integer.toString(roomX));
+        p.setProperty("roomY", Integer.toString(roomY));
         p.setProperty("timerScale", String.format(Locale.ROOT, "%.2f", timerScale));
         p.setProperty("splitsScale", String.format(Locale.ROOT, "%.2f", splitsScale));
         p.setProperty("breakerScale", String.format(Locale.ROOT, "%.2f", breakerScale));
+        p.setProperty("roomScale", String.format(Locale.ROOT, "%.2f", roomScale));
         p.setProperty("timerEnabled", Boolean.toString(timerEnabled));
         p.setProperty("splitsEnabled", Boolean.toString(splitsEnabled));
         try {
