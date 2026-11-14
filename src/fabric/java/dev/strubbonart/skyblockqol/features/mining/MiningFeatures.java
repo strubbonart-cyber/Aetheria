@@ -837,6 +837,8 @@ public final class MiningFeatures {
     }
 
     private static void reset() {
+        powderGemstones.clear();
+        pristineGemstonesByQuality.clear();
         gemstonePowder = mithrilPowder = chests = gemstoneDrops = 0;
         pristineProcs = pristineGemstones = diamondEssence = goldEssence = 0;
         oilBarrels = ascensionRopes = wishingCompasses = jungleHearts = 0;
