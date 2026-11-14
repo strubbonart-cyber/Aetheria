@@ -3,7 +3,7 @@
   "id": "skyblockqol",
   "version": "${version}",
   "name": "Skyblock QoL Port",
-  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. Current migrated features: performance HUD, countdown timer, Roman numeral and calculator commands, initial Mining HUD and counters, Fetchur display, powder chat filter, HOTM powder tooltip, Commission Highlight, Hide Blessing Messages, manual Ghost Tracker, Dungeon Breaker charge HUD, and scoreboard Dungeon timer.",
+  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. Current migrated features: performance HUD, countdown timer, Roman numeral and calculator commands, Mining HUD and counters with active-time/rate tracking, Fetchur display, powder chat filter, HOTM powder tooltip, Commission Highlight, Hide Blessing Messages, manual Ghost Tracker, Dungeon Breaker charge HUD, scoreboard Dungeon timer, and initial Dungeon phase-split tracking.",
   "authors": [
     "Original Aetheria contributors",
     "strubbonart-cyber"

@@ -98,6 +98,11 @@ public final class MiningFeatures {
     private static int previousGoldInventory = -1;
     private static int previousEnchantedGoldInventory = -1;
     private static long lastSaveTime;
+    private static boolean trackerPaused;
+    private static boolean sessionStarted;
+    private static long lastActivityTime;
+    private static long lastTickTime = System.currentTimeMillis();
+    private static long activeTimeMs;
 
     private MiningFeatures() {}
 
@@ -136,6 +141,21 @@ public final class MiningFeatures {
                         .then(ClientCommandManager.literal("reset").executes(context -> {
                             reset();
                             context.getSource().sendFeedback(Text.literal("Mining counters reset."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("pause").executes(context -> {
+                            trackerPaused = true;
+                            save();
+                            context.getSource().sendFeedback(Text.literal("Mining trackers paused."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("resume").executes(context -> {
+                            trackerPaused = false;
+                            sessionStarted = true;
+                            lastActivityTime = System.currentTimeMillis();
+                            lastTickTime = lastActivityTime;
+                            save();
+                            context.getSource().sendFeedback(Text.literal("Mining trackers resumed."));
                             return 1;
                         }))
                         .then(ClientCommandManager.literal("hud").executes(context -> {
@@ -203,7 +223,10 @@ public final class MiningFeatures {
             goldCompacts++;
             changed = true;
         }
-        if (changed) save();
+        if (changed) {
+            markActivity();
+            save();
+        }
 
         return !shouldHide(clean, raw);
     }
@@ -254,9 +277,35 @@ public final class MiningFeatures {
         return false;
     }
 
+    private static void markActivity() {
+        long now = System.currentTimeMillis();
+        sessionStarted = true;
+        lastActivityTime = now;
+    }
+
     private static void tick() {
         long now = System.currentTimeMillis();
+        long delta = Math.max(0L, Math.min(1_000L, now - lastTickTime));
+        lastTickTime = now;
+        if (!trackerPaused && sessionStarted && now - lastActivityTime <= 120_000L) {
+            activeTimeMs += delta;
+        }
         if (now - lastSaveTime > 30_000L) save();
+    }
+
+    private static long perHour(long amount) {
+        if (activeTimeMs <= 0L) return 0L;
+        return Math.round(amount * 3_600_000.0 / activeTimeMs);
+    }
+
+    private static String duration(long millis) {
+        long seconds = Math.max(0L, millis / 1_000L);
+        long hours = seconds / 3_600L;
+        long minutes = (seconds % 3_600L) / 60L;
+        long remaining = seconds % 60L;
+        return hours > 0L
+                ? String.format(Locale.ROOT, "%d:%02d:%02d", hours, minutes, remaining)
+                : String.format(Locale.ROOT, "%02d:%02d", minutes, remaining);
     }
 
     private static void scanGoldInventory(MinecraftClient client) {
@@ -329,6 +378,14 @@ public final class MiningFeatures {
                     "Gold Tracker: " + format(goldIngots) + " ingots | " + format(enchantedGold)
                             + " enchanted | " + format(goldCompacts) + " compacts",
                     8, y, 0xFFFF55);
+            y += 11;
+        }
+        if (sessionStarted) {
+            context.drawTextWithShadow(client.textRenderer,
+                    "Mining active: " + duration(activeTimeMs)
+                            + " | Powder/h: " + format(perHour(gemstonePowder + mithrilPowder))
+                            + " | Pristine/h: " + format(perHour(pristineGemstones)),
+                    8, y, trackerPaused ? 0xFF5555 : 0x55FF55);
         }
     }
 
@@ -342,7 +399,9 @@ public final class MiningFeatures {
                 + format(mithrilPowder) + " Mithril | Chests " + format(chests)
                 + " | Pristine procs " + format(pristineProcs)
                 + " | Gold " + format(goldIngots) + " ingots / " + format(enchantedGold) + " enchanted"
-                + " | Filter " + (powderFilterEnabled ? "ON" : "OFF");
+                + " | Filter " + (powderFilterEnabled ? "ON" : "OFF")
+                + " | Tracker " + (trackerPaused ? "PAUSED" : sessionStarted ? "ACTIVE" : "IDLE")
+                + " | Active " + duration(activeTimeMs);
     }
 
     private static void reset() {
@@ -352,6 +411,11 @@ public final class MiningFeatures {
         prehistoricEggs = pickonimbus = sludgeJuice = yoggies = 0;
         robotParts = treasurite = goblinEggs = hardStoneCompacts = goldCompacts = 0;
         goldIngots = enchantedGold = 0;
+        activeTimeMs = 0L;
+        sessionStarted = false;
+        trackerPaused = false;
+        lastActivityTime = 0L;
+        lastTickTime = System.currentTimeMillis();
         previousGoldInventory = previousEnchantedGoldInventory = -1;
         lastGoldOreBreakTime = 0;
         save();
@@ -389,6 +453,10 @@ public final class MiningFeatures {
             goldCompacts = value(p, "goldCompacts");
             goldIngots = value(p, "goldIngots");
             enchantedGold = value(p, "enchantedGold");
+            activeTimeMs = value(p, "activeTimeMs");
+            trackerPaused = Boolean.parseBoolean(p.getProperty("trackerPaused", "false"));
+            sessionStarted = Boolean.parseBoolean(p.getProperty("sessionStarted", "false"));
+            lastTickTime = System.currentTimeMillis();
         } catch (IOException ignored) {
             // A corrupt or unavailable stats file must not prevent the client from starting.
         }
@@ -428,6 +496,9 @@ public final class MiningFeatures {
         p.setProperty("goldCompacts", Long.toString(goldCompacts));
         p.setProperty("goldIngots", Long.toString(goldIngots));
         p.setProperty("enchantedGold", Long.toString(enchantedGold));
+        p.setProperty("activeTimeMs", Long.toString(activeTimeMs));
+        p.setProperty("trackerPaused", Boolean.toString(trackerPaused));
+        p.setProperty("sessionStarted", Boolean.toString(sessionStarted));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream out = Files.newOutputStream(DATA_FILE)) {

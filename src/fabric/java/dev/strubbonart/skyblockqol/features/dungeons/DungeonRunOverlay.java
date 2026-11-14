@@ -45,6 +45,18 @@ public final class DungeonRunOverlay {
         return enabled;
     }
 
+    public static boolean isInDungeon() {
+        return inDungeon;
+    }
+
+    public static long getElapsedSeconds() {
+        return elapsedSeconds;
+    }
+
+    public static String getCurrentFloor() {
+        return currentFloor;
+    }
+
     private static void tick() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null || client.player == null) {

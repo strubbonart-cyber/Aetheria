@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.calculator.CalculatorCommand;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
+import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.mining.CommissionHighlight;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
@@ -40,6 +41,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         GhostTrackerFeatures.initialize();
         DungeonFeatures.initialize();
         DungeonRunOverlay.initialize();
+        DungeonPhaseTracker.initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleHudKey.wasPressed()) {

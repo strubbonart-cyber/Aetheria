@@ -20,13 +20,13 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and `/mining hud`.
 - Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
-- Dungeon first slice: Hide Blessing Messages filter (`/dungeon blessing`); Dungeon Breaker charge HUD from hotbar item lore (`/dungeon breaker`); scoreboard-backed floor/run timer HUD (`/dungeon timer`); `/dungeon status` reports toggles. Blessing and breaker settings are persisted in `config/skyblockqol-dungeon.properties`.
+- Dungeon first slice: Hide Blessing Messages filter (`/dungeon blessing`); Dungeon Breaker charge HUD from hotbar item lore (`/dungeon breaker`); scoreboard-backed floor/run timer HUD (`/dungeon timer`); `/dungeon status` reports toggles. Added chat-driven Blood Door, clear percentage, boss-phase split tracking for Scarf, Professor, Sadan, and F7/M7, score/XP capture, run-end summaries, and a split HUD toggled with `/dungeonsplits`. These are split/timer features only, not the full original map/secret/highlight systems. Blessing and breaker settings are persisted in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
 
 - Mining message parsing is currently based on recognized system-chat text and is not yet gated by a verified Crystal Hollows/Dwarven Mines location.
 - The filter currently suppresses common reward line types. The original per-category thresholds, full wrapper formatting behavior, and all configurable options are not yet migrated.
-- Powder and Pristine counters currently show lifetime totals. Rate/hour calculations, active-time/session behavior, profile-specific stats, tracker keybinds, and full draggable overlays are not yet migrated.
+- Powder and Pristine counters show totals plus active mining time and powder/Pristine per-hour rates. `/mining pause` and `/mining resume` control active-time accumulation. Rates currently use the tracked chat counters and one shared active timer; Crystal Hollows location validation, per-gem quality breakdown widgets, profile-specific storage, tracker keybinds, and full draggable overlays are not yet migrated.
 - Initial Gold Tracker pickup counting is implemented by comparing inventory totals after a recently broken gold block/ore; ingot, enchanted-gold, and compact counts appear in the Mining HUD. Profit calculation, unit conversion, tablist mining stats, pause/hide settings, profile persistence, and exact internal SkyBlock item-ID detection remain unported.
 - HOTM tooltip migration: shows each recognized perk's powder invested against its max cost and, while Shift is held, the cost for the next up to 10 levels. Uses the original Aetheria perk cost formulas and activates in the Heart of the Mountain screen. The original blue-level adjustment and all config GUI format toggles are not yet ported.
 - Pickobulus world-space preview is not yet migrated.
@@ -35,7 +35,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 ## Dungeon features not yet ported
 
-- Dungeon phase/split timers and end-of-run stats
+- Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - Dungeon Room Overlay
 - Secret Finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - Boss and Blood Mob highlights
