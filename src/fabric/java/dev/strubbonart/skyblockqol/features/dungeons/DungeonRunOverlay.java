@@ -41,6 +41,10 @@ public final class DungeonRunOverlay {
         return enabled;
     }
 
+    public static boolean isEnabled() {
+        return enabled;
+    }
+
     private static void tick() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null || client.player == null) {
