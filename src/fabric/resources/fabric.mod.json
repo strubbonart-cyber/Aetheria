@@ -3,7 +3,7 @@
   "id": "skyblockqol",
   "version": "${version}",
   "name": "Skyblock QoL Port",
-  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. The first port stage provides a toggleable performance HUD.",
+  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. Current migrated features: performance HUD, countdown timer commands and HUD, and Roman numeral conversion command.",
   "authors": [
     "Original Aetheria contributors",
     "strubbonart-cyber"
