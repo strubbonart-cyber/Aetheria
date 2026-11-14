@@ -225,8 +225,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
     private void addButton(String name, int x, int y, int w, int h, Runnable action) {
         addDrawableChild(ButtonWidget.builder(Text.literal(name), button -> {
             action.run();
-            MinecraftClient.getInstance().setScreen(
-                    new SkyblockQolSettingsScreen(parent, page, target));
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (client.currentScreen == this) {
+                client.setScreen(new SkyblockQolSettingsScreen(parent, page, target));
+            }
         }).dimensions(x, y, w, h).build());
     }
 
