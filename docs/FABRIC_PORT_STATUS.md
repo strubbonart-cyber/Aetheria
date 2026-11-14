@@ -28,7 +28,8 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - The filter currently suppresses common reward line types. The original per-category thresholds, full wrapper formatting behavior, and all configurable options are not yet migrated.
 - Powder and Pristine counters currently show lifetime totals. Rate/hour calculations, active-time/session behavior, profile-specific stats, tracker keybinds, and full draggable overlays are not yet migrated.
 - Initial Gold Tracker pickup counting is implemented by comparing inventory totals after a recently broken gold block/ore; ingot, enchanted-gold, and compact counts appear in the Mining HUD. Profit calculation, unit conversion, tablist mining stats, pause/hide settings, profile persistence, and exact internal SkyBlock item-ID detection remain unported.
-- HOTM tooltip powder cost, Commission Highlight, and Pickobulus preview are not yet migrated.
+- HOTM tooltip powder cost and Pickobulus preview are not yet migrated.
+- Commission Highlight is migrated as a green translucent slot overlay on handled screens titled Commissions. Toggle with `/commissionhighlight`; it currently identifies completion from an exact `COMPLETED` lore line.
 - Ghost Tracker limitations: start/stop is manual so enable it only in The Mist; the original location validation, scavenger/purse tracker, drop-value/profit calculation, all original overlay options, and full profile/session behavior are not yet migrated.
 
 ## Dungeon features not yet ported
