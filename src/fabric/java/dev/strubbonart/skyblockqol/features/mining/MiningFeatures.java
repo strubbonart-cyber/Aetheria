@@ -140,6 +140,14 @@ public final class MiningFeatures {
     private static long goldCompacts;
     private static long goldIngots;
     private static long enchantedGold;
+    private static boolean goldOnlyWhileMining = true;
+    private static boolean goldDisplayEnchanted;
+    private static long goldActiveTimeMs;
+    private static long goldSessionTimeMs;
+    private static long goldLastActivityTime;
+    private static long goldLastTickTime = System.currentTimeMillis();
+    private static boolean goldTimerStarted;
+    private static boolean goldTimerRunning;
     private static long lastGoldOreBreakTime;
     private static int previousGoldInventory = -1;
     private static int previousEnchantedGoldInventory = -1;
@@ -159,6 +167,20 @@ public final class MiningFeatures {
             case "hotm" -> HotmPowderTooltip.setEnabled(value);
             default -> { return; }
         }
+        save();
+    }
+
+    public static boolean isGoldOnlyWhileMining() { return goldOnlyWhileMining; }
+
+    public static void setGoldOnlyWhileMining(boolean value) {
+        goldOnlyWhileMining = value;
+        save();
+    }
+
+    public static boolean isGoldDisplayEnchanted() { return goldDisplayEnchanted; }
+
+    public static void toggleGoldDisplayUnit() {
+        goldDisplayEnchanted = !goldDisplayEnchanted;
         save();
     }
 
@@ -324,6 +346,7 @@ public final class MiningFeatures {
             scanGoldInventory(client);
         });
         AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            if (!isGoldArea()) return ActionResult.PASS;
             var state = world.getBlockState(pos);
             if (state.isOf(Blocks.GOLD_ORE) || state.isOf(Blocks.DEEPSLATE_GOLD_ORE)
                     || state.isOf(Blocks.NETHER_GOLD_ORE) || state.isOf(Blocks.GOLD_BLOCK)
@@ -518,8 +541,10 @@ public final class MiningFeatures {
         changed |= addMatch(clean, TREASURITE, 11);
         changed |= addMatch(clean, GOBLIN_EGG, 12);
 
-        if (GOLD_COMPACT.matcher(raw).find()) {
+        if (GOLD_COMPACT.matcher(raw).find() && isGoldArea()
+                && (!goldOnlyWhileMining || System.currentTimeMillis() - lastGoldOreBreakTime <= 20_000L)) {
             goldCompacts++;
+            markGoldActivity(System.currentTimeMillis());
             changed = true;
         }
         if (changed) {
@@ -723,6 +748,17 @@ public final class MiningFeatures {
         if (!trackerPaused && sessionStarted && now - lastActivityTime <= 120_000L) {
             activeTimeMs += delta;
         }
+
+        long goldDelta = Math.max(0L, Math.min(1_000L, now - goldLastTickTime));
+        goldLastTickTime = now;
+        if (goldTimerRunning) {
+            if (now - goldLastActivityTime <= 10_000L && isGoldArea()) {
+                goldActiveTimeMs += goldDelta;
+                goldSessionTimeMs += goldDelta;
+            } else {
+                goldTimerRunning = false;
+            }
+        }
         if (now - lastSaveTime > 30_000L) save();
     }
 
@@ -741,8 +777,54 @@ public final class MiningFeatures {
                 : String.format(Locale.ROOT, "%02d:%02d", minutes, remaining);
     }
 
+    private static boolean isGoldArea() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.world == null) return false;
+        ScoreboardObjective objective = client.world.getScoreboard()
+                .getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return false;
+        for (ScoreboardEntry entry : client.world.getScoreboard().getScoreboardEntries(objective)) {
+            if (entry.hidden()) continue;
+            String line;
+            if (entry.display() != null) {
+                line = entry.display().getString();
+            } else {
+                Team team = client.world.getScoreboard().getScoreHolderTeam(entry.owner());
+                line = team == null ? entry.name().getString()
+                        : team.decorateName(entry.name()).getString();
+            }
+            String clean = stripFormatting(line).toLowerCase(Locale.ROOT);
+            if (clean.contains("dwarven mines") || clean.contains("crystal hollows")) return true;
+        }
+        return false;
+    }
+
+    private static void markGoldActivity(long now) {
+        goldTimerStarted = true;
+        goldTimerRunning = true;
+        goldLastActivityTime = now;
+        if (goldLastTickTime <= 0L) goldLastTickTime = now;
+    }
+
+    private static long goldTotalAsIngots() {
+        return goldIngots + enchantedGold * 160L;
+    }
+
+    private static long goldTotalAsEnchanted() {
+        return goldIngots / 160L + enchantedGold;
+    }
+
+    private static long goldDisplayTotal() {
+        return goldDisplayEnchanted ? goldTotalAsEnchanted() : goldTotalAsIngots();
+    }
+
+    private static long goldPerHour(long amount) {
+        if (goldActiveTimeMs <= 0L) return 0L;
+        return Math.round(amount * 3_600_000.0 / goldActiveTimeMs);
+    }
+
     private static void scanGoldInventory(MinecraftClient client) {
-        if (client.player == null || client.world == null) {
+        if (client.player == null || client.world == null || !isGoldArea()) {
             previousGoldInventory = previousEnchantedGoldInventory = -1;
             return;
         }
@@ -765,9 +847,12 @@ public final class MiningFeatures {
         }
         int ingotDelta = Math.max(0, ingotCount - previousGoldInventory);
         int enchantedDelta = Math.max(0, enchantedCount - previousEnchantedGoldInventory);
-        if (System.currentTimeMillis() - lastGoldOreBreakTime <= 20_000L) {
+        long now = System.currentTimeMillis();
+        boolean miningGold = now - lastGoldOreBreakTime <= 20_000L;
+        if ((!goldOnlyWhileMining || miningGold) && (ingotDelta > 0 || enchantedDelta > 0)) {
             if (ingotDelta > 0) goldIngots += ingotDelta;
             if (enchantedDelta > 0) enchantedGold += enchantedDelta;
+            markGoldActivity(now);
         }
         previousGoldInventory = ingotCount;
         previousEnchantedGoldInventory = enchantedCount;
@@ -836,11 +921,24 @@ public final class MiningFeatures {
             }
         }
         if (showGoldHud) {
+            String unit = goldDisplayEnchanted ? "enchanted gold" : "gold ingots";
             context.drawTextWithShadow(client.textRenderer,
-                    "Gold Tracker: " + format(goldIngots) + " ingots | " + format(enchantedGold)
-                            + " enchanted | " + format(goldCompacts) + " compacts",
+                    "Gold: " + format(goldDisplayTotal()) + " " + unit
+                            + " (" + format(goldPerHour(goldDisplayTotal())) + "/h)",
                     0, y, 0xFFFF55);
             y += 11;
+            context.drawTextWithShadow(client.textRenderer,
+                    "Raw: " + format(goldTotalAsIngots()) + " ingots | " + format(goldTotalAsEnchanted())
+                            + " enchanted | " + format(goldCompacts) + " compacts",
+                    0, y, 0xFFFFFF);
+            y += 11;
+            if (goldTimerStarted) {
+                context.drawTextWithShadow(client.textRenderer,
+                        "Gold active: " + duration(goldActiveTimeMs)
+                                + " | Session: " + duration(goldSessionTimeMs),
+                        0, y, 0xFFFFAA);
+                y += 11;
+            }
         }
         if (sessionStarted) {
             context.drawTextWithShadow(client.textRenderer,
@@ -878,6 +976,12 @@ public final class MiningFeatures {
         prehistoricEggs = pickonimbus = sludgeJuice = yoggies = 0;
         robotParts = treasurite = goblinEggs = hardStoneCompacts = goldCompacts = 0;
         goldIngots = enchantedGold = 0;
+        goldActiveTimeMs = 0L;
+        goldSessionTimeMs = 0L;
+        goldLastActivityTime = 0L;
+        goldLastTickTime = System.currentTimeMillis();
+        goldTimerStarted = false;
+        goldTimerRunning = false;
         activeTimeMs = 0L;
         sessionStarted = false;
         trackerPaused = false;
@@ -898,6 +1002,13 @@ public final class MiningFeatures {
             showPristineHud = Boolean.parseBoolean(p.getProperty("showPristineHud", "true"));
             showFetchurHud = Boolean.parseBoolean(p.getProperty("showFetchurHud", "true"));
             showGoldHud = Boolean.parseBoolean(p.getProperty("showGoldHud", "true"));
+            goldOnlyWhileMining = Boolean.parseBoolean(p.getProperty("goldOnlyWhileMining", "true"));
+            goldDisplayEnchanted = Boolean.parseBoolean(p.getProperty("goldDisplayEnchanted", "false"));
+            goldActiveTimeMs = value(p, "goldActiveTimeMs");
+            goldSessionTimeMs = 0L;
+            goldTimerStarted = goldActiveTimeMs > 0L;
+            goldTimerRunning = false;
+            goldLastTickTime = System.currentTimeMillis();
             showPowderGemBreakdown = Boolean.parseBoolean(p.getProperty("showPowderGemBreakdown", "true"));
             showPristineGemBreakdown = Boolean.parseBoolean(p.getProperty("showPristineGemBreakdown", "true"));
             powderGemstones.clear();
@@ -978,6 +1089,9 @@ public final class MiningFeatures {
         p.setProperty("showPristineHud", Boolean.toString(showPristineHud));
         p.setProperty("showFetchurHud", Boolean.toString(showFetchurHud));
         p.setProperty("showGoldHud", Boolean.toString(showGoldHud));
+        p.setProperty("goldOnlyWhileMining", Boolean.toString(goldOnlyWhileMining));
+        p.setProperty("goldDisplayEnchanted", Boolean.toString(goldDisplayEnchanted));
+        p.setProperty("goldActiveTimeMs", Long.toString(goldActiveTimeMs));
         p.setProperty("showPowderGemBreakdown", Boolean.toString(showPowderGemBreakdown));
         p.setProperty("showPristineGemBreakdown", Boolean.toString(showPristineGemBreakdown));
         powderGemstones.forEach((key, count) -> p.setProperty("powderGem." + key, Long.toString(count)));

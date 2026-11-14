@@ -71,6 +71,11 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 y += 24;
                 addToggle("Gold tracker HUD", MiningFeatures.isHudPanelEnabled("gold"),
                         left, y, colWidth, () -> MiningFeatures.setHudPanelEnabled("gold", !MiningFeatures.isHudPanelEnabled("gold")));
+                addToggle("Only while mining gold", MiningFeatures.isGoldOnlyWhileMining(),
+                        right, y, colWidth, () -> MiningFeatures.setGoldOnlyWhileMining(!MiningFeatures.isGoldOnlyWhileMining()));
+                y += 24;
+                addButton("Gold unit: " + (MiningFeatures.isGoldDisplayEnchanted() ? "ENCHANTED" : "INGOTS"),
+                        left, y, colWidth, 20, MiningFeatures::toggleGoldDisplayUnit);
                 addToggle("Pickobulus preview", PickobulusPreview.isEnabled(),
                         right, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("pickobulus", !PickobulusPreview.isEnabled()));
                 y += 24;
