@@ -6,7 +6,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 - Open the dedicated Mining/Dungeon settings screen with **Right Shift** or the client command `/skyblockqol`.
 - Mining and Dungeon tabs expose individual feature toggles. Mining includes a separate Powder Chat Filter options page.
-- Mining HUD panels share an adjustable saved position and scale; tracker pause and powder/essence thresholds are configurable in the GUI. Dungeon map, timer, splits, breaker, and room-status overlays each have independent saved layout controls.
+- Mining HUD panels share an adjustable saved position and scale; Ghost Tracker has its own saved position and scale. Tracker pause, powder/essence thresholds, panel visibility, and filter categories are configurable in the GUI. Dungeon map, timer, splits, breaker, and room-status overlays each have independent saved position/scale controls.
 - Changes are wired to the live feature settings and saved where the feature has persistent settings.
 
 ## Target
@@ -21,7 +21,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and independently toggleable HUD panels with `/mining hud fetchur|powder|pristine|gold`. Settings can also be changed in the dedicated GUI.
 - Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
-- Dungeon timer, split HUD, and Dungeon Breaker HUD now each have saved, independent position and scale values. Configure them with `/dungeon layout timer <x> <y> <scale>`, `/dungeon layout splits <x> <y> <scale>`, or `/dungeon layout breaker <x> <y> <scale>`; reset all three with `/dungeon layout reset`. Existing `/dungeon timer`, `/dungeonsplits`, and `/dungeon breaker` toggles remain separate.
+- Dungeon timer, split HUD, Dungeon Breaker HUD, and room-status HUD now each have saved, independent position and scale values; the settings screen edits the same values used by the renderers. Configure them with `/dungeon layout timer <x> <y> <scale>`, `/dungeon layout splits <x> <y> <scale>`, or `/dungeon layout breaker <x> <y> <scale>`; reset all three with `/dungeon layout reset`. Existing `/dungeon timer`, `/dungeonsplits`, and `/dungeon breaker` toggles remain separate.
 - Dungeon first slice: Hide Blessing Messages (`/dungeon blessing`); Dungeon Breaker charge HUD (`/dungeon breaker`); scoreboard floor/run timer (`/dungeon timer`); Blood Door, clear percentage, Scarf/Professor/Sadan/F7/M7 phase splits, score/XP capture and run-end summaries; toggleable split HUD (`/dungeonsplits`). Boss and Blood Room mob highlights now render colour-coded entity boxes, toggled with `/dungeon bosses` and `/dungeon blood`. Detection follows the original armor-stand-name association rules. These are world-space boxes, not the original model outlines. Settings persist in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
@@ -39,20 +39,15 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 ## Dungeon data foundation
 
 - Runtime downloader/cache for the original Aetheria dungeon room and secret-location JSON. Files are stored in `config/skyblockqol/dungeon-data/`, fetched asynchronously, and retained with their GPL-3.0 attribution metadata. Check using `/dungeon data`; refresh using `/dungeon refresh-data`.
-- This data foundation does not yet identify the player's room or render secrets. The original detector hashes legacy block-state strings, so the 1.21 port still needs a verified legacy-state normalization layer before its hashes can match the source dataset.
-
-- Rectangular and L-shaped Dungeon room scanner and Secret Finder: supports the original four-side width test, the special L-shape row traversal and its floor-hash discriminator, as well as exact four-neighbour origin-corner detection. Unknown hashes remain unmatched rather than guessed. The scanner uses the original sorted block-frequency MD5 lookup against the downloaded data, but live hash compatibility still needs validation in Fakepixel 1.21. Secret markers render coloured block boxes and track chest/lever interactions, nearby item/entrance collection, block disappearance, and the Secrets Found action bar. Toggle room overlay with `/dungeon room` and secret finder with `/dungeon secrets` or in the Dungeon GUI. uses the original sorted block-frequency MD5 plus floor-hash disambiguation against the downloaded GPL-3.0 room/secret datasets. Shows matched room name/category/alias/relative coordinates in the HUD. Secret markers render coloured block boxes, track chest/lever interactions, nearby item pickups, entrance proximity, block disappearance, and the server Secrets Found action bar. Toggle with `/dungeon room` and `/dungeon secrets`, or in the Dungeon GUI. Full secret collection edge cases, tracers, custom labels and actual 1.8-to-1.21 hash compatibility remain to be verified in-game. Unknown hashes are shown as unmatched rather than guessed.
-
-- Spirit Leap / InfiniLeap menu first slice: automatically replaces the matching chest screen while in a dungeon, shows the live map and party markers, and provides clickable teammate buttons. A button or clickable player map marker selects the matching player item in the original container using a normal vanilla slot click. Returning to the original chest is protected from automatically re-opening the overlay. Enable/disable with `/dungeon leap` or the Dungeon settings GUI. In-game server verification is still needed for both server menu title variants and item-name matching.
-
-- Dungeon chest reveal animation first slice: on Obsidian/Bedrock reward chests during a run, scans the server-populated reward slots after a short delay and selects the actual shown reward using the original Aetheria floor/material drop table. It displays a short visual carousel and the actual reward stack; it does not generate or change the reward. Toggle with `/dungeon chestanimation` or the Dungeon GUI. Croesus chest-list integration and original custom animated textures are not yet ported.
+- The Fabric room scanner supports rectangular and L-shaped room traversal, floor-hash disambiguation, and exact four-neighbour room-origin detection. It uses the original sorted block-frequency MD5 lookup against the downloaded data. The Secret Finder renders collected/remaining secret markers and tracks chest/lever interactions, nearby item pickups, entrance proximity, block disappearance, and the Secrets Found action bar. Unknown hashes stay unmatched rather than being guessed. Live 1.8-to-1.21 block-state hash compatibility and edge cases still require in-game validation.
+- Spirit Leap / InfiniLeap replaces the matching server chest screen while in a dungeon, displays the party map/markers, and supports normal server-validated slot clicks for teammates. Menu title variants and item matching still need in-game testing.
 
 ## Dungeon features not yet ported
 
-- L-shaped room detection, visited-room map labels/custom rank badges and advanced secret labels/tracers
-- Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
-- Dungeon chest price estimator
-- `/report-secret` workflow
+- Dungeon Chest Price Estimator and its best-value chest analyzer. The original relies on Aetheria's shared item-price cache, which is not part of this Fabric slice yet.
+- `/report-secret` submission GUI. The original endpoint expects an Aetheria mod-secret header, so it must not be copied into this public client port as a hard-coded credential.
+- Visited-room map labels/custom rank badges, advanced secret tracers/custom labels, and exact original detector compatibility remain incomplete or unverified.
+- The cosmetic CSGO-style chest-opening animation has been removed from this port's feature scope.
 
 ## Build verification
 

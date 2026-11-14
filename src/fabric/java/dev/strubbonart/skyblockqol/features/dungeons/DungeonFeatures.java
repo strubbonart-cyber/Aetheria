@@ -249,9 +249,17 @@ public final class DungeonFeatures {
                 return;
             }
             int color = current == maximum ? 0x55FF55 : current == 0 ? 0xFF5555 : 0xFFFFFF;
-            context.drawTextWithShadow(client.textRenderer, "Dungeon Breaker", 8, 112, 0xFF5555);
+            var matrices = context.getMatrices();
+            matrices.push();
+            matrices.translate(
+                    DungeonOverlaySettings.x(DungeonOverlaySettings.Widget.BREAKER),
+                    DungeonOverlaySettings.y(DungeonOverlaySettings.Widget.BREAKER), 0.0F);
+            float scale = DungeonOverlaySettings.scale(DungeonOverlaySettings.Widget.BREAKER);
+            matrices.scale(scale, scale, 1.0F);
+            context.drawTextWithShadow(client.textRenderer, "Dungeon Breaker", 0, 0, 0xFF5555);
             context.drawTextWithShadow(client.textRenderer,
-                    "Charges: " + current + "/" + maximum, 8, 123, color);
+                    "Charges: " + current + "/" + maximum, 0, 11, color);
+            matrices.pop();
             return;
         }
     }
