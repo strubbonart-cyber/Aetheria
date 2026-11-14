@@ -111,8 +111,6 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 int tierY = y + 5 * 24 + 4;
                 addButton("Gemstone tiers: " + MiningFeatures.getGemstoneTierFilter(),
                         left, tierY, 300, 22, MiningFeatures::cycleGemstoneTierFilter);
-                addButton("BACK TO MINING", left, height - 34, 300, 20,
-                        () -> open(Page.MINING, LayoutTarget.MINING));
             }
             case DUNGEONS -> {
                 addToggle("Hide blessing messages", DungeonFeatures.isHideBlessingMessagesEnabled(),
@@ -159,8 +157,13 @@ public final class SkyblockQolSettingsScreen extends Screen {
         }
 
         if (page != Page.HOME) {
-            addButton("BACK", left, height - 32, 300, 20,
-                    () -> open(Page.HOME, LayoutTarget.MINING));
+            if (page == Page.FILTER) {
+                addButton("BACK TO MINING", left, height - 32, 300, 20,
+                        () -> open(Page.MINING, LayoutTarget.MINING));
+            } else {
+                addButton("BACK", left, height - 32, 300, 20,
+                        () -> open(Page.HOME, LayoutTarget.MINING));
+            }
         }
     }
 

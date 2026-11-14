@@ -14,6 +14,9 @@ import dev.strubbonart.skyblockqol.features.mining.CommissionHighlight;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.HotmPowderTooltip;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.minecraft.text.Text;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -46,6 +49,15 @@ public final class SkyblockQolClient implements ClientModInitializer {
         DungeonMapOverlay.initialize();
         DungeonRoomScanner.initialize();
         DungeonMobHighlights.initialize();
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(ClientCommandManager.literal("skyblockqol")
+                        .executes(context -> {
+                            MinecraftClient client = MinecraftClient.getInstance();
+                            client.setScreen(new SkyblockQolSettingsScreen(client.currentScreen));
+                            context.getSource().sendFeedback(Text.literal("Opened Mining & Dungeon settings."));
+                            return 1;
+                        })));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (openSettingsKey.wasPressed()) {
