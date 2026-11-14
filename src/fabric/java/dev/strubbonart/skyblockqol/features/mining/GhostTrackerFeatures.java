@@ -1,6 +1,7 @@
 package dev.strubbonart.skyblockqol.features.mining;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -61,6 +62,7 @@ public final class GhostTrackerFeatures {
 
     public static void initialize() {
         load();
+        ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         ClientReceiveMessageEvents.ALLOW_GAME.register(GhostTrackerFeatures::onMessage);
         HudRenderCallback.EVENT.register(GhostTrackerFeatures::renderHud);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
