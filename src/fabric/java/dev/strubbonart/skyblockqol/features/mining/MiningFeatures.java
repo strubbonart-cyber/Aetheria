@@ -146,6 +146,16 @@ public final class MiningFeatures {
 
     private MiningFeatures() {}
 
+    public static void setMiningFeatureEnabled(String feature, boolean value) {
+        switch (feature) {
+            case "pickobulus" -> PickobulusPreview.setEnabled(value);
+            case "commission" -> CommissionHighlight.setEnabled(value);
+            case "hotm" -> HotmPowderTooltip.setEnabled(value);
+            default -> { return; }
+        }
+        save();
+    }
+
     public static boolean isPowderFilterEnabled() {
         return powderFilterEnabled;
     }
@@ -766,6 +776,9 @@ public final class MiningFeatures {
             showPristineHud = Boolean.parseBoolean(p.getProperty("showPristineHud", "true"));
             showFetchurHud = Boolean.parseBoolean(p.getProperty("showFetchurHud", "true"));
             showGoldHud = Boolean.parseBoolean(p.getProperty("showGoldHud", "true"));
+            PickobulusPreview.setEnabled(Boolean.parseBoolean(p.getProperty("pickobulusEnabled", "true")));
+            CommissionHighlight.setEnabled(Boolean.parseBoolean(p.getProperty("commissionHighlightEnabled", "true")));
+            HotmPowderTooltip.setEnabled(Boolean.parseBoolean(p.getProperty("hotmTooltipEnabled", "true")));
             hudX = (int) value(p, "hudX");
             hudY = (int) value(p, "hudY");
             hudScale = Math.max(0.5F, Math.min(3.0F, Float.parseFloat(p.getProperty("hudScale", "1.0"))));
@@ -835,6 +848,9 @@ public final class MiningFeatures {
         p.setProperty("showPristineHud", Boolean.toString(showPristineHud));
         p.setProperty("showFetchurHud", Boolean.toString(showFetchurHud));
         p.setProperty("showGoldHud", Boolean.toString(showGoldHud));
+        p.setProperty("pickobulusEnabled", Boolean.toString(PickobulusPreview.isEnabled()));
+        p.setProperty("commissionHighlightEnabled", Boolean.toString(CommissionHighlight.isEnabled()));
+        p.setProperty("hotmTooltipEnabled", Boolean.toString(HotmPowderTooltip.isEnabled()));
         p.setProperty("hudX", Integer.toString(hudX));
         p.setProperty("hudY", Integer.toString(hudY));
         p.setProperty("hudScale", Float.toString(hudScale));

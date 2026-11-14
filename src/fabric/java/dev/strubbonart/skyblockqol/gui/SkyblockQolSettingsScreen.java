@@ -71,22 +71,21 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Gold tracker HUD", MiningFeatures.isHudPanelEnabled("gold"),
                         left, y, colWidth, () -> MiningFeatures.setHudPanelEnabled("gold", !MiningFeatures.isHudPanelEnabled("gold")));
                 addToggle("Pickobulus preview", PickobulusPreview.isEnabled(),
-                        right, y, colWidth, () -> PickobulusPreview.setEnabled(!PickobulusPreview.isEnabled()));
+                        right, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("pickobulus", !PickobulusPreview.isEnabled()));
                 y += 24;
                 addToggle("Commission highlight", CommissionHighlight.isEnabled(),
-                        left, y, colWidth, () -> CommissionHighlight.setEnabled(!CommissionHighlight.isEnabled()));
+                        left, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("commission", !CommissionHighlight.isEnabled()));
                 addToggle("Ghost tracker session", GhostTrackerFeatures.isTracking(),
                         right, y, colWidth, () -> GhostTrackerFeatures.setTracking(!GhostTrackerFeatures.isTracking()));
                 y += 24;
                 addToggle("HOTM powder tooltip", HotmPowderTooltip.isEnabled(),
-                        left, y, colWidth, () -> HotmPowderTooltip.setEnabled(!HotmPowderTooltip.isEnabled()));
+                        left, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("hotm", !HotmPowderTooltip.isEnabled()));
                 addButton("CHAT FILTER OPTIONS", right, y, colWidth, 20,
                         () -> open(Page.FILTER, LayoutTarget.MINING));
 
                 y += 32;
                 addLayoutControlRow(left, y, LayoutTarget.MINING);
-                addLayoutControlRow(left, y + 24, LayoutTarget.MINING);
-                addButton("RESET MINING HUD LAYOUT", left, y + 52, 300, 20,
+                addButton("RESET MINING HUD LAYOUT", left, y + 26, 300, 20,
                         MiningFeatures::resetHudLayout);
             }
             case FILTER -> {
@@ -140,10 +139,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                     bx += 76;
                 }
                 addLayoutControlRow(left, y + 26, target);
-                addLayoutControlRow(left, y + 50, target);
-                addButton("RESET SELECTED LAYOUT", left, y + 78, 300, 20,
+                addButton("RESET SELECTED LAYOUT", left, y + 52, 300, 20,
                         this::resetSelectedLayout);
-                addButton("REFRESH ROOM / SECRET DATA", left, y + 102, 300, 20,
+                addButton("REFRESH ROOM / SECRET DATA", left, y + 76, 300, 20,
                         () -> dev.strubbonart.skyblockqol.features.dungeons.DungeonDataRepository.refresh());
             }
         }
