@@ -54,12 +54,13 @@ tasks.processResources {
 }
 
 tasks.withType<JavaCompile>().configureEach {
+    // Build runs on JDK 25 for current Loom; this keeps the resulting mod Java 21-compatible.
     options.release.set(21)
     options.encoding = "UTF-8"
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+    // Do not require a separate JDK 21 toolchain: JDK 25 can compile with --release 21.
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
     withSourcesJar()
