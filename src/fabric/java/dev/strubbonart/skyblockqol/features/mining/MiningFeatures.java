@@ -20,6 +20,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 import java.io.IOException;
@@ -105,6 +106,10 @@ public final class MiningFeatures {
     private static boolean showPowderHud = true;
     private static boolean showPristineHud = true;
     private static boolean showFetchurHud = true;
+    private static boolean showGoldHud = true;
+    private static int hudX = 8;
+    private static int hudY = 8;
+    private static float hudScale = 1.0F;
 
     private static long gemstonePowder;
     private static long mithrilPowder;
@@ -226,14 +231,68 @@ public final class MiningFeatures {
                             context.getSource().sendFeedback(Text.literal("Mining trackers resumed."));
                             return 1;
                         }))
-                        .then(ClientCommandManager.literal("hud").executes(context -> {
-                            showPowderHud = !showPowderHud;
-                            showPristineHud = showPowderHud;
-                            showFetchurHud = showPowderHud;
-                            context.getSource().sendFeedback(Text.literal(
-                                    "Mining HUDs " + (showPowderHud ? "enabled" : "disabled")));
-                            return 1;
-                        }))));
+                        .then(ClientCommandManager.literal("hud")
+                                .executes(context -> {
+                                    boolean next = !(showPowderHud || showPristineHud || showFetchurHud || showGoldHud);
+                                    showPowderHud = next;
+                                    showPristineHud = next;
+                                    showFetchurHud = next;
+                                    showGoldHud = next;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal(
+                                            "All Mining HUD panels " + (next ? "enabled" : "disabled")));
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.literal("fetchur").executes(context -> {
+                                    showFetchurHud = !showFetchurHud;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal("Fetchur HUD " + (showFetchurHud ? "enabled" : "disabled")));
+                                    return 1;
+                                }))
+                                .then(ClientCommandManager.literal("powder").executes(context -> {
+                                    showPowderHud = !showPowderHud;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal("Powder HUD " + (showPowderHud ? "enabled" : "disabled")));
+                                    return 1;
+                                }))
+                                .then(ClientCommandManager.literal("pristine").executes(context -> {
+                                    showPristineHud = !showPristineHud;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal("Pristine HUD " + (showPristineHud ? "enabled" : "disabled")));
+                                    return 1;
+                                }))
+                                .then(ClientCommandManager.literal("gold").executes(context -> {
+                                    showGoldHud = !showGoldHud;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal("Gold HUD " + (showGoldHud ? "enabled" : "disabled")));
+                                    return 1;
+                                }))
+                                .then(ClientCommandManager.literal("position")
+                                        .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 5000))
+                                                .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 5000))
+                                                        .executes(context -> {
+                                                            hudX = IntegerArgumentType.getInteger(context, "x");
+                                                            hudY = IntegerArgumentType.getInteger(context, "y");
+                                                            save();
+                                                            context.getSource().sendFeedback(Text.literal("Mining HUD position: " + hudX + ", " + hudY));
+                                                            return 1;
+                                                        }))))
+                                .then(ClientCommandManager.literal("scale")
+                                        .then(ClientCommandManager.argument("value", FloatArgumentType.floatArg(0.5F, 3.0F))
+                                                .executes(context -> {
+                                                    hudScale = FloatArgumentType.getFloat(context, "value");
+                                                    save();
+                                                    context.getSource().sendFeedback(Text.literal(String.format(Locale.ROOT, "Mining HUD scale: %.2fx", hudScale)));
+                                                    return 1;
+                                                })))
+                                .then(ClientCommandManager.literal("reset").executes(context -> {
+                                    hudX = hudY = 8;
+                                    hudScale = 1.0F;
+                                    showPowderHud = showPristineHud = showFetchurHud = showGoldHud = true;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal("Mining HUD settings reset."));
+                                    return 1;
+                                })))));
     }
 
     private static boolean onGameMessage(Text message, boolean overlay) {
@@ -504,38 +563,44 @@ public final class MiningFeatures {
                 || client.currentScreen != null && client.currentScreen.getTitle().getString().equals("Chat")) {
             return;
         }
+        if (!showFetchurHud && !showPowderHud && !showPristineHud && !showGoldHud && !sessionStarted) return;
 
-        int y = 8;
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(hudX, hudY, 0.0F);
+        matrices.scale(hudScale, hudScale, 1.0F);
+
+        int y = 0;
         if (showFetchurHud) {
-            context.drawTextWithShadow(client.textRenderer, "Fetchur: " + fetchurItem(), 8, y, 0x55FFFF);
+            context.drawTextWithShadow(client.textRenderer, "Fetchur: " + fetchurItem(), 0, y, 0x55FFFF);
             y += 11;
         }
         if (showPowderHud) {
             context.drawTextWithShadow(client.textRenderer,
                     "Powder: " + format(gemstonePowder) + " Gemstone | " + format(mithrilPowder) + " Mithril",
-                    8, y, 0xFFFFFF);
+                    0, y, 0xFFFFFF);
             y += 11;
             context.drawTextWithShadow(client.textRenderer,
                     "Chests: " + format(chests) + " | Gems: " + format(gemstoneDrops)
                             + " | Hard Stone compacts: " + format(hardStoneCompacts),
-                    8, y, 0xFFFFFF);
+                    0, y, 0xFFFFFF);
             y += 11;
             context.drawTextWithShadow(client.textRenderer,
                     "Essence: " + format(diamondEssence) + " Diamond, " + format(goldEssence) + " Gold",
-                    8, y, 0xAAAAFF);
+                    0, y, 0xAAAAFF);
             y += 11;
         }
         if (showPristineHud) {
             context.drawTextWithShadow(client.textRenderer,
                     "Pristine: " + format(pristineGemstones) + " gems | " + format(pristineProcs) + " procs",
-                    8, y, 0xFF55FF);
+                    0, y, 0xFF55FF);
             y += 11;
         }
-        if (showPowderHud) {
+        if (showGoldHud) {
             context.drawTextWithShadow(client.textRenderer,
                     "Gold Tracker: " + format(goldIngots) + " ingots | " + format(enchantedGold)
                             + " enchanted | " + format(goldCompacts) + " compacts",
-                    8, y, 0xFFFF55);
+                    0, y, 0xFFFF55);
             y += 11;
         }
         if (sessionStarted) {
@@ -543,8 +608,9 @@ public final class MiningFeatures {
                     "Mining active: " + duration(activeTimeMs)
                             + " | Powder/h: " + format(perHour(gemstonePowder + mithrilPowder))
                             + " | Pristine/h: " + format(perHour(pristineGemstones)),
-                    8, y, trackerPaused ? 0xFF5555 : 0x55FF55);
+                    0, y, trackerPaused ? 0xFF5555 : 0x55FF55);
         }
+        matrices.pop();
     }
 
     private static String fetchurItem() {
@@ -590,6 +656,10 @@ public final class MiningFeatures {
             showPowderHud = Boolean.parseBoolean(p.getProperty("showPowderHud", "true"));
             showPristineHud = Boolean.parseBoolean(p.getProperty("showPristineHud", "true"));
             showFetchurHud = Boolean.parseBoolean(p.getProperty("showFetchurHud", "true"));
+            showGoldHud = Boolean.parseBoolean(p.getProperty("showGoldHud", "true"));
+            hudX = (int) value(p, "hudX");
+            hudY = (int) value(p, "hudY");
+            hudScale = Math.max(0.5F, Math.min(3.0F, Float.parseFloat(p.getProperty("hudScale", "1.0"))));
             gemstonePowder = value(p, "gemstonePowder");
             mithrilPowder = value(p, "mithrilPowder");
             chests = value(p, "chests");
@@ -655,6 +725,10 @@ public final class MiningFeatures {
         p.setProperty("showPowderHud", Boolean.toString(showPowderHud));
         p.setProperty("showPristineHud", Boolean.toString(showPristineHud));
         p.setProperty("showFetchurHud", Boolean.toString(showFetchurHud));
+        p.setProperty("showGoldHud", Boolean.toString(showGoldHud));
+        p.setProperty("hudX", Integer.toString(hudX));
+        p.setProperty("hudY", Integer.toString(hudY));
+        p.setProperty("hudScale", Float.toString(hudScale));
         p.setProperty("gemstonePowder", Long.toString(gemstonePowder));
         p.setProperty("mithrilPowder", Long.toString(mithrilPowder));
         p.setProperty("chests", Long.toString(chests));
