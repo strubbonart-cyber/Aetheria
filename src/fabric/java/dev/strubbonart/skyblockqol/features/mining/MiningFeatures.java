@@ -5,12 +5,13 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.event.player.ClientPlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.event.player.AttackBlockCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -109,12 +110,14 @@ public final class MiningFeatures {
             tick();
             scanGoldInventory(client);
         });
-        ClientPlayerBlockBreakEvents.AFTER.register((world, player, pos, state) -> {
+        AttackBlockCallback.EVENT.register((player, world, hand, pos, direction) -> {
+            var state = world.getBlockState(pos);
             if (state.isOf(Blocks.GOLD_ORE) || state.isOf(Blocks.DEEPSLATE_GOLD_ORE)
                     || state.isOf(Blocks.NETHER_GOLD_ORE) || state.isOf(Blocks.GOLD_BLOCK)
                     || state.isOf(Blocks.RAW_GOLD_BLOCK)) {
                 lastGoldOreBreakTime = System.currentTimeMillis();
             }
+            return ActionResult.PASS;
         });
         HudRenderCallback.EVENT.register(MiningFeatures::renderHud);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
