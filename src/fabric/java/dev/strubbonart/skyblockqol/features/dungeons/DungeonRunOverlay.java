@@ -141,9 +141,17 @@ public final class DungeonRunOverlay {
         long minutes = elapsedSeconds / 60;
         long seconds = elapsedSeconds % 60;
         String floor = currentFloor.isEmpty() ? "Dungeon" : "Dungeon " + currentFloor;
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(
+                DungeonOverlaySettings.x(DungeonOverlaySettings.Widget.TIMER),
+                DungeonOverlaySettings.y(DungeonOverlaySettings.Widget.TIMER), 0.0F);
+        matrices.scale(DungeonOverlaySettings.scale(DungeonOverlaySettings.Widget.TIMER),
+                DungeonOverlaySettings.scale(DungeonOverlaySettings.Widget.TIMER), 1.0F);
         context.drawTextWithShadow(client.textRenderer,
                 floor + "  " + String.format(Locale.ROOT, "%02d:%02d", minutes, seconds),
-                8, 156, 0x55FFFF);
+                0, 0, 0x55FFFF);
+        matrices.pop();
     }
 
     private static String strip(String value) {

@@ -9,6 +9,8 @@ import net.minecraft.text.Text;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -51,6 +53,7 @@ public final class DungeonFeatures {
 
     public static void initialize() {
         load();
+        DungeonOverlaySettings.initialize();
         HudRenderCallback.EVENT.register(DungeonFeatures::renderBreakerOverlay);
         ClientReceiveMessageEvents.ALLOW_GAME.register((message, overlay) -> {
             if (!hideBlessingMessages) return true;
@@ -108,6 +111,36 @@ public final class DungeonFeatures {
                             context.getSource().sendFeedback(Text.literal("Dungeon room and secret data refresh queued."));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("layout")
+                                .then(ClientCommandManager.literal("timer")
+                                        .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 10000))
+                                                .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 10000))
+                                                        .then(ClientCommandManager.argument("scale", FloatArgumentType.floatArg(0.5F, 3.0F))
+                                                                .executes(context -> setLayout(DungeonOverlaySettings.Widget.TIMER, context.getSource(),
+                                                                        IntegerArgumentType.getInteger(context, "x"),
+                                                                        IntegerArgumentType.getInteger(context, "y"),
+                                                                        FloatArgumentType.getFloat(context, "scale")))))))
+                                .then(ClientCommandManager.literal("splits")
+                                        .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 10000))
+                                                .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 10000))
+                                                        .then(ClientCommandManager.argument("scale", FloatArgumentType.floatArg(0.5F, 3.0F))
+                                                                .executes(context -> setLayout(DungeonOverlaySettings.Widget.SPLITS, context.getSource(),
+                                                                        IntegerArgumentType.getInteger(context, "x"),
+                                                                        IntegerArgumentType.getInteger(context, "y"),
+                                                                        FloatArgumentType.getFloat(context, "scale")))))))
+                                .then(ClientCommandManager.literal("breaker")
+                                        .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 10000))
+                                                .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 10000))
+                                                        .then(ClientCommandManager.argument("scale", FloatArgumentType.floatArg(0.5F, 3.0F))
+                                                                .executes(context -> setLayout(DungeonOverlaySettings.Widget.BREAKER, context.getSource(),
+                                                                        IntegerArgumentType.getInteger(context, "x"),
+                                                                        IntegerArgumentType.getInteger(context, "y"),
+                                                                        FloatArgumentType.getFloat(context, "scale")))))))
+                                .then(ClientCommandManager.literal("reset").executes(context -> {
+                                    DungeonOverlaySettings.reset();
+                                    context.getSource().sendFeedback(Text.literal("Dungeon HUD layouts reset."));
+                                    return 1;
+                                })))
                         .then(ClientCommandManager.literal("status").executes(context -> {
                             context.getSource().sendFeedback(Text.literal(
                                     "Hide dungeon blessing messages: "
@@ -122,6 +155,15 @@ public final class DungeonFeatures {
                                             + " | " + DungeonDataRepository.getStatus()));
                             return 1;
                         }))));
+    }
+
+    private static int setLayout(DungeonOverlaySettings.Widget widget,
+                                  net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource source,
+                                  int x, int y, float scale) {
+        DungeonOverlaySettings.set(widget, x, y, scale);
+        source.sendFeedback(Text.literal("Dungeon " + widget.name().toLowerCase(java.util.Locale.ROOT)
+                + " HUD layout saved: " + x + ", " + y + " at " + scale + "x"));
+        return 1;
     }
 
     private static void renderBreakerOverlay(DrawContext context, RenderTickCounter tickCounter) {

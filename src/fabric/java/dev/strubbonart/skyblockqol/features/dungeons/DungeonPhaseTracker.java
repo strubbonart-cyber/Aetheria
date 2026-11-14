@@ -281,21 +281,29 @@ public final class DungeonPhaseTracker {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null || client.options.hudHidden) return;
 
-        int y = 178;
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(
+                DungeonOverlaySettings.x(DungeonOverlaySettings.Widget.SPLITS),
+                DungeonOverlaySettings.y(DungeonOverlaySettings.Widget.SPLITS), 0.0F);
+        float scale = DungeonOverlaySettings.scale(DungeonOverlaySettings.Widget.SPLITS);
+        matrices.scale(scale, scale, 1.0F);
+
+        int y = 0;
         String floor = DungeonRunOverlay.getCurrentFloor();
         context.drawTextWithShadow(client.textRenderer,
                 "Dungeon splits " + (floor.isEmpty() ? "" : floor) + " | " + format(lastElapsed),
-                8, y, 0x55FFFF);
+                0, y, 0x55FFFF);
         y += 12;
         if (clearTime >= 0) {
-            context.drawTextWithShadow(client.textRenderer, "Clear: " + format(clearTime), 8, y, 0x55FF55);
+            context.drawTextWithShadow(client.textRenderer, "Clear: " + format(clearTime), 0, y, 0x55FF55);
             y += 11;
         } else if (clearPercent > 0) {
-            context.drawTextWithShadow(client.textRenderer, "Cleared: " + clearPercent + "%", 8, y, 0xFFFFFF);
+            context.drawTextWithShadow(client.textRenderer, "Cleared: " + clearPercent + "%", 0, y, 0xFFFFFF);
             y += 11;
         }
         if (bloodTime >= 0) {
-            context.drawTextWithShadow(client.textRenderer, "Blood: " + format(bloodTime), 8, y, 0xFF5555);
+            context.drawTextWithShadow(client.textRenderer, "Blood: " + format(bloodTime), 0, y, 0xFF5555);
             y += 11;
         }
         for (Map.Entry<String, Long> entry : starts.entrySet()) {
@@ -303,10 +311,11 @@ public final class DungeonPhaseTracker {
             String label = LABELS.getOrDefault(entry.getKey(), entry.getKey());
             context.drawTextWithShadow(client.textRenderer,
                     label + ": " + format(Math.max(0, lastElapsed - entry.getValue())),
-                    8, y, 0xFFFF55);
+                    0, y, 0xFFFF55);
             y += 11;
             break;
         }
+        matrices.pop();
     }
 
     private static void resetRun() {
