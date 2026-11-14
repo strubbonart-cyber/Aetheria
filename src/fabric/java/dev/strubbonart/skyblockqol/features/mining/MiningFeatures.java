@@ -20,6 +20,7 @@ import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -395,7 +396,7 @@ public final class MiningFeatures {
         return false;
     }
 
-    private static int toggleFilterSetting(String setting, net.minecraft.server.command.ServerCommandSource source) {
+    private static int toggleFilterSetting(String setting, FabricClientCommandSource source) {
         boolean value;
         switch (setting) {
             case "chest": hideChestOpen = !hideChestOpen; value = hideChestOpen; break;
@@ -420,17 +421,17 @@ public final class MiningFeatures {
                 hideTreasurite = hideOilBarrel;
                 value = hideOilBarrel;
                 break;
-            default: source.sendFeedback(() -> Text.literal("Unknown filter setting.")); return 0;
+            default: source.sendFeedback(Text.literal("Unknown filter setting.")); return 0;
         }
         save();
-        source.sendFeedback(() -> Text.literal(setting + " hide setting " + (value ? "enabled" : "disabled")));
+        source.sendFeedback(Text.literal(setting + " hide setting " + (value ? "enabled" : "disabled")));
         return 1;
     }
 
-    private static int setGemstoneTier(String tier, net.minecraft.server.command.ServerCommandSource source) {
+    private static int setGemstoneTier(String tier, FabricClientCommandSource source) {
         gemstoneTierFilter = tier;
         save();
-        source.sendFeedback(() -> Text.literal("Gemstone tier filter: " + tier));
+        source.sendFeedback(Text.literal("Gemstone tier filter: " + tier));
         return 1;
     }
 
