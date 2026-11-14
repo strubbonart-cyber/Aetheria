@@ -156,7 +156,6 @@ public final class DungeonRoomScanner {
         int west = scan.endOfRoom(x, top, z, Direction.WEST);
         if (north < 0 || south < 0 || east < 0 || west < 0 || west >= east || north >= south) return null;
 
-        // Aetheria's original rectangle path requires matching opposing widths.
         int northWidth = scan.endOfRoom(x, top, north, Direction.EAST)
                 - scan.endOfRoom(x, top, north, Direction.WEST);
         int southWidth = scan.endOfRoom(x, top, south, Direction.EAST)
@@ -165,17 +164,27 @@ public final class DungeonRoomScanner {
                 - scan.endOfRoom(east, top, z, Direction.NORTH);
         int westWidth = scan.endOfRoom(west, top, z, Direction.SOUTH)
                 - scan.endOfRoom(west, top, z, Direction.NORTH);
-        if (northWidth != southWidth || eastWidth != westWidth) return null;
+
+        boolean rectangular = northWidth == southWidth && eastWidth == westWidth;
+        boolean lShaped = scan.isLShape(northWidth, southWidth, eastWidth, westWidth);
+        if (!rectangular && !lShaped) return null;
 
         int floor = scan.dungeonBottom(x, z);
         if (floor < 0) return null;
 
-        String frequency = scan.blockFrequency(west, east, north, south, top);
+        String frequency = scan.blockFrequency(x, top, z, north, south, east, west,
+                northWidth, southWidth, eastWidth, westWidth, rectangular);
         if (frequency == null) return null;
         String rawHash = md5(frequency);
         String hash = resolveHash(rawHash);
-        String floorFrequency = scan.floorFrequency(west, east, north, south, top);
+        String floorFrequency = rectangular
+                ? scan.floorFrequency(west, east, north, south, top)
+                : scan.lShapeFloorFrequency(x, z, top);
         String floorHash = floorFrequency == null ? null : md5(floorFrequency);
+        if ("16370f79b2cad049096f881d5294aee6".equals(rawHash)
+                && !"94fb12c91c4b46bd0c254edadaa49a3d".equals(floorHash)) {
+            floorHash = "e617eff1d7b77faf0f8dd53ec93a220f";
+        }
 
         JsonObject match = findRoom(roomData, hash, floorHash);
         String name = match == null ? null : getString(match, "name", null);
@@ -432,10 +441,10 @@ public final class DungeonRoomScanner {
                 boolean east = world.getBlockState(pos.east()).isAir();
                 boolean west = world.getBlockState(pos.west()).isAir();
 
-                if (north && west) return new Corner(pos, "northwest");
-                if (north && east) return new Corner(pos, "northeast");
-                if (south && east) return new Corner(pos, "southeast");
-                if (south && west) return new Corner(pos, "southwest");
+                if (north && !south && !east && west) return new Corner(pos, "northwest");
+                if (north && !south && east && !west) return new Corner(pos, "northeast");
+                if (!north && south && east && !west) return new Corner(pos, "southeast");
+                if (!north && south && !east && west) return new Corner(pos, "southwest");
             }
         }
         return null;
@@ -603,14 +612,89 @@ public final class DungeonRoomScanner {
             return -1;
         }
 
-        private String blockFrequency(int minX, int maxX, int minZ, int maxZ, int y) {
+        private boolean isLShape(int north, int south, int east, int west) {
+            int l62 = (north == 62 ? 1 : 0) + (south == 62 ? 1 : 0)
+                    + (east == 62 ? 1 : 0) + (west == 62 ? 1 : 0);
+            int l30 = (north == 30 ? 1 : 0) + (south == 30 ? 1 : 0)
+                    + (east == 30 ? 1 : 0) + (west == 30 ? 1 : 0);
+            return l62 >= 2 && l30 == 4 - l62;
+        }
+
+        private String blockFrequency(int x, int y, int z,
+                                      int north, int south, int east, int west,
+                                      int northWidth, int southWidth, int eastWidth, int westWidth,
+                                      boolean rectangular) {
             Map<String, Integer> counts = new HashMap<>();
-            for (int x = minX; x <= maxX; x++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    String state = world.getBlockState(new BlockPos(x, y, z)).toString();
-                    counts.merge(state, 1, Integer::sum);
+
+            if (rectangular) {
+                for (int px = west; px <= east; px++) {
+                    for (int pz = north; pz <= south; pz++) {
+                        String state = world.getBlockState(new BlockPos(px, y, pz)).toString();
+                        counts.merge(state, 1, Integer::sum);
+                    }
+                }
+                return frequencyString(counts);
+            }
+
+            // This scan mirrors the original Aetheria L-room traversal: it walks
+            // successive rows from the longer side and stops each row at the
+            // actual dungeon boundary, avoiding the empty quadrant in the box.
+            if (northWidth == southWidth) {
+                int startX = eastWidth > westWidth ? east : west;
+                int startZ = north;
+                int dx = eastWidth > westWidth ? -1 : 1;
+                for (int i = 0; i < 200; i++) {
+                    int currentZ = startZ + i;
+                    if (world.getBlockState(new BlockPos(startX, y, currentZ)).isAir()
+                            || checkPlatform(startX, y + 1, currentZ)
+                            || (i > 0 && Math.abs(dungeonHeight(startX, currentZ)
+                            - dungeonHeight(startX, currentZ - 1)) > 3)) {
+                        break;
+                    }
+                    for (int j = 0; j < 200; j++) {
+                        int currentX = startX + dx * j;
+                        BlockPos pos = new BlockPos(currentX, y, currentZ);
+                        if (world.getBlockState(pos).isAir()
+                                || checkPlatform(currentX, y + 1, currentZ)
+                                || (j > 0 && Math.abs(dungeonHeight(currentX, currentZ)
+                                - dungeonHeight(currentX - dx, currentZ)) > 3)) {
+                            break;
+                        }
+                        counts.merge(world.getBlockState(pos).getBlock().toString(), 1, Integer::sum);
+                    }
+                }
+            } else {
+                int startZ = northWidth > southWidth ? north : south;
+                int startX = endOfRoom(x, y, startZ, Direction.WEST);
+                int dz = northWidth > southWidth ? 1 : -1;
+                if (startX < 0) return null;
+                for (int i = 0; i < 200; i++) {
+                    int currentX = startX + i;
+                    if (world.getBlockState(new BlockPos(currentX, y, startZ)).isAir()
+                            || checkPlatform(currentX, y + 1, startZ)
+                            || (i > 0 && Math.abs(dungeonHeight(currentX, startZ)
+                            - dungeonHeight(currentX - 1, startZ)) > 3)) {
+                        break;
+                    }
+                    for (int j = 0; j < 200; j++) {
+                        int currentZ = startZ + dz * j;
+                        BlockPos pos = new BlockPos(currentX, y, currentZ);
+                        if (world.getBlockState(pos).isAir()
+                                || checkPlatform(currentX, y + 1, currentZ)
+                                || (j > 0 && Math.abs(dungeonHeight(currentX, currentZ)
+                                - dungeonHeight(currentX, currentZ - dz)) > 3)) {
+                            break;
+                        }
+                        counts.merge(world.getBlockState(pos).getBlock().toString(), 1, Integer::sum);
+                    }
                 }
             }
+            return frequencyString(counts);
+        }
+
+        private String lShapeFloorFrequency(int x, int z, int topY) {
+            Map<String, Integer> counts = new HashMap<>();
+            counts.put(Integer.toString(dungeonTop(x, z)), 1);
             return frequencyString(counts);
         }
 
