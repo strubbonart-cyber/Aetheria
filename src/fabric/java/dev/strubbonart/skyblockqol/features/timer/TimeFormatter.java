@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public final class TimeFormatter {
     private static final Pattern TOKEN = Pattern.compile(
-            "(\\\\d+)\\\\s*(days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)?",
+            "(\\d+)\\s*(days?|d|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s)?",
             Pattern.CASE_INSENSITIVE
     );
 
