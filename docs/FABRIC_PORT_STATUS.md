@@ -19,28 +19,36 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Advanced calculator: `/calc <expression>` and `/athrcalc <expression>`, using the original expression evaluator with arithmetic, functions, constants, postfix multipliers, and factorial.
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and `/mining hud`.
+- Dungeon first slice: Hide Blessing Messages filter, controlled by `/dungeon blessing` and inspected with `/dungeon status`; setting is persisted in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
 
 - Mining message parsing is currently based on recognized system-chat text and is not yet gated by a verified Crystal Hollows/Dwarven Mines location.
-- The filter currently suppresses the common reward line types implemented in the parser. The original per-category thresholds, full wrapper formatting behavior, and all configurable options are not yet migrated.
+- The filter currently suppresses common reward line types. The original per-category thresholds, full wrapper formatting behavior, and all configurable options are not yet migrated.
 - Powder and Pristine counters currently show lifetime totals. Rate/hour calculations, active-time/session behavior, profile-specific stats, tracker keybinds, and full draggable overlays are not yet migrated.
 - Full Gold Tracker pickup inventory-delta tracking and tablist stats are not yet migrated. Only its compact notification counter is parsed.
 - HOTM tooltip powder cost, Commission Highlight, and Pickobulus preview are not yet migrated.
 - The Ghost Tracker is not yet migrated.
-- Dungeon features are not yet migrated.
+
+## Dungeon features not yet ported
+
+- Dungeon overlay/splits and end-of-run stats
+- Dungeon Breaker Overlay and Dungeon Room Overlay
+- Secret Finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
+- Boss and Blood Mob highlights
+- CSGO chest opening animation
+- Dungeon chest price estimator
+- `/report-secret` workflow
 
 ## Build verification
 
 A successful GitHub Actions build confirms that Gradle compilation and remapping pass. It does not by itself prove that the mod has been launched or exercised in a Minecraft client. Manual in-game verification remains required.
 
-## Not yet ported
+## Other feature families not yet ported
 
-- Configuration GUI and persistent feature settings beyond the simple Mining properties file
+- Configuration GUI and persistent feature settings beyond the simple Mining/Dungeon properties files
 - Original item database, recipe viewer, tooltip changes, storage overlay and inventory features
 - Chat filters, compacting, timestamps, chat heads, copy helpers, emoji rendering and global chat
-- Dungeon map, secrets, timers, room overlays, boss and blood mob highlights, leap menu, CSGO chest animation, blessing filter, and chest estimator
-- Remaining Mining options listed above
 - Farming trackers, visitor tools, pest tools, mouse lock and Trevor solver
 - Fishing trackers and timers
 - Diana tracker, loot overlays, HP overlays and party finder
