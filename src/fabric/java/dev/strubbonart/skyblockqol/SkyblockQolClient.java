@@ -7,6 +7,7 @@ import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.mining.CommissionHighlight;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
+import dev.strubbonart.skyblockqol.features.mining.HotmPowderTooltip;
 import dev.strubbonart.skyblockqol.features.roman.RomanNumeralCommands;
 import dev.strubbonart.skyblockqol.features.timer.CountdownTimer;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,6 +36,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         CalculatorCommand.register();
         MiningFeatures.initialize();
         CommissionHighlight.initialize();
+        HotmPowderTooltip.initialize();
         GhostTrackerFeatures.initialize();
         DungeonFeatures.initialize();
         DungeonRunOverlay.initialize();
