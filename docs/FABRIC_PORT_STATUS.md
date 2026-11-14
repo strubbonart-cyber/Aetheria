@@ -20,7 +20,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and `/mining hud`.
 - Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
-- Dungeon first slice: Hide Blessing Messages filter, controlled by `/dungeon blessing` and inspected with `/dungeon status`; setting is persisted in `config/skyblockqol-dungeon.properties`.
+- Dungeon first slice: Hide Blessing Messages filter, controlled by `/dungeon blessing`; Dungeon Breaker charge HUD from hotbar item lore, toggled with `/dungeon breaker`; `/dungeon status` reports both toggles. Settings are persisted in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
 
@@ -34,7 +34,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 ## Dungeon features not yet ported
 
 - Dungeon overlay/splits and end-of-run stats
-- Dungeon Breaker Overlay and Dungeon Room Overlay
+- Dungeon Room Overlay
 - Secret Finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - Boss and Blood Mob highlights
 - CSGO chest opening animation
