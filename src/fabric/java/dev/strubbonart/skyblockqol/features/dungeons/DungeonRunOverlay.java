@@ -32,17 +32,23 @@ public final class DungeonRunOverlay {
     private DungeonRunOverlay() {}
 
     public static void initialize() {
+        enabled = DungeonOverlaySettings.isEnabled(DungeonOverlaySettings.Widget.TIMER);
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         HudRenderCallback.EVENT.register(DungeonRunOverlay::render);
     }
 
     public static boolean toggle() {
-        enabled = !enabled;
+        setEnabled(!enabled);
         return enabled;
     }
 
     public static boolean isEnabled() {
         return enabled;
+    }
+
+    public static void setEnabled(boolean value) {
+        enabled = value;
+        DungeonOverlaySettings.setEnabled(DungeonOverlaySettings.Widget.TIMER, value);
     }
 
     public static boolean isInDungeon() {

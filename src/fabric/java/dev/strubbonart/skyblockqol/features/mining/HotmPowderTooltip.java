@@ -21,10 +21,15 @@ import java.util.regex.Pattern;
 public final class HotmPowderTooltip {
     private static final String HOTM_TITLE = "Heart of the Mountain";
     private static final Pattern LEVEL_PATTERN = Pattern.compile("Level\\s+(\\d+)", Pattern.CASE_INSENSITIVE);
+    private static boolean enabled = true;
     private static final Text SHIFT_HINT = Text.literal("[SHIFT: powder for next 10 levels]")
             .formatted(Formatting.DARK_GRAY);
 
     private HotmPowderTooltip() {}
+
+    public static boolean isEnabled() { return enabled; }
+
+    public static void setEnabled(boolean value) { enabled = value; }
 
     public static void initialize() {
         ItemTooltipCallback.EVENT.register(HotmPowderTooltip::appendTooltip);
@@ -32,6 +37,7 @@ public final class HotmPowderTooltip {
 
     private static void appendTooltip(ItemStack stack, Item.TooltipContext tooltipContext,
                                       TooltipType tooltipType, List<Text> lines) {
+        if (!enabled) return;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.currentScreen == null
                 || !HOTM_TITLE.equals(client.currentScreen.getTitle().getString())) return;

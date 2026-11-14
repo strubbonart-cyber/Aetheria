@@ -36,6 +36,13 @@ public final class PickobulusPreview {
 
     private PickobulusPreview() {}
 
+    public static boolean isEnabled() { return enabled; }
+
+    public static void setEnabled(boolean value) {
+        enabled = value;
+        if (!value) previewBox = null;
+    }
+
     public static void initialize() {
         ClientTickEvents.END_CLIENT_TICK.register(PickobulusPreview::tick);
         WorldRenderEvents.AFTER_ENTITIES.register(PickobulusPreview::render);

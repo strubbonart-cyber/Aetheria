@@ -146,6 +146,115 @@ public final class MiningFeatures {
 
     private MiningFeatures() {}
 
+    public static boolean isPowderFilterEnabled() {
+        return powderFilterEnabled;
+    }
+
+    public static void setPowderFilterEnabled(boolean value) {
+        powderFilterEnabled = value;
+        save();
+    }
+
+    public static boolean isHudPanelEnabled(String panel) {
+        return switch (panel) {
+            case "fetchur" -> showFetchurHud;
+            case "powder" -> showPowderHud;
+            case "pristine" -> showPristineHud;
+            case "gold" -> showGoldHud;
+            default -> false;
+        };
+    }
+
+    public static void setHudPanelEnabled(String panel, boolean value) {
+        switch (panel) {
+            case "fetchur" -> showFetchurHud = value;
+            case "powder" -> showPowderHud = value;
+            case "pristine" -> showPristineHud = value;
+            case "gold" -> showGoldHud = value;
+            default -> { return; }
+        }
+        save();
+    }
+
+    public static int getHudX() { return hudX; }
+    public static int getHudY() { return hudY; }
+    public static float getHudScale() { return hudScale; }
+
+    public static void adjustHudLayout(int dx, int dy, float scaleDelta) {
+        hudX = Math.max(0, Math.min(5000, hudX + dx));
+        hudY = Math.max(0, Math.min(5000, hudY + dy));
+        hudScale = Math.max(0.5F, Math.min(3.0F,
+                Math.round((hudScale + scaleDelta) * 10.0F) / 10.0F));
+        save();
+    }
+
+    public static void resetHudLayout() {
+        hudX = 8;
+        hudY = 8;
+        hudScale = 1.0F;
+        save();
+    }
+
+    public static boolean getFilterOption(String option) {
+        return switch (option) {
+            case "chest" -> hideChestOpen;
+            case "already-looted" -> hideAlreadyLooted;
+            case "breaking-power" -> hideBreakingPower;
+            case "compact" -> hideCompact;
+            case "wrappers" -> hideRewardWrappers;
+            case "powder" -> hidePowder;
+            case "essence" -> hideEssence;
+            case "gemstones" -> hideGemstones;
+            case "goblin-eggs" -> hideGoblinEggs;
+            case "special-drops" -> hideOilBarrel && hideAscensionRope && hideWishingCompass
+                    && hideJungleHeart && hidePrehistoricEgg && hidePickonimbus
+                    && hideSludgeJuice && hideYoggie && hideRobotParts && hideTreasurite;
+            default -> false;
+        };
+    }
+
+    public static void setFilterOption(String option, boolean value) {
+        switch (option) {
+            case "chest" -> hideChestOpen = value;
+            case "already-looted" -> hideAlreadyLooted = value;
+            case "breaking-power" -> hideBreakingPower = value;
+            case "compact" -> hideCompact = value;
+            case "wrappers" -> hideRewardWrappers = value;
+            case "powder" -> hidePowder = value;
+            case "essence" -> hideEssence = value;
+            case "gemstones" -> hideGemstones = value;
+            case "goblin-eggs" -> hideGoblinEggs = value;
+            case "special-drops" -> {
+                hideOilBarrel = value;
+                hideAscensionRope = value;
+                hideWishingCompass = value;
+                hideJungleHeart = value;
+                hidePrehistoricEgg = value;
+                hidePickonimbus = value;
+                hideSludgeJuice = value;
+                hideYoggie = value;
+                hideRobotParts = value;
+                hideTreasurite = value;
+            }
+            default -> { return; }
+        }
+        save();
+    }
+
+    public static String getGemstoneTierFilter() {
+        return gemstoneTierFilter;
+    }
+
+    public static void cycleGemstoneTierFilter() {
+        gemstoneTierFilter = switch (gemstoneTierFilter) {
+            case "Show All" -> "Hide Rough";
+            case "Hide Rough" -> "Hide Rough & Flawed";
+            case "Hide Rough & Flawed" -> "Hide All";
+            default -> "Show All";
+        };
+        save();
+    }
+
     public static void initialize() {
         if (initialized) return;
         initialized = true;

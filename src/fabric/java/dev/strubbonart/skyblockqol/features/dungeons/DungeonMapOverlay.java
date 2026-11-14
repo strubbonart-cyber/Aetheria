@@ -121,6 +121,39 @@ public final class DungeonMapOverlay {
         return enabled;
     }
 
+    public static void setEnabled(boolean value) {
+        enabled = value;
+        save();
+    }
+
+    public static boolean areLabelsEnabled() { return labelsEnabled; }
+
+    public static void setLabelsEnabled(boolean value) {
+        labelsEnabled = value;
+        save();
+    }
+
+    public static int getPositionX() { return positionX; }
+    public static int getPositionY() { return positionY; }
+    public static float getScale() { return scale; }
+
+    public static void adjustLayout(int dx, int dy, float scaleDelta) {
+        if (positionX < 0) positionX = 8;
+        positionX = Math.max(0, Math.min(10000, positionX + dx));
+        positionY = Math.max(0, Math.min(10000, positionY + dy));
+        scale = Math.max(0.5F, Math.min(2.0F,
+                Math.round((scale + scaleDelta) * 10.0F) / 10.0F));
+        save();
+    }
+
+    public static void resetLayout() {
+        positionX = -1;
+        positionY = 8;
+        scale = 1.0F;
+        labelsEnabled = true;
+        save();
+    }
+
     private static void render(DrawContext context, RenderTickCounter tickCounter) {
         if (!enabled || !DungeonRunOverlay.isInDungeon()) return;
 

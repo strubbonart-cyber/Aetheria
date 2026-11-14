@@ -43,6 +43,29 @@ public final class DungeonFeatures {
 
     private DungeonFeatures() {}
 
+    public static boolean isHideBlessingMessagesEnabled() { return hideBlessingMessages; }
+    public static boolean isBreakerOverlayEnabled() { return breakerOverlayEnabled; }
+
+    public static void setHideBlessingMessagesEnabled(boolean value) {
+        hideBlessingMessages = value;
+        save();
+    }
+
+    public static void setBreakerOverlayEnabled(boolean value) {
+        breakerOverlayEnabled = value;
+        save();
+    }
+
+    public static void setBossHighlightsEnabled(boolean value) {
+        bossHighlightsEnabled = value;
+        save();
+    }
+
+    public static void setBloodHighlightsEnabled(boolean value) {
+        bloodHighlightsEnabled = value;
+        save();
+    }
+
     public static boolean areBossHighlightsEnabled() {
         return bossHighlightsEnabled;
     }

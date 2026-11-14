@@ -100,13 +100,21 @@ public final class DungeonPhaseTracker {
 
     private DungeonPhaseTracker() {}
 
+    public static boolean isHudEnabled() { return hudEnabled; }
+
+    public static void setHudEnabled(boolean value) {
+        hudEnabled = value;
+        DungeonOverlaySettings.setEnabled(DungeonOverlaySettings.Widget.SPLITS, value);
+    }
+
     public static void initialize() {
+        hudEnabled = DungeonOverlaySettings.isEnabled(DungeonOverlaySettings.Widget.SPLITS);
         ClientTickEvents.END_CLIENT_TICK.register(DungeonPhaseTracker::tick);
         ClientReceiveMessageEvents.ALLOW_GAME.register(DungeonPhaseTracker::onMessage);
         HudRenderCallback.EVENT.register(DungeonPhaseTracker::render);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal("dungeonsplits").executes(context -> {
-                    hudEnabled = !hudEnabled;
+                    setHudEnabled(!hudEnabled);
                     context.getSource().sendFeedback(Text.literal(
                             "Dungeon split HUD " + (hudEnabled ? "enabled" : "disabled")));
                     return 1;

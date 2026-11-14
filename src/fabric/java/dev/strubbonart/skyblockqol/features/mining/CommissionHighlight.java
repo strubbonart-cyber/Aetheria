@@ -62,6 +62,10 @@ public final class CommissionHighlight {
         return enabled;
     }
 
+    public static void setEnabled(boolean value) {
+        enabled = value;
+    }
+
     private static boolean isCompleted(ItemStack stack) {
         if (stack.isEmpty()) return false;
         LoreComponent lore = stack.get(DataComponentTypes.LORE);

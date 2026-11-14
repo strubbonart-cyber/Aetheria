@@ -60,6 +60,17 @@ public final class GhostTrackerFeatures {
 
     private GhostTrackerFeatures() {}
 
+    public static boolean isTracking() {
+        return tracking;
+    }
+
+    public static void setTracking(boolean value) {
+        tracking = value;
+        previousCombatProgress = -1;
+        lastTick = System.currentTimeMillis();
+        save();
+    }
+
     public static void initialize() {
         load();
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
@@ -68,10 +79,7 @@ public final class GhostTrackerFeatures {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal("ghosttracker")
                         .then(ClientCommandManager.literal("toggle").executes(context -> {
-                            tracking = !tracking;
-                            previousCombatProgress = -1;
-                            lastTick = System.currentTimeMillis();
-                            save();
+                            setTracking(!tracking);
                             context.getSource().sendFeedback(Text.literal(
                                     "Ghost Tracker " + (tracking ? "enabled. Use only in The Mist." : "disabled.")));
                             return 1;

@@ -21,6 +21,8 @@ public final class DungeonOverlaySettings {
     private static int splitsX = 8, splitsY = 178;
     private static int breakerX = 8, breakerY = 112;
     private static float timerScale = 1.0F, splitsScale = 1.0F, breakerScale = 1.0F;
+    private static boolean timerEnabled = true;
+    private static boolean splitsEnabled = true;
     private static boolean loaded;
 
     private DungeonOverlaySettings() {}
@@ -41,9 +43,23 @@ public final class DungeonOverlaySettings {
             timerScale = decimal(p, "timerScale", 1F);
             splitsScale = decimal(p, "splitsScale", 1F);
             breakerScale = decimal(p, "breakerScale", 1F);
+            timerEnabled = Boolean.parseBoolean(p.getProperty("timerEnabled", "true"));
+            splitsEnabled = Boolean.parseBoolean(p.getProperty("splitsEnabled", "true"));
         } catch (IOException ignored) {
             resetValues();
         }
+    }
+
+    public static boolean isEnabled(Widget widget) {
+        initialize();
+        return widget == Widget.TIMER ? timerEnabled : widget == Widget.SPLITS ? splitsEnabled : true;
+    }
+
+    public static void setEnabled(Widget widget, boolean value) {
+        initialize();
+        if (widget == Widget.TIMER) timerEnabled = value;
+        if (widget == Widget.SPLITS) splitsEnabled = value;
+        save();
     }
 
     public static int x(Widget widget) {
@@ -120,6 +136,8 @@ public final class DungeonOverlaySettings {
         p.setProperty("timerScale", String.format(Locale.ROOT, "%.2f", timerScale));
         p.setProperty("splitsScale", String.format(Locale.ROOT, "%.2f", splitsScale));
         p.setProperty("breakerScale", String.format(Locale.ROOT, "%.2f", breakerScale));
+        p.setProperty("timerEnabled", Boolean.toString(timerEnabled));
+        p.setProperty("splitsEnabled", Boolean.toString(splitsEnabled));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream out = Files.newOutputStream(FILE)) {

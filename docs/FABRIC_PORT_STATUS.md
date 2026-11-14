@@ -2,6 +2,13 @@
 
 This branch is an unofficial, incomplete Fabric port based on the Aetheria source. It is not an official Aetheria release.
 
+## In-game settings GUI
+
+- Open the dedicated Mining/Dungeon settings screen with **Right Shift**.
+- Mining and Dungeon tabs expose individual feature toggles. Mining includes a separate Powder Chat Filter options page.
+- Mining HUD panels share an adjustable saved position and scale. Dungeon map, timer, splits, and breaker overlays each have independent saved layout controls.
+- Changes are wired to the live feature settings and saved where the feature has persistent settings.
+
 ## Target
 
 - Minecraft 1.21.0
@@ -11,14 +18,8 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 ## Implemented in the Fabric source set
 
-- Performance HUD: FPS, ping, XYZ coordinates, yaw and pitch. Toggle with Right Shift.
-- Countdown timer: `/timer <duration>` or `/asmtimer <duration>`; accepts inputs such as `30s`, `5m`, and `1h30m`.
-- Timer controls: `/timer show`, `pause`, `resume`, `cancel`, and `add <duration>`.
-- Timer HUD: remaining duration and pause state; expiration produces a chat notification.
-- Roman numeral conversion: `/roman <numeral>`, accepting canonical numerals from I through MMMCMXCIX.
-- Advanced calculator: `/calc <expression>` and `/athrcalc <expression>`, using the original expression evaluator with arithmetic, functions, constants, postfix multipliers, and factorial.
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
-- Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and independently toggleable HUD panels with `/mining hud fetchur|powder|pristine|gold`. Set position with `/mining hud position <x> <y>`, scale with `/mining hud scale <0.5-3.0>`, or reset with `/mining hud reset`. Display settings persist in `config/skyblockqol-mining.properties`.
+- Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and independently toggleable HUD panels with `/mining hud fetchur|powder|pristine|gold`. Settings can also be changed in the dedicated GUI.
 - Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
 - Dungeon timer, split HUD, and Dungeon Breaker HUD now each have saved, independent position and scale values. Configure them with `/dungeon layout timer <x> <y> <scale>`, `/dungeon layout splits <x> <y> <scale>`, or `/dungeon layout breaker <x> <y> <scale>`; reset all three with `/dungeon layout reset`. Existing `/dungeon timer`, `/dungeonsplits`, and `/dungeon breaker` toggles remain separate.
 - Dungeon first slice: Hide Blessing Messages (`/dungeon blessing`); Dungeon Breaker charge HUD (`/dungeon breaker`); scoreboard floor/run timer (`/dungeon timer`); Blood Door, clear percentage, Scarf/Professor/Sadan/F7/M7 phase splits, score/XP capture and run-end summaries; toggleable split HUD (`/dungeonsplits`). Boss and Blood Room mob highlights now render colour-coded entity boxes, toggled with `/dungeon bosses` and `/dungeon blood`. Detection follows the original armor-stand-name association rules. These are world-space boxes, not the original model outlines. Settings persist in `config/skyblockqol-dungeon.properties`.
@@ -52,9 +53,9 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 A successful GitHub Actions build confirms that Gradle compilation and remapping pass. It does not by itself prove that the mod has been launched or exercised in a Minecraft client. Manual in-game verification remains required.
 
-## Other feature families not yet ported
+## Other feature families intentionally excluded from this port
 
-- Configuration GUI and persistent feature settings beyond the simple Mining/Dungeon properties files
+- All non-Mining and non-Dungeon Aetheria feature families are out of scope for this Fabric build.
 - Original item database, recipe viewer, tooltip changes, storage overlay and inventory features
 - Chat filters, compacting, timestamps, chat heads, copy helpers, emoji rendering and global chat
 - Farming trackers, visitor tools, pest tools, mouse lock and Trevor solver
