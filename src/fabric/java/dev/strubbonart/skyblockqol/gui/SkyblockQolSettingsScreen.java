@@ -230,6 +230,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 case TIMER -> DungeonOverlaySettings.Widget.TIMER;
                 case SPLITS -> DungeonOverlaySettings.Widget.SPLITS;
                 case BREAKER -> DungeonOverlaySettings.Widget.BREAKER;
+                case ROOM -> DungeonOverlaySettings.Widget.ROOM;
                 default -> DungeonOverlaySettings.Widget.TIMER;
             };
             int x = switch (target) {
@@ -310,6 +311,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case TIMER -> DungeonOverlaySettings.Widget.TIMER;
             case SPLITS -> DungeonOverlaySettings.Widget.SPLITS;
             case BREAKER -> DungeonOverlaySettings.Widget.BREAKER;
+            case ROOM -> DungeonOverlaySettings.Widget.ROOM;
             default -> DungeonOverlaySettings.Widget.TIMER;
         };
         return "X " + DungeonOverlaySettings.x(widget) + "  Y " + DungeonOverlaySettings.y(widget)
