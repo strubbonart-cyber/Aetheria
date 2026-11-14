@@ -29,6 +29,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -107,6 +109,8 @@ public final class MiningFeatures {
     private static boolean showPristineHud = true;
     private static boolean showFetchurHud = true;
     private static boolean showGoldHud = true;
+    private static boolean showPowderGemBreakdown = true;
+    private static boolean showPristineGemBreakdown = true;
     private static int hudX = 8;
     private static int hudY = 8;
     private static float hudScale = 1.0F;
@@ -115,6 +119,8 @@ public final class MiningFeatures {
     private static long mithrilPowder;
     private static long chests;
     private static long gemstoneDrops;
+    private static final Map<String, Long> powderGemstones = new HashMap<>();
+    private static final Map<String, Long> pristineGemstonesByQuality = new HashMap<>();
     private static long pristineProcs;
     private static long pristineGemstones;
     private static long diamondEssence;
@@ -153,6 +159,16 @@ public final class MiningFeatures {
             case "hotm" -> HotmPowderTooltip.setEnabled(value);
             default -> { return; }
         }
+        save();
+    }
+
+    public static boolean isGemstoneBreakdownEnabled(String tracker) {
+        return "pristine".equals(tracker) ? showPristineGemBreakdown : showPowderGemBreakdown;
+    }
+
+    public static void setGemstoneBreakdownEnabled(String tracker, boolean value) {
+        if ("pristine".equals(tracker)) showPristineGemBreakdown = value;
+        else showPowderGemBreakdown = value;
         save();
     }
 
@@ -441,12 +457,16 @@ public final class MiningFeatures {
         matcher = PRISTINE.matcher(clean);
         if (matcher.find()) {
             pristineProcs++;
-            pristineGemstones += amount(matcher.group(3));
+            long count = amount(matcher.group(3));
+            pristineGemstones += count;
+            addGemstoneCount(pristineGemstonesByQuality, matcher.group(1), matcher.group(2), count);
             changed = true;
         } else if (!isPristine) {
             matcher = GEM.matcher(clean);
             if (matcher.find()) {
-                gemstoneDrops += amount(matcher.group(3));
+                long count = amount(matcher.group(3));
+                gemstoneDrops += count;
+                addGemstoneCount(powderGemstones, matcher.group(1), matcher.group(2), count);
                 changed = true;
             }
         }
@@ -475,6 +495,50 @@ public final class MiningFeatures {
         }
 
         return !shouldHide(clean, raw);
+    }
+
+    private static void addGemstoneCount(Map<String, Long> counts, String quality, String gemstone, long amount) {
+        if (quality == null || gemstone == null || amount <= 0) return;
+        String key = quality + "_" + gemstone;
+        counts.merge(key, amount, Long::sum);
+    }
+
+    private static long gemCount(Map<String, Long> counts, String quality, String gem) {
+        return counts.getOrDefault(quality + "_" + gem, 0L);
+    }
+
+    private static String compactPowderGemLine(String gem) {
+        long rough = gemCount(powderGemstones, "Rough", gem);
+        long flawed = gemCount(powderGemstones, "Flawed", gem);
+        long fine = gemCount(powderGemstones, "Fine", gem);
+        long flawless = gemCount(powderGemstones, "Flawless", gem);
+        long base = rough + flawed * 80L + fine * 6_400L + flawless * 512_000L;
+        if (base == 0L) return null;
+        long[] tiers = {base / 512_000L, (base % 512_000L) / 6_400L,
+                (base % 6_400L) / 80L, base % 80L};
+        return gem + " F/Fn/Fd/R " + tiers[0] + "/" + tiers[1] + "/" + tiers[2] + "/" + tiers[3];
+    }
+
+    private static String compactPristineGemLine(String gem) {
+        long flawed = gemCount(pristineGemstonesByQuality, "Flawed", gem);
+        long fine = gemCount(pristineGemstonesByQuality, "Fine", gem);
+        long flawless = gemCount(pristineGemstonesByQuality, "Flawless", gem);
+        long base = flawed + fine * 80L + flawless * 6_400L;
+        if (base == 0L) return null;
+        long[] tiers = {base / 6_400L, (base % 6_400L) / 80L, base % 80L};
+        return gem + " F/Fn/Fd " + tiers[0] + "/" + tiers[1] + "/" + tiers[2];
+    }
+
+    private static void addGemstoneBreakdownLines(DrawContext context, MinecraftClient client, int y,
+                                                   Map<String, Long> counts, boolean pristine) {
+        String[] gems = {"Ruby", "Sapphire", "Amber", "Amethyst", "Jade", "Topaz",
+                "Jasper", "Opal", "Citrine", "Aquamarine", "Peridot", "Onyx"};
+        for (String gem : gems) {
+            String line = pristine ? compactPristineGemLine(gem) : compactPowderGemLine(gem);
+            if (line == null) continue;
+            context.drawTextWithShadow(client.textRenderer, line, 0, y, pristine ? 0xFFFF88FF : 0xFFB8E8FF);
+            y += 10;
+        }
     }
 
     private static boolean addMatch(String message, Pattern pattern, int counter) {
@@ -708,12 +772,35 @@ public final class MiningFeatures {
                     "Essence: " + format(diamondEssence) + " Diamond, " + format(goldEssence) + " Gold",
                     0, y, 0xAAAAFF);
             y += 11;
+            if (showPowderGemBreakdown) {
+                int before = y;
+                for (String gem : new String[]{"Ruby", "Sapphire", "Amber", "Amethyst", "Jade", "Topaz",
+                        "Jasper", "Opal", "Citrine", "Aquamarine", "Peridot", "Onyx"}) {
+                    String line = compactPowderGemLine(gem);
+                    if (line == null) continue;
+                    context.drawTextWithShadow(client.textRenderer, line, 0, y, 0xFFB8E8FF);
+                    y += 10;
+                }
+                if (y == before) {
+                    context.drawTextWithShadow(client.textRenderer, "Gemstone quality: no drops yet", 0, y, 0xFFB8E8FF);
+                    y += 10;
+                }
+            }
         }
         if (showPristineHud) {
             context.drawTextWithShadow(client.textRenderer,
                     "Pristine: " + format(pristineGemstones) + " gems | " + format(pristineProcs) + " procs",
                     0, y, 0xFF55FF);
             y += 11;
+            if (showPristineGemBreakdown) {
+                for (String gem : new String[]{"Ruby", "Sapphire", "Amber", "Amethyst", "Jade", "Topaz",
+                        "Jasper", "Opal", "Citrine", "Aquamarine", "Peridot", "Onyx"}) {
+                    String line = compactPristineGemLine(gem);
+                    if (line == null) continue;
+                    context.drawTextWithShadow(client.textRenderer, line, 0, y, 0xFFFF88FF);
+                    y += 10;
+                }
+            }
         }
         if (showGoldHud) {
             context.drawTextWithShadow(client.textRenderer,
@@ -776,6 +863,14 @@ public final class MiningFeatures {
             showPristineHud = Boolean.parseBoolean(p.getProperty("showPristineHud", "true"));
             showFetchurHud = Boolean.parseBoolean(p.getProperty("showFetchurHud", "true"));
             showGoldHud = Boolean.parseBoolean(p.getProperty("showGoldHud", "true"));
+            showPowderGemBreakdown = Boolean.parseBoolean(p.getProperty("showPowderGemBreakdown", "true"));
+            showPristineGemBreakdown = Boolean.parseBoolean(p.getProperty("showPristineGemBreakdown", "true"));
+            powderGemstones.clear();
+            pristineGemstonesByQuality.clear();
+            for (String key : p.stringPropertyNames()) {
+                if (key.startsWith("powderGem.")) powderGemstones.put(key.substring("powderGem.".length()), value(p, key));
+                else if (key.startsWith("pristineGem.")) pristineGemstonesByQuality.put(key.substring("pristineGem.".length()), value(p, key));
+            }
             PickobulusPreview.setEnabled(Boolean.parseBoolean(p.getProperty("pickobulusEnabled", "true")));
             CommissionHighlight.setEnabled(Boolean.parseBoolean(p.getProperty("commissionHighlightEnabled", "true")));
             HotmPowderTooltip.setEnabled(Boolean.parseBoolean(p.getProperty("hotmTooltipEnabled", "true")));
@@ -848,6 +943,10 @@ public final class MiningFeatures {
         p.setProperty("showPristineHud", Boolean.toString(showPristineHud));
         p.setProperty("showFetchurHud", Boolean.toString(showFetchurHud));
         p.setProperty("showGoldHud", Boolean.toString(showGoldHud));
+        p.setProperty("showPowderGemBreakdown", Boolean.toString(showPowderGemBreakdown));
+        p.setProperty("showPristineGemBreakdown", Boolean.toString(showPristineGemBreakdown));
+        powderGemstones.forEach((key, count) -> p.setProperty("powderGem." + key, Long.toString(count)));
+        pristineGemstonesByQuality.forEach((key, count) -> p.setProperty("pristineGem." + key, Long.toString(count)));
         p.setProperty("pickobulusEnabled", Boolean.toString(PickobulusPreview.isEnabled()));
         p.setProperty("commissionHighlightEnabled", Boolean.toString(CommissionHighlight.isEnabled()));
         p.setProperty("hotmTooltipEnabled", Boolean.toString(HotmPowderTooltip.isEnabled()));

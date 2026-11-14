@@ -74,6 +74,11 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Pickobulus preview", PickobulusPreview.isEnabled(),
                         right, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("pickobulus", !PickobulusPreview.isEnabled()));
                 y += 24;
+                addToggle("Powder gem breakdown", MiningFeatures.isGemstoneBreakdownEnabled("powder"),
+                        left, y, colWidth, () -> MiningFeatures.setGemstoneBreakdownEnabled("powder", !MiningFeatures.isGemstoneBreakdownEnabled("powder")));
+                addToggle("Pristine gem breakdown", MiningFeatures.isGemstoneBreakdownEnabled("pristine"),
+                        right, y, colWidth, () -> MiningFeatures.setGemstoneBreakdownEnabled("pristine", !MiningFeatures.isGemstoneBreakdownEnabled("pristine")));
+                y += 24;
                 addToggle("Commission highlight", CommissionHighlight.isEnabled(),
                         left, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("commission", !CommissionHighlight.isEnabled()));
                 addToggle("Ghost tracker session", GhostTrackerFeatures.isTracking(),
