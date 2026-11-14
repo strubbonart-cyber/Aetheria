@@ -41,9 +41,11 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Runtime downloader/cache for the original Aetheria dungeon room and secret-location JSON. Files are stored in `config/skyblockqol/dungeon-data/`, fetched asynchronously, and retained with their GPL-3.0 attribution metadata. Check using `/dungeon data`; refresh using `/dungeon refresh-data`.
 - This data foundation does not yet identify the player's room or render secrets. The original detector hashes legacy block-state strings, so the 1.21 port still needs a verified legacy-state normalization layer before its hashes can match the source dataset.
 
+- Rectangular Dungeon room scanner and Secret Finder first slice: uses the original sorted block-frequency MD5 plus floor-hash disambiguation against the downloaded GPL-3.0 room/secret datasets. Shows matched room name/category/alias/relative coordinates in the HUD. Secret markers render coloured block boxes, track chest/lever interactions, nearby item pickups, entrance proximity, block disappearance, and the server Secrets Found action bar. Toggle with `/dungeon room` and `/dungeon secrets`, or in the Dungeon GUI. Only rectangular room geometry is supported at this stage; L-shaped rooms, full secret collection edge cases, tracers, custom labels, and 1.8-to-1.21 hash compatibility remain to be verified in-game. Unknown hashes are shown as unmatched rather than guessed.
+
 ## Dungeon features not yet ported
 
-- Dungeon room detection/overlay, secret finder, visited-room labels, custom party names/ranks and Spirit Leap/InfiniLeap map menu
+- L-shaped room detection, visited-room map labels/custom rank badges, advanced secret labels/tracers and Spirit Leap/InfiniLeap map menu
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - CSGO chest opening animation
 - Dungeon chest price estimator

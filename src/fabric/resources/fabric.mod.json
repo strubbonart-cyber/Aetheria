@@ -3,7 +3,7 @@
   "id": "skyblockqol",
   "version": "${version}",
   "name": "Skyblock QoL: Mining & Dungeons",
-  "description": "Unofficial Minecraft 1.21 Fabric port focused on Mining and Dungeon features. Includes a dedicated in-game settings GUI, Mining trackers and filters, Fetchur, HOTM tooltip, Commission Highlight, Pickobulus Preview, Ghost Tracker, Dungeon timers and split tracking, boss/Blood highlights, cached Dungeon data, and an adjustable Dungeon map.",
+  "description": "Unofficial Minecraft 1.21 Fabric port focused on Mining and Dungeon features. Includes a dedicated in-game settings GUI, Mining trackers and filters, Fetchur, HOTM tooltip, Commission Highlight, Pickobulus Preview, Ghost Tracker, Dungeon timers and split tracking, boss/Blood highlights, cached Dungeon data, rectangular room detection, secret markers, and an adjustable Dungeon map.",
   "authors": [
     "Original Aetheria contributors",
     "strubbonart-cyber"

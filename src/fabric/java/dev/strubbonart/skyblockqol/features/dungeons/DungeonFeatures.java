@@ -125,6 +125,18 @@ public final class DungeonFeatures {
                             context.getSource().sendFeedback(Text.literal("Dungeon map HUD " + (enabled ? "enabled" : "disabled")));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("room").executes(context -> {
+                            boolean enabled = !DungeonRoomScanner.isRoomOverlayEnabled();
+                            DungeonRoomScanner.setRoomOverlayEnabled(enabled);
+                            context.getSource().sendFeedback(Text.literal("Dungeon room overlay " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("secrets").executes(context -> {
+                            boolean enabled = !DungeonRoomScanner.isSecretFinderEnabled();
+                            DungeonRoomScanner.setSecretFinderEnabled(enabled);
+                            context.getSource().sendFeedback(Text.literal("Dungeon secret finder " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.literal("data").executes(context -> {
                             context.getSource().sendFeedback(Text.literal(DungeonDataRepository.getStatus()));
                             return 1;
@@ -175,6 +187,8 @@ public final class DungeonFeatures {
                                             + " | Boss highlights: " + (bossHighlightsEnabled ? "ON" : "OFF")
                                             + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")
                                             + " | Dungeon map HUD: " + (DungeonMapOverlay.isEnabled() ? "ON" : "OFF")
+                                            + " | Room overlay: " + (DungeonRoomScanner.isRoomOverlayEnabled() ? "ON" : "OFF")
+                                            + " | Secret finder: " + (DungeonRoomScanner.isSecretFinderEnabled() ? "ON" : "OFF")
                                             + " | " + DungeonDataRepository.getStatus()));
                             return 1;
                         }))));

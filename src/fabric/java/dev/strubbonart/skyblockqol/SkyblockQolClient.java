@@ -7,6 +7,7 @@ import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMobHighlights;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonDataRepository;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
+import dev.strubbonart.skyblockqol.features.dungeons.DungeonRoomScanner;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.mining.PickobulusPreview;
 import dev.strubbonart.skyblockqol.features.mining.CommissionHighlight;
@@ -43,6 +44,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         DungeonPhaseTracker.initialize();
         DungeonDataRepository.initialize();
         DungeonMapOverlay.initialize();
+        DungeonRoomScanner.initialize();
         DungeonMobHighlights.initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

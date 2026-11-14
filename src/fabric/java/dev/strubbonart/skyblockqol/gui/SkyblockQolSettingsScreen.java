@@ -129,6 +129,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Map player labels", DungeonMapOverlay.areLabelsEnabled(),
                         right, y, colWidth, () -> DungeonMapOverlay.setLabelsEnabled(!DungeonMapOverlay.areLabelsEnabled()));
 
+                y += 24;
+                addToggle("Room overlay", DungeonRoomScanner.isRoomOverlayEnabled(),
+                        left, y, colWidth, () -> DungeonRoomScanner.setRoomOverlayEnabled(!DungeonRoomScanner.isRoomOverlayEnabled()));
+                addToggle("Secret finder", DungeonRoomScanner.isSecretFinderEnabled(),
+                        right, y, colWidth, () -> DungeonRoomScanner.setSecretFinderEnabled(!DungeonRoomScanner.isSecretFinderEnabled()));
+
                 y += 31;
                 String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER"};
                 int bx = left;
