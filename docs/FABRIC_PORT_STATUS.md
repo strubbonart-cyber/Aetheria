@@ -20,7 +20,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and `/mining hud`.
 - Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
-- Dungeon first slice: Hide Blessing Messages filter (`/dungeon blessing`); Dungeon Breaker charge HUD from hotbar item lore (`/dungeon breaker`); scoreboard-backed floor/run timer HUD (`/dungeon timer`); `/dungeon status` reports toggles. Added chat-driven Blood Door, clear percentage, boss-phase split tracking for Scarf, Professor, Sadan, and F7/M7, score/XP capture, run-end summaries, and a split HUD toggled with `/dungeonsplits`. These are split/timer features only, not the full original map/secret/highlight systems. Blessing and breaker settings are persisted in `config/skyblockqol-dungeon.properties`.
+- Dungeon first slice: Hide Blessing Messages (`/dungeon blessing`); Dungeon Breaker charge HUD (`/dungeon breaker`); scoreboard floor/run timer (`/dungeon timer`); Blood Door, clear percentage, Scarf/Professor/Sadan/F7/M7 phase splits, score/XP capture and run-end summaries; toggleable split HUD (`/dungeonsplits`). Boss and Blood Room mob highlights now render colour-coded entity boxes, toggled with `/dungeon bosses` and `/dungeon blood`. Detection follows the original armor-stand-name association rules. These are world-space boxes, not the original model outlines. Settings persist in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
 
@@ -37,9 +37,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 ## Dungeon features not yet ported
 
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
-- Dungeon Room Overlay
-- Secret Finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
-- Boss and Blood Mob highlights
+- Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - CSGO chest opening animation
 - Dungeon chest price estimator
 - `/report-secret` workflow

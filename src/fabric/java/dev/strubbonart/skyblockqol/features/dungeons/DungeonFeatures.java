@@ -36,8 +36,18 @@ public final class DungeonFeatures {
             .resolve("skyblockqol-dungeon.properties");
     private static boolean hideBlessingMessages;
     private static boolean breakerOverlayEnabled;
+    private static boolean bossHighlightsEnabled = true;
+    private static boolean bloodHighlightsEnabled = true;
 
     private DungeonFeatures() {}
+
+    public static boolean areBossHighlightsEnabled() {
+        return bossHighlightsEnabled;
+    }
+
+    public static boolean areBloodHighlightsEnabled() {
+        return bloodHighlightsEnabled;
+    }
 
     public static void initialize() {
         load();
@@ -65,6 +75,20 @@ public final class DungeonFeatures {
                                             + (breakerOverlayEnabled ? "enabled" : "disabled")));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("bosses").executes(context -> {
+                            bossHighlightsEnabled = !bossHighlightsEnabled;
+                            save();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon boss highlights " + (bossHighlightsEnabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("blood").executes(context -> {
+                            bloodHighlightsEnabled = !bloodHighlightsEnabled;
+                            save();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon Blood Room highlights " + (bloodHighlightsEnabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.literal("timer").executes(context -> {
                             boolean enabled = DungeonRunOverlay.toggle();
                             context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
@@ -77,7 +101,9 @@ public final class DungeonFeatures {
                                             + " | Dungeon Breaker overlay: "
                                             + (breakerOverlayEnabled ? "ON" : "OFF")
                                             + " | Dungeon timer HUD: "
-                                            + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")));
+                                            + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")
+                                            + " | Boss highlights: " + (bossHighlightsEnabled ? "ON" : "OFF")
+                                            + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")));
                             return 1;
                         }))));
     }
@@ -127,6 +153,8 @@ public final class DungeonFeatures {
             properties.load(input);
             hideBlessingMessages = Boolean.parseBoolean(properties.getProperty("hideBlessingMessages", "false"));
             breakerOverlayEnabled = Boolean.parseBoolean(properties.getProperty("breakerOverlayEnabled", "false"));
+            bossHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bossHighlightsEnabled", "true"));
+            bloodHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bloodHighlightsEnabled", "true"));
         } catch (IOException ignored) {
             hideBlessingMessages = false;
         }
@@ -136,6 +164,8 @@ public final class DungeonFeatures {
         Properties properties = new Properties();
         properties.setProperty("hideBlessingMessages", Boolean.toString(hideBlessingMessages));
         properties.setProperty("breakerOverlayEnabled", Boolean.toString(breakerOverlayEnabled));
+        properties.setProperty("bossHighlightsEnabled", Boolean.toString(bossHighlightsEnabled));
+        properties.setProperty("bloodHighlightsEnabled", Boolean.toString(bloodHighlightsEnabled));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(DATA_FILE)) {
