@@ -19,6 +19,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Advanced calculator: `/calc <expression>` and `/athrcalc <expression>`, using the original expression evaluator with arithmetic, functions, constants, postfix multipliers, and factorial.
 - Mining first slice: daily Fetchur item HUD; Fabric system-chat listener for powder, chest, ordinary gemstone, essence, pristine, hard-stone compact, gold compact, and named Crystal Hollows reward counters; simple powder reward chat filter; mining HUD; counters persisted in `config/skyblockqol-mining.properties`.
 - Mining controls: `/mining status`, `/mining filter`, `/mining reset`, and `/mining hud`.
+- Ghost Tracker first slice: manual session toggle via `/ghosttracker toggle`, status/reset commands, combat-XP-based kill estimate, Sorrow/Volta/Plasma/Ghostly Boots/Bag of Cash drop counts, coin-drop count, average/highest Magic Find, HUD, and persisted counters.
 - Dungeon first slice: Hide Blessing Messages filter, controlled by `/dungeon blessing` and inspected with `/dungeon status`; setting is persisted in `config/skyblockqol-dungeon.properties`.
 
 ## Important limitations of the first Mining slice
@@ -28,7 +29,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Powder and Pristine counters currently show lifetime totals. Rate/hour calculations, active-time/session behavior, profile-specific stats, tracker keybinds, and full draggable overlays are not yet migrated.
 - Full Gold Tracker pickup inventory-delta tracking and tablist stats are not yet migrated. Only its compact notification counter is parsed.
 - HOTM tooltip powder cost, Commission Highlight, and Pickobulus preview are not yet migrated.
-- The Ghost Tracker is not yet migrated.
+- Ghost Tracker limitations: start/stop is manual so enable it only in The Mist; the original location validation, scavenger/purse tracker, drop-value/profit calculation, all original overlay options, and full profile/session behavior are not yet migrated.
 
 ## Dungeon features not yet ported
 
