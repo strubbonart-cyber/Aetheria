@@ -12,10 +12,20 @@ import net.minecraft.text.Text;
  * decides whether a particular teammate is a valid Leap destination.
  */
 public final class DungeonLeapMenu {
+    private static Screen bypassScreen;
+
     private DungeonLeapMenu() {}
+
+    public static void suppressWrapFor(Screen screen) {
+        bypassScreen = screen;
+    }
 
     public static void initialize() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            if (screen == bypassScreen) {
+                bypassScreen = null;
+                return;
+            }
             if (!DungeonFeatures.isLeapMenuEnabled() || !DungeonRunOverlay.isInDungeon()) return;
             if (!(screen instanceof HandledScreen<?> handled)) return;
 

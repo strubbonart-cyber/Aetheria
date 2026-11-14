@@ -117,6 +117,56 @@ public final class DungeonLeapScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 
+    @Override
+    protected boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0 && mouseX >= mapX && mouseX <= mapX + mapSize
+                && mouseY >= mapY && mouseY <= mapY + mapSize) {
+            String player = playerAtMapPosition(mouseX, mouseY);
+            if (player != null) {
+                leapToPlayer(player);
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    private String playerAtMapPosition(double mouseX, double mouseY) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player == null || client.world == null) return null;
+        ItemStack mapStack = client.player.getInventory().getStack(8);
+        if (mapStack.isEmpty()) return null;
+        MapIdComponent mapId = mapStack.get(DataComponentTypes.MAP_ID);
+        if (mapId == null) return null;
+        MapState state = client.world.getMapState(mapId);
+        if (state == null) return null;
+
+        List<String> names = DungeonMapOverlay.getOrderedPartyNames(client);
+        int index = 0;
+        double bestDistance = 8.0 * 8.0;
+        String closest = null;
+        for (MapDecoration decoration : state.getDecorations()) {
+            if (!decoration.getAssetId().getPath().startsWith("player")) continue;
+            String name = decoration.name().map(Text::getString).orElse(null);
+            if (name == null || name.isBlank()) {
+                if (index >= names.size()) break;
+                name = names.get(index);
+            }
+            index++;
+
+            if (name.equalsIgnoreCase(client.player.getName().getString())) continue;
+            double x = mapX + (decoration.x() / 2.0 + 64.0) * mapScale;
+            double y = mapY + (decoration.z() / 2.0 + 64.0) * mapScale;
+            double dx = mouseX - x;
+            double dy = mouseY - y;
+            double distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                closest = name;
+            }
+        }
+        return closest;
+    }
+
     private void drawLiveMap(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null || mapSize <= 0) return;
@@ -160,6 +210,7 @@ public final class DungeonLeapScreen extends Screen {
     }
 
     private void returnToParent() {
+        DungeonLeapMenu.suppressWrapFor(parent);
         MinecraftClient.getInstance().setScreen(parent);
     }
 
