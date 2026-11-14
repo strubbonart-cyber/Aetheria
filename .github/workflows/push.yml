@@ -18,9 +18,14 @@ jobs:
           SHA: ${{ github.sha }}
           TIMESTAMP: ${{ github.event.head_commit.timestamp }}
         run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK_PUSH is not configured; skipping optional Discord notification."
+            exit 0
+          fi
+
           COMMITS=$(jq -r '.commits[] | "• `\(.message)` — \(.author.name)"' <<< "$EVENT" | paste -sd '\n' -)
           SHORT_SHA="${SHA:0:7}"
-          BUILD_URL="https://github.com/$REPO/actions/workflows/build.yml?query=branch%3A$REF+event%3Apush"
+          BUILD_URL="https://github.com/$REPO/actions/workflows/main.yml?query=branch%3A$REF+event%3Apush"
           COMMIT_URL="https://github.com/$REPO/commit/$SHA"
           PAYLOAD=$(jq -n \
             --arg commits "$COMMITS" \
@@ -45,4 +50,4 @@ jobs:
               footer: {text: "Aetheria Push Event"},
               timestamp: $timestamp
             }]}')
-          curl -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$WEBHOOK"
+          curl --fail-with-body -H "Content-Type: application/json" -X POST -d "$PAYLOAD" "$WEBHOOK"
