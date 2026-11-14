@@ -1,4 +1,4 @@
-name: Build Aetheria Fabric 1.21
+name: Build Skyblock QoL Fabric Port 1.21
 
 on:
   workflow_dispatch:
@@ -32,13 +32,13 @@ jobs:
           sed -i 's/\r$//' gradlew
           chmod +x gradlew
 
-      - name: Build Fabric mod for Java 21
+      - name: Build mod with Java 21 bytecode compatibility
         run: ./gradlew clean build --no-daemon
 
       - name: Upload Fabric mod JAR
         uses: actions/upload-artifact@v4
         with:
-          name: aetheria-fabric-1.21
-          path: build/libs/*-1.0.0-fabric.jar
+          name: skyblock-qol-fabric-port-1.21
+          path: build/libs/skyblock-qol-fabric-port-1.21-1.0.0-fabric.jar
           if-no-files-found: error
           retention-days: 7
