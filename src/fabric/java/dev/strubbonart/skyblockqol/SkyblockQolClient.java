@@ -6,7 +6,6 @@ import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMobHighlights;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonLeapMenu;
-import dev.strubbonart.skyblockqol.features.dungeons.caseopening.DungeonCaseOpeningListener;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonDataRepository;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRoomScanner;
@@ -52,7 +51,6 @@ public final class SkyblockQolClient implements ClientModInitializer {
         DungeonRoomScanner.initialize();
         DungeonMobHighlights.initialize();
         DungeonLeapMenu.initialize();
-        DungeonCaseOpeningListener.initialize();
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal("skyblockqol")

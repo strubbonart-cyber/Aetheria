@@ -41,6 +41,9 @@ public final class GhostTrackerFeatures {
             .resolve("skyblockqol-ghost.properties");
 
     private static boolean tracking;
+    private static int hudX = 8;
+    private static int hudY = 58;
+    private static float hudScale = 1.0F;
     private static long kills;
     private static long totalCombatXp;
     private static long sorrow;
@@ -62,6 +65,25 @@ public final class GhostTrackerFeatures {
 
     public static boolean isTracking() {
         return tracking;
+    }
+
+    public static int getHudX() { return hudX; }
+    public static int getHudY() { return hudY; }
+    public static float getHudScale() { return hudScale; }
+
+    public static void adjustHudLayout(int dx, int dy, float scaleDelta) {
+        hudX = Math.max(0, Math.min(5000, hudX + dx));
+        hudY = Math.max(0, Math.min(5000, hudY + dy));
+        hudScale = Math.max(0.5F, Math.min(3.0F,
+                Math.round((hudScale + scaleDelta) * 10.0F) / 10.0F));
+        save();
+    }
+
+    public static void resetHudLayout() {
+        hudX = 8;
+        hudY = 58;
+        hudScale = 1.0F;
+        save();
     }
 
     public static void setTracking(boolean value) {
@@ -160,22 +182,27 @@ public final class GhostTrackerFeatures {
         if (!tracking) return;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null || client.options.hudHidden) return;
-        int y = 58;
-        context.drawTextWithShadow(client.textRenderer, "Ghost Tracker (manual mode)", 8, y, 0xFFAA00);
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(hudX, hudY, 0.0F);
+        matrices.scale(hudScale, hudScale, 1.0F);
+        int y = 0;
+        context.drawTextWithShadow(client.textRenderer, "Ghost Tracker (manual mode)", 0, y, 0xFFAA00);
         y += 11;
         context.drawTextWithShadow(client.textRenderer,
-                "Kills: " + format(kills) + " | Combat XP: " + format(totalCombatXp), 8, y, 0xFFFFFF);
+                "Kills: " + format(kills) + " | Combat XP: " + format(totalCombatXp), 0, y, 0xFFFFFF);
         y += 11;
         context.drawTextWithShadow(client.textRenderer,
-                "Sorrow " + sorrow + " | Volta " + volta + " | Plasma " + plasma, 8, y, 0x55FFFF);
+                "Sorrow " + sorrow + " | Volta " + volta + " | Plasma " + plasma, 0, y, 0x55FFFF);
         y += 11;
         context.drawTextWithShadow(client.textRenderer,
                 "Ghostly Boots " + ghostlyBoots + " | Bags " + bagsOfCash + " | Coin drops " + coinDrops,
-                8, y, 0xFFFFFF);
+                0, y, 0xFFFFFF);
         y += 11;
         long avgMf = magicFindDrops == 0 ? 0 : totalMagicFind / magicFindDrops;
         context.drawTextWithShadow(client.textRenderer,
-                "Magic Find avg " + avgMf + "% | Highest " + highestMagicFind + "%", 8, y, 0xFF55FF);
+                "Magic Find avg " + avgMf + "% | Highest " + highestMagicFind + "%", 0, y, 0xFF55FF);
+        matrices.pop();
     }
 
     private static String status() {
@@ -221,6 +248,9 @@ public final class GhostTrackerFeatures {
             magicFindDrops = number(p, "magicFindDrops");
             highestMagicFind = number(p, "highestMagicFind");
             activeTimeMs = number(p, "activeTimeMs");
+            hudX = integer(p, "hudX", 8);
+            hudY = integer(p, "hudY", 58);
+            hudScale = decimal(p, "hudScale", 1.0F);
         } catch (IOException ignored) {
             tracking = false;
         }
@@ -229,6 +259,20 @@ public final class GhostTrackerFeatures {
     private static long number(Properties p, String key) {
         try { return Long.parseLong(p.getProperty(key, "0")); }
         catch (NumberFormatException ignored) { return 0; }
+    }
+
+    private static int integer(Properties p, String key, int fallback) {
+        try { return Math.max(0, Math.min(5000, Integer.parseInt(p.getProperty(key, Integer.toString(fallback))))); }
+        catch (NumberFormatException ignored) { return fallback; }
+    }
+
+    private static float decimal(Properties p, String key, float fallback) {
+        try {
+            float value = Float.parseFloat(p.getProperty(key, Float.toString(fallback)));
+            return Float.isFinite(value) ? Math.max(0.5F, Math.min(3.0F, value)) : fallback;
+        } catch (NumberFormatException ignored) {
+            return fallback;
+        }
     }
 
     private static void save() {
@@ -246,6 +290,9 @@ public final class GhostTrackerFeatures {
         p.setProperty("magicFindDrops", Long.toString(magicFindDrops));
         p.setProperty("highestMagicFind", Long.toString(highestMagicFind));
         p.setProperty("activeTimeMs", Long.toString(activeTimeMs));
+        p.setProperty("hudX", Integer.toString(hudX));
+        p.setProperty("hudY", Integer.toString(hudY));
+        p.setProperty("hudScale", Float.toString(hudScale));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream out = Files.newOutputStream(DATA_FILE)) {

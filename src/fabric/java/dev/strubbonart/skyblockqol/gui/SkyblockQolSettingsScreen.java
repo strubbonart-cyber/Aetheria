@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 public final class SkyblockQolSettingsScreen extends Screen {
     private enum Page { HOME, MINING, FILTER, DUNGEONS }
-    private enum LayoutTarget { MINING, MAP, TIMER, SPLITS, BREAKER, ROOM }
+    private enum LayoutTarget { MINING, GHOST, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
     private final Page page;
@@ -86,7 +86,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 y += 24;
                 addToggle("Commission highlight", CommissionHighlight.isEnabled(),
                         left, y, colWidth, () -> MiningFeatures.setMiningFeatureEnabled("commission", !CommissionHighlight.isEnabled()));
-                addToggle("Ghost tracker session", GhostTrackerFeatures.isTracking(),
+                addToggle("Ghost tracker + HUD", GhostTrackerFeatures.isTracking(),
                         right, y, colWidth, () -> GhostTrackerFeatures.setTracking(!GhostTrackerFeatures.isTracking()));
                 y += 24;
                 addToggle("HOTM powder tooltip", HotmPowderTooltip.isEnabled(),
@@ -98,9 +98,14 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, colWidth, () -> MiningFeatures.setTrackerPaused(!MiningFeatures.isTrackerPaused()));
 
                 y += 32;
-                addLayoutControlRow(left, y, LayoutTarget.MINING);
-                addButton("RESET MINING HUD LAYOUT", left, y + 26, 300, 20,
-                        MiningFeatures::resetHudLayout);
+                addButton(target == LayoutTarget.MINING ? "[MINING HUD LAYOUT]" : "MINING HUD LAYOUT",
+                        left, y, 146, 20, () -> open(Page.MINING, LayoutTarget.MINING));
+                addButton(target == LayoutTarget.GHOST ? "[GHOST HUD LAYOUT]" : "GHOST HUD LAYOUT",
+                        right, y, 146, 20, () -> open(Page.MINING, LayoutTarget.GHOST));
+                y += 24;
+                addLayoutControlRow(left, y, target);
+                addButton("RESET " + (target == LayoutTarget.GHOST ? "GHOST" : "MINING") + " HUD LAYOUT",
+                        left, y + 26, 300, 20, this::resetSelectedLayout);
             }
             case FILTER -> {
                 String[] names = {"chest", "already-looted", "breaking-power", "compact", "wrappers",
@@ -159,10 +164,6 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Spirit Leap / InfiniLeap menu", DungeonFeatures.isLeapMenuEnabled(),
                         left, y, 300, () -> DungeonFeatures.setLeapMenuEnabled(!DungeonFeatures.isLeapMenuEnabled()));
 
-                y += 24;
-                addToggle("Chest reveal animation", DungeonFeatures.isCaseOpeningAnimationEnabled(),
-                        left, y, 300, () -> DungeonFeatures.setCaseOpeningAnimationEnabled(!DungeonFeatures.isCaseOpeningAnimationEnabled()));
-
                 y += 31;
                 String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER", "ROOM"};
                 int bx = left;
@@ -198,12 +199,13 @@ public final class SkyblockQolSettingsScreen extends Screen {
         for (int i = 0; i < labels.length; i++) {
             final int index = i;
             addButton(labels[i], x + i * 50, y, buttonWidth, 20, () -> {
+                float scaleDelta = index == 4 ? -0.1F : index == 5 ? 0.1F : 0.0F;
                 if (selected == LayoutTarget.MINING) {
-                    MiningFeatures.adjustHudLayout(changes[index][0], changes[index][1],
-                            index == 4 ? -0.1F : index == 5 ? 0.1F : 0.0F);
+                    MiningFeatures.adjustHudLayout(changes[index][0], changes[index][1], scaleDelta);
+                } else if (selected == LayoutTarget.GHOST) {
+                    GhostTrackerFeatures.adjustHudLayout(changes[index][0], changes[index][1], scaleDelta);
                 } else {
-                    adjustDungeonLayout(selected, changes[index][0], changes[index][1],
-                            index == 4 ? -0.1F : index == 5 ? 0.1F : 0.0F);
+                    adjustDungeonLayout(selected, changes[index][0], changes[index][1], scaleDelta);
                 }
             });
         }
@@ -231,6 +233,8 @@ public final class SkyblockQolSettingsScreen extends Screen {
     private void resetSelectedLayout() {
         if (target == LayoutTarget.MINING) {
             MiningFeatures.resetHudLayout();
+        } else if (target == LayoutTarget.GHOST) {
+            GhostTrackerFeatures.resetHudLayout();
         } else if (target == LayoutTarget.MAP) {
             DungeonMapOverlay.resetLayout();
         } else {
@@ -294,9 +298,13 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 42, 0xFFFFFFFF);
 
         if (page == Page.MINING) {
-            String layout = "Mining HUD  X: " + MiningFeatures.getHudX()
-                    + "  Y: " + MiningFeatures.getHudY()
-                    + "  Scale: " + String.format(Locale.ROOT, "%.1fx", MiningFeatures.getHudScale());
+            String layout = target == LayoutTarget.GHOST
+                    ? "Ghost HUD  X: " + GhostTrackerFeatures.getHudX()
+                        + "  Y: " + GhostTrackerFeatures.getHudY()
+                        + "  Scale: " + String.format(Locale.ROOT, "%.1fx", GhostTrackerFeatures.getHudScale())
+                    : "Mining HUD  X: " + MiningFeatures.getHudX()
+                        + "  Y: " + MiningFeatures.getHudY()
+                        + "  Scale: " + String.format(Locale.ROOT, "%.1fx", MiningFeatures.getHudScale());
             context.drawTextWithShadow(textRenderer, layout, width / 2 - textRenderer.getWidth(layout) / 2,
                     height - 60, 0xFFB8D8FF);
         } else if (page == Page.DUNGEONS) {
