@@ -6,7 +6,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 - Open the dedicated Mining/Dungeon settings screen with **Right Shift** or the client command `/skyblockqol`.
 - Mining and Dungeon tabs expose individual feature toggles. Mining includes a separate Powder Chat Filter options page.
-- Mining HUD panels share an adjustable saved position and scale; Ghost Tracker has its own saved position and scale. Tracker pause, powder/essence thresholds, panel visibility, and filter categories are configurable in the GUI. Dungeon map, timer, splits, breaker, and room-status overlays each have independent saved position/scale controls.
+- Fetchur, Powder, Pristine, and Gold HUD panels each have an independent saved position and scale; Ghost Tracker also has its own saved position and scale. Tracker pause, powder/essence thresholds, panel visibility, and filter categories are configurable in the GUI. Dungeon map, timer, splits, breaker, and room-status overlays each have independent saved position/scale controls.
 - Changes are wired to the live feature settings and saved where the feature has persistent settings.
 
 ## Target

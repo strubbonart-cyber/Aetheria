@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -111,8 +112,24 @@ public final class MiningFeatures {
     private static boolean showGoldHud = true;
     private static boolean showPowderGemBreakdown = true;
     private static boolean showPristineGemBreakdown = true;
+    private enum HudPanel { FETCHUR, POWDER, PRISTINE, GOLD }
+
+    private static final class HudLayout {
+        private int x;
+        private int y;
+        private float scale;
+
+        private HudLayout(int x, int y, float scale) {
+            this.x = x;
+            this.y = y;
+            this.scale = scale;
+        }
+    }
+
+    private static final EnumMap<HudPanel, HudLayout> HUD_LAYOUTS = createDefaultHudLayouts();
+    // Retained for compatibility with the original /mining hud position and scale commands.
     private static int hudX = 8;
-    private static int hudY = 8;
+    private static int hudY = 24;
     private static float hudScale = 1.0F;
 
     private static long gemstonePowder;
@@ -257,22 +274,85 @@ public final class MiningFeatures {
         save();
     }
 
-    public static int getHudX() { return hudX; }
-    public static int getHudY() { return hudY; }
-    public static float getHudScale() { return hudScale; }
+    private static EnumMap<HudPanel, HudLayout> createDefaultHudLayouts() {
+        EnumMap<HudPanel, HudLayout> layouts = new EnumMap<>(HudPanel.class);
+        layouts.put(HudPanel.FETCHUR, new HudLayout(8, 8, 1.0F));
+        layouts.put(HudPanel.POWDER, new HudLayout(8, 24, 1.0F));
+        layouts.put(HudPanel.PRISTINE, new HudLayout(8, 200, 1.0F));
+        layouts.put(HudPanel.GOLD, new HudLayout(8, 345, 1.0F));
+        return layouts;
+    }
+
+    private static HudLayout layout(String panel) {
+        HudPanel key;
+        try {
+            key = HudPanel.valueOf(panel.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            key = HudPanel.POWDER;
+        }
+        return HUD_LAYOUTS.get(key);
+    }
+
+    public static int getHudX() { return getHudX("powder"); }
+    public static int getHudY() { return getHudY("powder"); }
+    public static float getHudScale() { return getHudScale("powder"); }
+    public static int getHudX(String panel) { return layout(panel).x; }
+    public static int getHudY(String panel) { return layout(panel).y; }
+    public static float getHudScale(String panel) { return layout(panel).scale; }
 
     public static void adjustHudLayout(int dx, int dy, float scaleDelta) {
-        hudX = Math.max(0, Math.min(5000, hudX + dx));
-        hudY = Math.max(0, Math.min(5000, hudY + dy));
-        hudScale = Math.max(0.5F, Math.min(3.0F,
-                Math.round((hudScale + scaleDelta) * 10.0F) / 10.0F));
+        adjustHudLayout("powder", dx, dy, scaleDelta);
+    }
+
+    public static void adjustHudLayout(String panel, int dx, int dy, float scaleDelta) {
+        HudLayout value = layout(panel);
+        value.x = Math.max(0, Math.min(5000, value.x + dx));
+        value.y = Math.max(0, Math.min(5000, value.y + dy));
+        value.scale = Math.max(0.5F, Math.min(3.0F,
+                Math.round((value.scale + scaleDelta) * 10.0F) / 10.0F));
+        syncLegacyHudLayout();
+        save();
+    }
+
+    public static void resetHudLayout(String panel) {
+        HudPanel key;
+        try {
+            key = HudPanel.valueOf(panel.toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ignored) {
+            key = HudPanel.POWDER;
+        }
+        HUD_LAYOUTS.put(key, createDefaultHudLayouts().get(key));
+        syncLegacyHudLayout();
         save();
     }
 
     public static void resetHudLayout() {
-        hudX = 8;
-        hudY = 8;
-        hudScale = 1.0F;
+        HUD_LAYOUTS.clear();
+        HUD_LAYOUTS.putAll(createDefaultHudLayouts());
+        syncLegacyHudLayout();
+        save();
+    }
+
+    private static void syncLegacyHudLayout() {
+        HudLayout powder = HUD_LAYOUTS.get(HudPanel.POWDER);
+        hudX = powder.x;
+        hudY = powder.y;
+        hudScale = powder.scale;
+    }
+
+    private static void setAllHudPositions(int x, int y) {
+        HUD_LAYOUTS.put(HudPanel.FETCHUR, new HudLayout(x, y, HUD_LAYOUTS.get(HudPanel.FETCHUR).scale));
+        HUD_LAYOUTS.put(HudPanel.POWDER, new HudLayout(x, y + 16, HUD_LAYOUTS.get(HudPanel.POWDER).scale));
+        HUD_LAYOUTS.put(HudPanel.PRISTINE, new HudLayout(x, y + 192, HUD_LAYOUTS.get(HudPanel.PRISTINE).scale));
+        HUD_LAYOUTS.put(HudPanel.GOLD, new HudLayout(x, y + 337, HUD_LAYOUTS.get(HudPanel.GOLD).scale));
+        syncLegacyHudLayout();
+        save();
+    }
+
+    private static void setAllHudScales(float scale) {
+        float bounded = Math.max(0.5F, Math.min(3.0F, scale));
+        HUD_LAYOUTS.values().forEach(value -> value.scale = bounded);
+        syncLegacyHudLayout();
         save();
     }
 
@@ -462,23 +542,20 @@ public final class MiningFeatures {
                                         .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 5000))
                                                 .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 5000))
                                                         .executes(context -> {
-                                                            hudX = IntegerArgumentType.getInteger(context, "x");
-                                                            hudY = IntegerArgumentType.getInteger(context, "y");
-                                                            save();
-                                                            context.getSource().sendFeedback(Text.literal("Mining HUD position: " + hudX + ", " + hudY));
+                                                            setAllHudPositions(IntegerArgumentType.getInteger(context, "x"),
+                                                                    IntegerArgumentType.getInteger(context, "y"));
+                                                            context.getSource().sendFeedback(Text.literal("Mining HUD panels repositioned."));
                                                             return 1;
                                                         }))))
                                 .then(ClientCommandManager.literal("scale")
                                         .then(ClientCommandManager.argument("value", FloatArgumentType.floatArg(0.5F, 3.0F))
                                                 .executes(context -> {
-                                                    hudScale = FloatArgumentType.getFloat(context, "value");
-                                                    save();
-                                                    context.getSource().sendFeedback(Text.literal(String.format(Locale.ROOT, "Mining HUD scale: %.2fx", hudScale)));
+                                                    setAllHudScales(FloatArgumentType.getFloat(context, "value"));
+                                                    context.getSource().sendFeedback(Text.literal("Mining HUD panel scale updated."));
                                                     return 1;
                                                 })))
                                 .then(ClientCommandManager.literal("reset").executes(context -> {
-                                    hudX = hudY = 8;
-                                    hudScale = 1.0F;
+                                    resetHudLayout();
                                     showPowderHud = showPristineHud = showFetchurHud = showGoldHud = true;
                                     save();
                                     context.getSource().sendFeedback(Text.literal("Mining HUD settings reset."));
@@ -870,19 +947,23 @@ public final class MiningFeatures {
                 || client.currentScreen != null && client.currentScreen.getTitle().getString().equals("Chat")) {
             return;
         }
-        if (!showFetchurHud && !showPowderHud && !showPristineHud && !showGoldHud && !sessionStarted) return;
 
         var matrices = context.getMatrices();
-        matrices.push();
-        matrices.translate(hudX, hudY, 0.0F);
-        matrices.scale(hudScale, hudScale, 1.0F);
-
-        int y = 0;
         if (showFetchurHud) {
-            context.drawTextWithShadow(client.textRenderer, "Fetchur: " + fetchurItem(), 0, y, 0x55FFFF);
-            y += 11;
+            HudLayout layout = HUD_LAYOUTS.get(HudPanel.FETCHUR);
+            matrices.push();
+            matrices.translate(layout.x, layout.y, 0.0F);
+            matrices.scale(layout.scale, layout.scale, 1.0F);
+            context.drawTextWithShadow(client.textRenderer, "Fetchur: " + fetchurItem(), 0, 0, 0x55FFFF);
+            matrices.pop();
         }
+
         if (showPowderHud) {
+            HudLayout layout = HUD_LAYOUTS.get(HudPanel.POWDER);
+            matrices.push();
+            matrices.translate(layout.x, layout.y, 0.0F);
+            matrices.scale(layout.scale, layout.scale, 1.0F);
+            int y = 0;
             context.drawTextWithShadow(client.textRenderer,
                     "Powder: " + format(gemstonePowder) + " Gemstone | " + format(mithrilPowder) + " Mithril",
                     0, y, 0xFFFFFF);
@@ -910,8 +991,22 @@ public final class MiningFeatures {
                     y += 10;
                 }
             }
+            if (sessionStarted) {
+                context.drawTextWithShadow(client.textRenderer,
+                        "Mining active: " + duration(activeTimeMs)
+                                + " | Powder/h: " + format(perHour(gemstonePowder + mithrilPowder))
+                                + " | Pristine/h: " + format(perHour(pristineGemstones)),
+                        0, y, trackerPaused ? 0xFF5555 : 0x55FF55);
+            }
+            matrices.pop();
         }
+
         if (showPristineHud) {
+            HudLayout layout = HUD_LAYOUTS.get(HudPanel.PRISTINE);
+            matrices.push();
+            matrices.translate(layout.x, layout.y, 0.0F);
+            matrices.scale(layout.scale, layout.scale, 1.0F);
+            int y = 0;
             context.drawTextWithShadow(client.textRenderer,
                     "Pristine: " + format(pristineGemstones) + " gems | " + format(pristineProcs) + " procs",
                     0, y, 0xFF55FF);
@@ -925,8 +1020,15 @@ public final class MiningFeatures {
                     y += 10;
                 }
             }
+            matrices.pop();
         }
+
         if (showGoldHud) {
+            HudLayout layout = HUD_LAYOUTS.get(HudPanel.GOLD);
+            matrices.push();
+            matrices.translate(layout.x, layout.y, 0.0F);
+            matrices.scale(layout.scale, layout.scale, 1.0F);
+            int y = 0;
             String unit = goldDisplayEnchanted ? "enchanted gold" : "gold ingots";
             context.drawTextWithShadow(client.textRenderer,
                     "Gold: " + format(goldDisplayTotal()) + " " + unit
@@ -943,17 +1045,9 @@ public final class MiningFeatures {
                         "Gold active: " + duration(goldActiveTimeMs)
                                 + " | Session: " + duration(goldSessionTimeMs),
                         0, y, 0xFFFFAA);
-                y += 11;
             }
+            matrices.pop();
         }
-        if (sessionStarted) {
-            context.drawTextWithShadow(client.textRenderer,
-                    "Mining active: " + duration(activeTimeMs)
-                            + " | Powder/h: " + format(perHour(gemstonePowder + mithrilPowder))
-                            + " | Pristine/h: " + format(perHour(pristineGemstones)),
-                    0, y, trackerPaused ? 0xFF5555 : 0x55FF55);
-        }
-        matrices.pop();
     }
 
     private static String fetchurItem() {
@@ -1029,6 +1123,7 @@ public final class MiningFeatures {
             hudX = (int) value(p, "hudX");
             hudY = (int) value(p, "hudY");
             hudScale = Math.max(0.5F, Math.min(3.0F, Float.parseFloat(p.getProperty("hudScale", "1.0"))));
+            loadHudLayouts(p);
             gemstonePowder = value(p, "gemstonePowder");
             mithrilPowder = value(p, "mithrilPowder");
             chests = value(p, "chests");
@@ -1083,6 +1178,38 @@ public final class MiningFeatures {
         }
     }
 
+    private static void loadHudLayouts(Properties p) {
+        int oldX = hudX;
+        int oldY = hudY;
+        float oldScale = hudScale;
+        HUD_LAYOUTS.put(HudPanel.FETCHUR, new HudLayout(oldX, oldY, oldScale));
+        HUD_LAYOUTS.put(HudPanel.POWDER, new HudLayout(oldX, oldY + 16, oldScale));
+        HUD_LAYOUTS.put(HudPanel.PRISTINE, new HudLayout(oldX, oldY + 192, oldScale));
+        HUD_LAYOUTS.put(HudPanel.GOLD, new HudLayout(oldX, oldY + 337, oldScale));
+        for (HudPanel panel : HudPanel.values()) {
+            HudLayout layout = HUD_LAYOUTS.get(panel);
+            String prefix = "hud." + panel.name().toLowerCase(Locale.ROOT) + ".";
+            layout.x = boundedInt(p.getProperty(prefix + "x"), layout.x);
+            layout.y = boundedInt(p.getProperty(prefix + "y"), layout.y);
+            layout.scale = boundedScale(p.getProperty(prefix + "scale"), layout.scale);
+        }
+        syncLegacyHudLayout();
+    }
+
+    private static int boundedInt(String raw, int fallback) {
+        try { return Math.max(0, Math.min(5000, Integer.parseInt(raw == null ? Integer.toString(fallback) : raw))); }
+        catch (NumberFormatException ignored) { return fallback; }
+    }
+
+    private static float boundedScale(String raw, float fallback) {
+        try {
+            float value = Float.parseFloat(raw == null ? Float.toString(fallback) : raw);
+            return Float.isFinite(value) ? Math.max(0.5F, Math.min(3.0F, value)) : fallback;
+        } catch (NumberFormatException ignored) {
+            return fallback;
+        }
+    }
+
     private static long value(Properties p, String key) {
         try { return Long.parseLong(p.getProperty(key, "0")); }
         catch (NumberFormatException ignored) { return 0; }
@@ -1105,9 +1232,17 @@ public final class MiningFeatures {
         p.setProperty("pickobulusEnabled", Boolean.toString(PickobulusPreview.isEnabled()));
         p.setProperty("commissionHighlightEnabled", Boolean.toString(CommissionHighlight.isEnabled()));
         p.setProperty("hotmTooltipEnabled", Boolean.toString(HotmPowderTooltip.isEnabled()));
+        syncLegacyHudLayout();
         p.setProperty("hudX", Integer.toString(hudX));
         p.setProperty("hudY", Integer.toString(hudY));
         p.setProperty("hudScale", Float.toString(hudScale));
+        for (HudPanel panel : HudPanel.values()) {
+            HudLayout layout = HUD_LAYOUTS.get(panel);
+            String prefix = "hud." + panel.name().toLowerCase(Locale.ROOT) + ".";
+            p.setProperty(prefix + "x", Integer.toString(layout.x));
+            p.setProperty(prefix + "y", Integer.toString(layout.y));
+            p.setProperty(prefix + "scale", Float.toString(layout.scale));
+        }
         p.setProperty("gemstonePowder", Long.toString(gemstonePowder));
         p.setProperty("mithrilPowder", Long.toString(mithrilPowder));
         p.setProperty("chests", Long.toString(chests));
