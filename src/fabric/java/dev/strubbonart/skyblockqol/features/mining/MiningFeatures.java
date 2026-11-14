@@ -491,56 +491,62 @@ public final class MiningFeatures {
         String clean = stripFormatting(raw).trim();
         if (clean.isEmpty()) return !powderFilterEnabled;
 
+        boolean inHollows = isCrystalHollows();
         boolean isPristine = clean.contains("PRISTINE!");
         boolean changed = false;
 
-        if (CHEST.matcher(clean).find()) {
-            chests++;
-            changed = true;
-        }
-        if (COMPACT.matcher(clean).find()) {
-            hardStoneCompacts++;
-            changed = true;
-        }
-        Matcher matcher = POWDER.matcher(clean);
-        if (matcher.find()) {
-            long amount = amount(matcher.group(1));
-            if (clean.contains("Gemstone Powder")) gemstonePowder += amount;
-            else mithrilPowder += amount;
-            changed = true;
-        }
-
-        matcher = PRISTINE.matcher(clean);
-        if (matcher.find()) {
-            pristineProcs++;
-            long count = amount(matcher.group(3));
-            pristineGemstones += count;
-            addGemstoneCount(pristineGemstonesByQuality, matcher.group(1), matcher.group(2), count);
-            changed = true;
-        } else if (!isPristine) {
-            matcher = GEM.matcher(clean);
-            if (matcher.find()) {
-                long count = amount(matcher.group(3));
-                gemstoneDrops += count;
-                addGemstoneCount(powderGemstones, matcher.group(1), matcher.group(2), count);
+        // Powder, chest, gemstone, Pristine and Crystal Hollows reward stats are
+        // intentionally limited to Crystal Hollows, matching the original tracker.
+        if (inHollows) {
+            if (CHEST.matcher(clean).find()) {
+                chests++;
                 changed = true;
             }
+            if (COMPACT.matcher(clean).find()) {
+                hardStoneCompacts++;
+                changed = true;
+            }
+            Matcher matcher = POWDER.matcher(clean);
+            if (matcher.find()) {
+                long count = amount(matcher.group(1));
+                if (clean.contains("Gemstone Powder")) gemstonePowder += count;
+                else mithrilPowder += count;
+                changed = true;
+            }
+
+            matcher = PRISTINE.matcher(clean);
+            if (matcher.find()) {
+                pristineProcs++;
+                long count = amount(matcher.group(3));
+                pristineGemstones += count;
+                addGemstoneCount(pristineGemstonesByQuality, matcher.group(1), matcher.group(2), count);
+                changed = true;
+            } else if (!isPristine) {
+                matcher = GEM.matcher(clean);
+                if (matcher.find()) {
+                    long count = amount(matcher.group(3));
+                    gemstoneDrops += count;
+                    addGemstoneCount(powderGemstones, matcher.group(1), matcher.group(2), count);
+                    changed = true;
+                }
+            }
+
+            changed |= addMatch(clean, DIAMOND_ESSENCE, 0);
+            changed |= addMatch(clean, GOLD_ESSENCE, 1);
+            changed |= addMatch(clean, OIL, 2);
+            changed |= addMatch(clean, ROPE, 3);
+            changed |= addMatch(clean, COMPASS, 4);
+            changed |= addMatch(clean, HEART, 5);
+            changed |= addMatch(clean, EGG, 6);
+            changed |= addMatch(clean, PICKONIMBUS, 7);
+            changed |= addMatch(clean, SLUDGE, 8);
+            changed |= addMatch(clean, YOGGIE, 9);
+            changed |= addMatch(clean, ROBOT, 10);
+            changed |= addMatch(clean, TREASURITE, 11);
+            changed |= addMatch(clean, GOBLIN_EGG, 12);
         }
 
-        changed |= addMatch(clean, DIAMOND_ESSENCE, 0);
-        changed |= addMatch(clean, GOLD_ESSENCE, 1);
-        changed |= addMatch(clean, OIL, 2);
-        changed |= addMatch(clean, ROPE, 3);
-        changed |= addMatch(clean, COMPASS, 4);
-        changed |= addMatch(clean, HEART, 5);
-        changed |= addMatch(clean, EGG, 6);
-        changed |= addMatch(clean, PICKONIMBUS, 7);
-        changed |= addMatch(clean, SLUDGE, 8);
-        changed |= addMatch(clean, YOGGIE, 9);
-        changed |= addMatch(clean, ROBOT, 10);
-        changed |= addMatch(clean, TREASURITE, 11);
-        changed |= addMatch(clean, GOBLIN_EGG, 12);
-
+        // Gold is available in both the Dwarven Mines and Crystal Hollows.
         if (GOLD_COMPACT.matcher(raw).find() && isGoldArea()
                 && (!goldOnlyWhileMining || System.currentTimeMillis() - lastGoldOreBreakTime <= 20_000L)) {
             goldCompacts++;
