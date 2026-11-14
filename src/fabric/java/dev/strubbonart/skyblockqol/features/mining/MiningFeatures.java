@@ -5,11 +5,15 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.player.ClientPlayerBlockBreakEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,6 +91,11 @@ public final class MiningFeatures {
     private static long goblinEggs;
     private static long hardStoneCompacts;
     private static long goldCompacts;
+    private static long goldIngots;
+    private static long enchantedGold;
+    private static long lastGoldOreBreakTime;
+    private static int previousGoldInventory = -1;
+    private static int previousEnchantedGoldInventory = -1;
     private static long lastSaveTime;
 
     private MiningFeatures() {}
@@ -96,7 +105,17 @@ public final class MiningFeatures {
         initialized = true;
         load();
         ClientReceiveMessageEvents.ALLOW_GAME.register(MiningFeatures::onGameMessage);
-        ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            tick();
+            scanGoldInventory(client);
+        });
+        ClientPlayerBlockBreakEvents.AFTER.register((world, player, pos, state) -> {
+            if (state.isOf(Blocks.GOLD_ORE) || state.isOf(Blocks.DEEPSLATE_GOLD_ORE)
+                    || state.isOf(Blocks.NETHER_GOLD_ORE) || state.isOf(Blocks.GOLD_BLOCK)
+                    || state.isOf(Blocks.RAW_GOLD_BLOCK)) {
+                lastGoldOreBreakTime = System.currentTimeMillis();
+            }
+        });
         HudRenderCallback.EVENT.register(MiningFeatures::renderHud);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal("mining")
@@ -237,6 +256,38 @@ public final class MiningFeatures {
         if (now - lastSaveTime > 30_000L) save();
     }
 
+    private static void scanGoldInventory(MinecraftClient client) {
+        if (client.player == null || client.world == null) {
+            previousGoldInventory = previousEnchantedGoldInventory = -1;
+            return;
+        }
+        int ingotCount = 0;
+        int enchantedCount = 0;
+        for (int slot = 0; slot < client.player.getInventory().size(); slot++) {
+            ItemStack stack = client.player.getInventory().getStack(slot);
+            if (stack.isEmpty()) continue;
+            String displayName = stack.getName().getString().toLowerCase(Locale.ROOT);
+            if (displayName.contains("enchanted gold")) {
+                enchantedCount += stack.getCount();
+            } else if (stack.isOf(Items.GOLD_INGOT)) {
+                ingotCount += stack.getCount();
+            }
+        }
+        if (previousGoldInventory < 0 || previousEnchantedGoldInventory < 0) {
+            previousGoldInventory = ingotCount;
+            previousEnchantedGoldInventory = enchantedCount;
+            return;
+        }
+        int ingotDelta = Math.max(0, ingotCount - previousGoldInventory);
+        int enchantedDelta = Math.max(0, enchantedCount - previousEnchantedGoldInventory);
+        if (System.currentTimeMillis() - lastGoldOreBreakTime <= 20_000L) {
+            if (ingotDelta > 0) goldIngots += ingotDelta;
+            if (enchantedDelta > 0) enchantedGold += enchantedDelta;
+        }
+        previousGoldInventory = ingotCount;
+        previousEnchantedGoldInventory = enchantedCount;
+    }
+
     private static void renderHud(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null || client.options.hudHidden
@@ -268,6 +319,13 @@ public final class MiningFeatures {
             context.drawTextWithShadow(client.textRenderer,
                     "Pristine: " + format(pristineGemstones) + " gems | " + format(pristineProcs) + " procs",
                     8, y, 0xFF55FF);
+            y += 11;
+        }
+        if (showPowderHud) {
+            context.drawTextWithShadow(client.textRenderer,
+                    "Gold Tracker: " + format(goldIngots) + " ingots | " + format(enchantedGold)
+                            + " enchanted | " + format(goldCompacts) + " compacts",
+                    8, y, 0xFFFF55);
         }
     }
 
@@ -280,6 +338,7 @@ public final class MiningFeatures {
         return "Mining counters | Powder " + format(gemstonePowder) + " Gemstone / "
                 + format(mithrilPowder) + " Mithril | Chests " + format(chests)
                 + " | Pristine procs " + format(pristineProcs)
+                + " | Gold " + format(goldIngots) + " ingots / " + format(enchantedGold) + " enchanted"
                 + " | Filter " + (powderFilterEnabled ? "ON" : "OFF");
     }
 
@@ -289,6 +348,9 @@ public final class MiningFeatures {
         oilBarrels = ascensionRopes = wishingCompasses = jungleHearts = 0;
         prehistoricEggs = pickonimbus = sludgeJuice = yoggies = 0;
         robotParts = treasurite = goblinEggs = hardStoneCompacts = goldCompacts = 0;
+        goldIngots = enchantedGold = 0;
+        previousGoldInventory = previousEnchantedGoldInventory = -1;
+        lastGoldOreBreakTime = 0;
         save();
     }
 
@@ -322,6 +384,8 @@ public final class MiningFeatures {
             goblinEggs = value(p, "goblinEggs");
             hardStoneCompacts = value(p, "hardStoneCompacts");
             goldCompacts = value(p, "goldCompacts");
+            goldIngots = value(p, "goldIngots");
+            enchantedGold = value(p, "enchantedGold");
         } catch (IOException ignored) {
             // A corrupt or unavailable stats file must not prevent the client from starting.
         }
@@ -359,6 +423,8 @@ public final class MiningFeatures {
         p.setProperty("goblinEggs", Long.toString(goblinEggs));
         p.setProperty("hardStoneCompacts", Long.toString(hardStoneCompacts));
         p.setProperty("goldCompacts", Long.toString(goldCompacts));
+        p.setProperty("goldIngots", Long.toString(goldIngots));
+        p.setProperty("enchantedGold", Long.toString(enchantedGold));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream out = Files.newOutputStream(DATA_FILE)) {
