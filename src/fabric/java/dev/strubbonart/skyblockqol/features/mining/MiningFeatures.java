@@ -15,6 +15,11 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.ScoreboardEntry;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,6 +60,13 @@ public final class MiningFeatures {
     private static final Pattern GOBLIN_EGG = Pattern.compile("(?:Green |Red |Yellow |Blue )?Goblin Egg(?: x([\\d,]+))?");
     private static final Pattern GOLD_COMPACT = Pattern.compile("COMPACT!.*Enchanted Gold");
 
+    private static final Pattern ALREADY_LOOTED = Pattern.compile("This chest has already been looted\\.");
+    private static final Pattern BREAKING_POWER = Pattern.compile("You need a tool with a Breaking Power of .+? to mine .+");
+    private static final Pattern POWDER_LINE = Pattern.compile("(?:Gemstone|Mithril) Powder x([\\d,]+)");
+    private static final Pattern ESSENCE_LINE = Pattern.compile("(?:Diamond|Gold) Essence x([\\d,]+)");
+    private static final Pattern GEM_LINE = Pattern.compile("\\b(Rough|Flawed|Fine|Flawless) (Ruby|Sapphire|Amber|Amethyst|Jade|Topaz|Jasper|Opal|Citrine|Aquamarine|Peridot|Onyx) Gemstone x([\\d,]+)");
+
+
     private static final String[] FETCHUR_ITEMS = {
             "Yellow Stained Glass x20", "Compass x1", "Mithril x20",
             "Firework Rocket x1", "Wooden Door x1 (any type)",
@@ -67,6 +79,28 @@ public final class MiningFeatures {
 
     private static boolean initialized;
     private static boolean powderFilterEnabled;
+    private static boolean hideChestOpen = true;
+    private static boolean hideAlreadyLooted = true;
+    private static boolean hideBreakingPower = true;
+    private static boolean hideCompact = false;
+    private static boolean hideRewardWrappers = true;
+    private static boolean hidePowder = true;
+    private static int powderThreshold;
+    private static boolean hideEssence = true;
+    private static int essenceThreshold;
+    private static boolean hideGemstones = true;
+    private static String gemstoneTierFilter = "Hide Rough";
+    private static boolean hideGoblinEggs;
+    private static boolean hideOilBarrel = true;
+    private static boolean hideAscensionRope = true;
+    private static boolean hideWishingCompass = true;
+    private static boolean hideJungleHeart = true;
+    private static boolean hidePrehistoricEgg = true;
+    private static boolean hidePickonimbus = true;
+    private static boolean hideSludgeJuice = true;
+    private static boolean hideYoggie = true;
+    private static boolean hideRobotParts = true;
+    private static boolean hideTreasurite = true;
     private static boolean showPowderHud = true;
     private static boolean showPristineHud = true;
     private static boolean showFetchurHud = true;
@@ -131,13 +165,46 @@ public final class MiningFeatures {
                             context.getSource().sendFeedback(Text.literal(statusLine()));
                             return 1;
                         }))
-                        .then(ClientCommandManager.literal("filter").executes(context -> {
-                            powderFilterEnabled = !powderFilterEnabled;
-                            save();
-                            context.getSource().sendFeedback(Text.literal(
-                                    "Powder chat filter " + (powderFilterEnabled ? "enabled" : "disabled")));
-                            return 1;
-                        }))
+                        .then(ClientCommandManager.literal("filter")
+                                .executes(context -> {
+                                    powderFilterEnabled = !powderFilterEnabled;
+                                    save();
+                                    context.getSource().sendFeedback(Text.literal(
+                                            "Powder chat filter " + (powderFilterEnabled ? "enabled" : "disabled")));
+                                    return 1;
+                                })
+                                .then(ClientCommandManager.literal("chest").executes(context -> toggleFilterSetting("chest", context.getSource())))
+                                .then(ClientCommandManager.literal("already-looted").executes(context -> toggleFilterSetting("already-looted", context.getSource())))
+                                .then(ClientCommandManager.literal("breaking-power").executes(context -> toggleFilterSetting("breaking-power", context.getSource())))
+                                .then(ClientCommandManager.literal("compact").executes(context -> toggleFilterSetting("compact", context.getSource())))
+                                .then(ClientCommandManager.literal("wrappers").executes(context -> toggleFilterSetting("wrappers", context.getSource())))
+                                .then(ClientCommandManager.literal("powder").executes(context -> toggleFilterSetting("powder", context.getSource())))
+                                .then(ClientCommandManager.literal("essence").executes(context -> toggleFilterSetting("essence", context.getSource())))
+                                .then(ClientCommandManager.literal("gemstones").executes(context -> toggleFilterSetting("gemstones", context.getSource())))
+                                .then(ClientCommandManager.literal("goblin-eggs").executes(context -> toggleFilterSetting("goblin-eggs", context.getSource())))
+                                .then(ClientCommandManager.literal("special-drops").executes(context -> toggleFilterSetting("special-drops", context.getSource())))
+                                .then(ClientCommandManager.literal("tiers")
+                                        .then(ClientCommandManager.literal("show-all").executes(context -> setGemstoneTier("Show All", context.getSource())))
+                                        .then(ClientCommandManager.literal("hide-rough").executes(context -> setGemstoneTier("Hide Rough", context.getSource())))
+                                        .then(ClientCommandManager.literal("hide-rough-flawed").executes(context -> setGemstoneTier("Hide Rough & Flawed", context.getSource())))
+                                        .then(ClientCommandManager.literal("hide-all").executes(context -> setGemstoneTier("Hide All", context.getSource())))))
+                        .then(ClientCommandManager.literal("threshold")
+                                .then(ClientCommandManager.literal("powder")
+                                        .then(ClientCommandManager.argument("amount", IntegerArgumentType.integer(0, 60000))
+                                                .executes(context -> {
+                                                    powderThreshold = IntegerArgumentType.getInteger(context, "amount");
+                                                    save();
+                                                    context.getSource().sendFeedback(Text.literal("Powder hide threshold: " + powderThreshold));
+                                                    return 1;
+                                                })))
+                                .then(ClientCommandManager.literal("essence")
+                                        .then(ClientCommandManager.argument("amount", IntegerArgumentType.integer(0, 20))
+                                                .executes(context -> {
+                                                    essenceThreshold = IntegerArgumentType.getInteger(context, "amount");
+                                                    save();
+                                                    context.getSource().sendFeedback(Text.literal("Essence hide threshold: " + essenceThreshold));
+                                                    return 1;
+                                                }))))
                         .then(ClientCommandManager.literal("reset").executes(context -> {
                             reset();
                             context.getSource().sendFeedback(Text.literal("Mining counters reset."));
@@ -255,26 +322,116 @@ public final class MiningFeatures {
     }
 
     private static boolean shouldHide(String clean, String raw) {
-        if (!powderFilterEnabled || clean.contains("PRISTINE!")) return false;
-        // Only suppress known Crystal Hollows mining reward lines; normal player,
-        // party, guild and private messages are not matched by these patterns.
-        if (CHEST.matcher(clean).find()) return true;
-        if (clean.equals("This chest has already been looted.")) return true;
-        if (clean.startsWith("You need a tool with a Breaking Power of ")) return true;
-        if (clean.startsWith("COMPACT! You found ")) return false;
-        if (clean.contains("Gemstone Powder") || clean.contains("Mithril Powder")) return true;
-        if (clean.contains("Diamond Essence") || clean.contains("Gold Essence")) return true;
-        Matcher gemMatcher = GEM.matcher(clean);
-        if (gemMatcher.find()) return "Rough".equals(gemMatcher.group(1));
-        if (OIL.matcher(clean).find() || ROPE.matcher(clean).find()
-                || COMPASS.matcher(clean).find() || HEART.matcher(clean).find()
-                || EGG.matcher(clean).find() || PICKONIMBUS.matcher(clean).find()
-                || SLUDGE.matcher(clean).find() || YOGGIE.matcher(clean).find()
-                || ROBOT.matcher(clean).find() || TREASURITE.matcher(clean).find()) return true;
-        String compact = clean.toUpperCase(Locale.ROOT);
-        if (compact.contains("CHEST LOCKPICKED") || compact.contains("LOOT CHEST COLLECTED")
-                || compact.equals("REWARDS") || compact.startsWith("▬")) return true;
+        if (!powderFilterEnabled || !isCrystalHollows() || clean.contains("PRISTINE!")) return false;
+        String lower = clean.toLowerCase(Locale.ROOT);
+        if (lower.startsWith("party >") || lower.startsWith("guild >")
+                || lower.startsWith("officer >") || lower.startsWith("co-op >")
+                || lower.startsWith("from ") || lower.startsWith("to ")) return false;
+
+        if (hideRewardWrappers && (lower.contains("chest lockpicked")
+                || lower.contains("loot chest collected") || lower.equals("rewards")
+                || clean.startsWith("▬"))) return true;
+        if (CHEST.matcher(clean).find()) return hideChestOpen;
+        if (ALREADY_LOOTED.matcher(clean).find()) return hideAlreadyLooted;
+        if (BREAKING_POWER.matcher(clean).find()) return hideBreakingPower;
+        if (COMPACT.matcher(clean).find()) return hideCompact;
+
+        Matcher matcher = POWDER_LINE.matcher(clean);
+        if (matcher.find() && hidePowder) {
+            int count = (int) Math.min(Integer.MAX_VALUE, amount(matcher.group(1)));
+            return powderThreshold == 0 || count < powderThreshold;
+        }
+
+        matcher = ESSENCE_LINE.matcher(clean);
+        if (matcher.find() && hideEssence) {
+            int count = (int) Math.min(Integer.MAX_VALUE, amount(matcher.group(1)));
+            return essenceThreshold == 0 || count < essenceThreshold;
+        }
+
+        matcher = GEM_LINE.matcher(clean);
+        if (matcher.find() && hideGemstones) {
+            String tier = matcher.group(1);
+            return switch (gemstoneTierFilter) {
+                case "Show All" -> false;
+                case "Hide All" -> true;
+                case "Hide Rough" -> tier.equals("Rough");
+                case "Hide Rough & Flawed" -> tier.equals("Rough") || tier.equals("Flawed");
+                default -> false;
+            };
+        }
+
+        if (OIL.matcher(clean).find()) return hideOilBarrel;
+        if (ROPE.matcher(clean).find()) return hideAscensionRope;
+        if (COMPASS.matcher(clean).find()) return hideWishingCompass;
+        if (HEART.matcher(clean).find()) return hideJungleHeart;
+        if (EGG.matcher(clean).find()) return hidePrehistoricEgg;
+        if (PICKONIMBUS.matcher(clean).find()) return hidePickonimbus;
+        if (SLUDGE.matcher(clean).find()) return hideSludgeJuice;
+        if (YOGGIE.matcher(clean).find()) return hideYoggie;
+        if (ROBOT.matcher(clean).find()) return hideRobotParts;
+        if (TREASURITE.matcher(clean).find()) return hideTreasurite;
+        if (GOBLIN_EGG.matcher(clean).find()) return hideGoblinEggs;
         return false;
+    }
+
+    private static boolean isCrystalHollows() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.world == null) return false;
+        ScoreboardObjective objective = client.world.getScoreboard()
+                .getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return false;
+        for (ScoreboardEntry entry : client.world.getScoreboard().getScoreboardEntries(objective)) {
+            if (entry.hidden()) continue;
+            String line;
+            if (entry.display() != null) {
+                line = entry.display().getString();
+            } else {
+                Team team = client.world.getScoreboard().getScoreHolderTeam(entry.owner());
+                line = team == null ? entry.name().getString()
+                        : team.decorateName(entry.name()).getString();
+            }
+            if (stripFormatting(line).toLowerCase(Locale.ROOT).contains("crystal hollows")) return true;
+        }
+        return false;
+    }
+
+    private static int toggleFilterSetting(String setting, net.minecraft.server.command.ServerCommandSource source) {
+        boolean value;
+        switch (setting) {
+            case "chest": hideChestOpen = !hideChestOpen; value = hideChestOpen; break;
+            case "already-looted": hideAlreadyLooted = !hideAlreadyLooted; value = hideAlreadyLooted; break;
+            case "breaking-power": hideBreakingPower = !hideBreakingPower; value = hideBreakingPower; break;
+            case "compact": hideCompact = !hideCompact; value = hideCompact; break;
+            case "wrappers": hideRewardWrappers = !hideRewardWrappers; value = hideRewardWrappers; break;
+            case "powder": hidePowder = !hidePowder; value = hidePowder; break;
+            case "essence": hideEssence = !hideEssence; value = hideEssence; break;
+            case "gemstones": hideGemstones = !hideGemstones; value = hideGemstones; break;
+            case "goblin-eggs": hideGoblinEggs = !hideGoblinEggs; value = hideGoblinEggs; break;
+            case "special-drops":
+                hideOilBarrel = !hideOilBarrel;
+                hideAscensionRope = hideOilBarrel;
+                hideWishingCompass = hideOilBarrel;
+                hideJungleHeart = hideOilBarrel;
+                hidePrehistoricEgg = hideOilBarrel;
+                hidePickonimbus = hideOilBarrel;
+                hideSludgeJuice = hideOilBarrel;
+                hideYoggie = hideOilBarrel;
+                hideRobotParts = hideOilBarrel;
+                hideTreasurite = hideOilBarrel;
+                value = hideOilBarrel;
+                break;
+            default: source.sendFeedback(() -> Text.literal("Unknown filter setting.")); return 0;
+        }
+        save();
+        source.sendFeedback(() -> Text.literal(setting + " hide setting " + (value ? "enabled" : "disabled")));
+        return 1;
+    }
+
+    private static int setGemstoneTier(String tier, net.minecraft.server.command.ServerCommandSource source) {
+        gemstoneTierFilter = tier;
+        save();
+        source.sendFeedback(() -> Text.literal("Gemstone tier filter: " + tier));
+        return 1;
     }
 
     private static void markActivity() {
@@ -401,7 +558,9 @@ public final class MiningFeatures {
                 + " | Gold " + format(goldIngots) + " ingots / " + format(enchantedGold) + " enchanted"
                 + " | Filter " + (powderFilterEnabled ? "ON" : "OFF")
                 + " | Tracker " + (trackerPaused ? "PAUSED" : sessionStarted ? "ACTIVE" : "IDLE")
-                + " | Active " + duration(activeTimeMs);
+                + " | Active " + duration(activeTimeMs)
+                + " | Powder threshold " + powderThreshold + " | Essence threshold " + essenceThreshold
+                + " | Gem tier " + gemstoneTierFilter;
     }
 
     private static void reset() {
@@ -453,6 +612,28 @@ public final class MiningFeatures {
             goldCompacts = value(p, "goldCompacts");
             goldIngots = value(p, "goldIngots");
             enchantedGold = value(p, "enchantedGold");
+            hideChestOpen = Boolean.parseBoolean(p.getProperty("hideChestOpen", "true"));
+            hideAlreadyLooted = Boolean.parseBoolean(p.getProperty("hideAlreadyLooted", "true"));
+            hideBreakingPower = Boolean.parseBoolean(p.getProperty("hideBreakingPower", "true"));
+            hideCompact = Boolean.parseBoolean(p.getProperty("hideCompact", "false"));
+            hideRewardWrappers = Boolean.parseBoolean(p.getProperty("hideRewardWrappers", "true"));
+            hidePowder = Boolean.parseBoolean(p.getProperty("hidePowder", "true"));
+            powderThreshold = (int) value(p, "powderThreshold");
+            hideEssence = Boolean.parseBoolean(p.getProperty("hideEssence", "true"));
+            essenceThreshold = (int) value(p, "essenceThreshold");
+            hideGemstones = Boolean.parseBoolean(p.getProperty("hideGemstones", "true"));
+            gemstoneTierFilter = p.getProperty("gemstoneTierFilter", "Hide Rough");
+            hideGoblinEggs = Boolean.parseBoolean(p.getProperty("hideGoblinEggs", "false"));
+            hideOilBarrel = Boolean.parseBoolean(p.getProperty("hideOilBarrel", "true"));
+            hideAscensionRope = Boolean.parseBoolean(p.getProperty("hideAscensionRope", "true"));
+            hideWishingCompass = Boolean.parseBoolean(p.getProperty("hideWishingCompass", "true"));
+            hideJungleHeart = Boolean.parseBoolean(p.getProperty("hideJungleHeart", "true"));
+            hidePrehistoricEgg = Boolean.parseBoolean(p.getProperty("hidePrehistoricEgg", "true"));
+            hidePickonimbus = Boolean.parseBoolean(p.getProperty("hidePickonimbus", "true"));
+            hideSludgeJuice = Boolean.parseBoolean(p.getProperty("hideSludgeJuice", "true"));
+            hideYoggie = Boolean.parseBoolean(p.getProperty("hideYoggie", "true"));
+            hideRobotParts = Boolean.parseBoolean(p.getProperty("hideRobotParts", "true"));
+            hideTreasurite = Boolean.parseBoolean(p.getProperty("hideTreasurite", "true"));
             activeTimeMs = value(p, "activeTimeMs");
             trackerPaused = Boolean.parseBoolean(p.getProperty("trackerPaused", "false"));
             sessionStarted = Boolean.parseBoolean(p.getProperty("sessionStarted", "false"));
@@ -496,6 +677,28 @@ public final class MiningFeatures {
         p.setProperty("goldCompacts", Long.toString(goldCompacts));
         p.setProperty("goldIngots", Long.toString(goldIngots));
         p.setProperty("enchantedGold", Long.toString(enchantedGold));
+        p.setProperty("hideChestOpen", Boolean.toString(hideChestOpen));
+        p.setProperty("hideAlreadyLooted", Boolean.toString(hideAlreadyLooted));
+        p.setProperty("hideBreakingPower", Boolean.toString(hideBreakingPower));
+        p.setProperty("hideCompact", Boolean.toString(hideCompact));
+        p.setProperty("hideRewardWrappers", Boolean.toString(hideRewardWrappers));
+        p.setProperty("hidePowder", Boolean.toString(hidePowder));
+        p.setProperty("powderThreshold", Integer.toString(powderThreshold));
+        p.setProperty("hideEssence", Boolean.toString(hideEssence));
+        p.setProperty("essenceThreshold", Integer.toString(essenceThreshold));
+        p.setProperty("hideGemstones", Boolean.toString(hideGemstones));
+        p.setProperty("gemstoneTierFilter", gemstoneTierFilter);
+        p.setProperty("hideGoblinEggs", Boolean.toString(hideGoblinEggs));
+        p.setProperty("hideOilBarrel", Boolean.toString(hideOilBarrel));
+        p.setProperty("hideAscensionRope", Boolean.toString(hideAscensionRope));
+        p.setProperty("hideWishingCompass", Boolean.toString(hideWishingCompass));
+        p.setProperty("hideJungleHeart", Boolean.toString(hideJungleHeart));
+        p.setProperty("hidePrehistoricEgg", Boolean.toString(hidePrehistoricEgg));
+        p.setProperty("hidePickonimbus", Boolean.toString(hidePickonimbus));
+        p.setProperty("hideSludgeJuice", Boolean.toString(hideSludgeJuice));
+        p.setProperty("hideYoggie", Boolean.toString(hideYoggie));
+        p.setProperty("hideRobotParts", Boolean.toString(hideRobotParts));
+        p.setProperty("hideTreasurite", Boolean.toString(hideTreasurite));
         p.setProperty("activeTimeMs", Long.toString(activeTimeMs));
         p.setProperty("trackerPaused", Boolean.toString(trackerPaused));
         p.setProperty("sessionStarted", Boolean.toString(sessionStarted));
