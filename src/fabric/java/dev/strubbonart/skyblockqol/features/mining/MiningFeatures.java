@@ -238,13 +238,13 @@ public final class MiningFeatures {
         if (clean.startsWith("COMPACT! You found ")) return false;
         if (clean.contains("Gemstone Powder") || clean.contains("Mithril Powder")) return true;
         if (clean.contains("Diamond Essence") || clean.contains("Gold Essence")) return true;
-        if (clean.contains("Gemstone x")) return true;
+        Matcher gemMatcher = GEM.matcher(clean);
+        if (gemMatcher.find()) return "Rough".equals(gemMatcher.group(1));
         if (OIL.matcher(clean).find() || ROPE.matcher(clean).find()
                 || COMPASS.matcher(clean).find() || HEART.matcher(clean).find()
                 || EGG.matcher(clean).find() || PICKONIMBUS.matcher(clean).find()
                 || SLUDGE.matcher(clean).find() || YOGGIE.matcher(clean).find()
-                || ROBOT.matcher(clean).find() || TREASURITE.matcher(clean).find()
-                || GOBLIN_EGG.matcher(clean).find()) return true;
+                || ROBOT.matcher(clean).find() || TREASURITE.matcher(clean).find()) return true;
         String compact = clean.toUpperCase(Locale.ROOT);
         if (compact.contains("CHEST LOCKPICKED") || compact.contains("LOOT CHEST COLLECTED")
                 || compact.equals("REWARDS") || compact.startsWith("▬")) return true;
