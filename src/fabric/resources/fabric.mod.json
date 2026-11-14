@@ -3,7 +3,7 @@
   "id": "skyblockqol",
   "version": "${version}",
   "name": "Skyblock QoL Port",
-  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. Current migrated features: performance HUD, countdown timer commands and HUD, and Roman numeral conversion command.",
+  "description": "Unofficial Minecraft 1.21 Fabric porting effort based on the Aetheria source. Current migrated features: performance HUD, countdown timer commands and HUD, Roman numeral conversion command, and advanced calculator commands.",
   "authors": [
     "Original Aetheria contributors",
     "strubbonart-cyber"
