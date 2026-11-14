@@ -27,7 +27,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Mining message parsing is currently based on recognized system-chat text and is not yet gated by a verified Crystal Hollows/Dwarven Mines location.
 - The filter currently suppresses common reward line types. The original per-category thresholds, full wrapper formatting behavior, and all configurable options are not yet migrated.
 - Powder and Pristine counters currently show lifetime totals. Rate/hour calculations, active-time/session behavior, profile-specific stats, tracker keybinds, and full draggable overlays are not yet migrated.
-- Full Gold Tracker pickup inventory-delta tracking and tablist stats are not yet migrated. Only its compact notification counter is parsed.
+- Initial Gold Tracker pickup counting is implemented by comparing inventory totals after a recently broken gold block/ore; ingot, enchanted-gold, and compact counts appear in the Mining HUD. Profit calculation, unit conversion, tablist mining stats, pause/hide settings, profile persistence, and exact internal SkyBlock item-ID detection remain unported.
 - HOTM tooltip powder cost, Commission Highlight, and Pickobulus preview are not yet migrated.
 - Ghost Tracker limitations: start/stop is manual so enable it only in The Mist; the original location validation, scavenger/purse tracker, drop-value/profit calculation, all original overlay options, and full profile/session behavior are not yet migrated.
 
