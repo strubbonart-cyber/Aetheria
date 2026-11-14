@@ -436,6 +436,10 @@ public final class DungeonRoomScanner {
         return value != null && value.isJsonPrimitive() ? value.getAsString() : fallback;
     }
 
+    private static String strip(String text) {
+        return text.replaceAll("§[0-9A-FK-ORa-fk-or]", "").trim();
+    }
+
     private static String shortHash(String hash) {
         return hash == null ? "unknown" : hash.substring(0, Math.min(8, hash.length()));
     }
