@@ -1,6 +1,8 @@
 package dev.strubbonart.skyblockqol.features.mining;
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.LoreComponent;
@@ -19,6 +21,12 @@ public final class CommissionHighlight {
     private CommissionHighlight() {}
 
     public static void initialize() {
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(ClientCommandManager.literal("commissionhighlight").executes(context -> {
+                    boolean active = toggle();
+                    context.getSource().sendFeedback(Text.literal("Commission highlight " + (active ? "enabled" : "disabled")));
+                    return 1;
+                })));
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (!(screen instanceof HandledScreen<?> handled)) return;
             if (!screen.getTitle().getString().contains("Commissions")) return;
