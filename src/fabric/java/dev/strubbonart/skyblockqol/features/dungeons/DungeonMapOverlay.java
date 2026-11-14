@@ -1,22 +1,24 @@
 package dev.strubbonart.skyblockqol.features.dungeons;
 
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.map.MapState;
 import net.minecraft.item.map.MapDecoration;
+import net.minecraft.item.map.MapState;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardEntry;
 import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.scoreboard.Team;
-import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 
 import java.io.IOException;
@@ -24,20 +26,32 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
- * Displays the live dungeon map from hotbar slot 9. Map decorations are drawn
- * by vanilla's MapRenderer, keeping the server-provided player markers intact.
- * Custom Aetheria room labels/player-name decorations are a later migration slice.
+ * Adjustable live Dungeon map HUD.
+ *
+ * Controls:
+ *   /dungeonmap                 toggle map
+ *   /dungeonmap labels          toggle player name labels
+ *   /dungeonmap position x y   set top-left screen position in scaled GUI pixels
+ *   /dungeonmap scale value    set size multiplier (0.5 to 2.0)
+ *   /dungeonmap reset           restore default position/size/labels
  */
 public final class DungeonMapOverlay {
     private static final Path SETTINGS = FabricLoader.getInstance().getConfigDir()
             .resolve("skyblockqol-dungeon-map.properties");
-    private static final int MAP_SIZE = 128;
+    private static final int BASE_SIZE = 128;
     private static final int PADDING = 5;
 
     private static boolean enabled;
+    private static boolean labelsEnabled = true;
+    private static int positionX = -1; // -1 = right-aligned default
+    private static int positionY = 8;
+    private static float scale = 1.0F;
 
     private DungeonMapOverlay() {}
 
@@ -45,13 +59,56 @@ public final class DungeonMapOverlay {
         load();
         HudRenderCallback.EVENT.register(DungeonMapOverlay::render);
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommandManager.literal("dungeonmap").executes(context -> {
-                    enabled = !enabled;
-                    save();
-                    context.getSource().sendFeedback(Text.literal(
-                            "Dungeon map HUD " + (enabled ? "enabled" : "disabled")));
-                    return 1;
-                })));
+                dispatcher.register(ClientCommandManager.literal("dungeonmap")
+                        .executes(context -> {
+                            boolean state = toggle();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon map HUD " + (state ? "enabled" : "disabled")));
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("toggle").executes(context -> {
+                            boolean state = toggle();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon map HUD " + (state ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("labels").executes(context -> {
+                            labelsEnabled = !labelsEnabled;
+                            save();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon map player labels " + (labelsEnabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("position")
+                                .then(ClientCommandManager.argument("x", IntegerArgumentType.integer(0, 10000))
+                                        .then(ClientCommandManager.argument("y", IntegerArgumentType.integer(0, 10000))
+                                                .executes(context -> {
+                                                    positionX = IntegerArgumentType.getInteger(context, "x");
+                                                    positionY = IntegerArgumentType.getInteger(context, "y");
+                                                    save();
+                                                    context.getSource().sendFeedback(Text.literal(
+                                                            "Dungeon map position set to " + positionX + ", " + positionY
+                                                                    + " (scaled GUI pixels from top-left)"));
+                                                    return 1;
+                                                }))))
+                        .then(ClientCommandManager.literal("scale")
+                                .then(ClientCommandManager.argument("value", FloatArgumentType.floatArg(0.5F, 2.0F))
+                                        .executes(context -> {
+                                            scale = FloatArgumentType.getFloat(context, "value");
+                                            save();
+                                            context.getSource().sendFeedback(Text.literal(
+                                                    String.format(Locale.ROOT, "Dungeon map scale: %.2fx", scale)));
+                                            return 1;
+                                        })))
+                        .then(ClientCommandManager.literal("reset").executes(context -> {
+                            positionX = -1;
+                            positionY = 8;
+                            scale = 1.0F;
+                            labelsEnabled = true;
+                            save();
+                            context.getSource().sendFeedback(Text.literal("Dungeon map position, size and labels reset."));
+                            return 1;
+                        }))));
     }
 
     public static boolean toggle() {
@@ -80,15 +137,19 @@ public final class DungeonMapOverlay {
         MapState mapState = client.world.getMapState(mapId);
         if (mapState == null) return;
 
-        int x = context.getScaledWindowWidth() - MAP_SIZE - PADDING - 8;
-        int y = 8;
+        int mapSize = Math.round(BASE_SIZE * scale);
+        int x = positionX < 0
+                ? context.getScaledWindowWidth() - mapSize - PADDING - 8
+                : positionX;
+        int y = positionY;
 
-        context.fill(x - 3, y - 3, x + MAP_SIZE + 3, y + MAP_SIZE + 3, 0x99000000);
+        context.fill(x - 3, y - 3, x + mapSize + 3, y + mapSize + 3, 0x99000000);
         context.drawTextWithShadow(client.textRenderer, "Dungeon Map", x, y - 11, 0xFFFFFFFF);
 
         var matrices = context.getMatrices();
         matrices.push();
         matrices.translate(x, y, 0.0F);
+        matrices.scale(scale, scale, 1.0F);
         client.gameRenderer.getMapRenderer().draw(
                 matrices,
                 context.getVertexConsumers(),
@@ -98,12 +159,13 @@ public final class DungeonMapOverlay {
                 0x00F000F0
         );
         matrices.pop();
-        drawPlayerLabels(context, mapState, x, y, client);
+
+        if (labelsEnabled) drawPlayerLabels(context, mapState, x, y, client);
     }
 
     private static void drawPlayerLabels(DrawContext context, MapState mapState,
-                                          int mapX, int mapY, MinecraftClient client) {
-        java.util.List<String> names = getOrderedPartyNames(client);
+                                         int mapX, int mapY, MinecraftClient client) {
+        List<String> names = getOrderedPartyNames(client);
         if (names.isEmpty()) return;
 
         int playerIndex = 0;
@@ -118,9 +180,9 @@ public final class DungeonMapOverlay {
             }
             playerIndex++;
 
-            int px = (int) Math.round(decoration.x() / 2.0 + 64.0);
-            int pz = (int) Math.round(decoration.z() / 2.0 + 64.0);
-            if (px < 0 || px >= MAP_SIZE || pz < 0 || pz >= MAP_SIZE) continue;
+            int px = (int) Math.round((decoration.x() / 2.0 + 64.0) * scale);
+            int pz = (int) Math.round((decoration.z() / 2.0 + 64.0) * scale);
+            if (px < 0 || px >= BASE_SIZE * scale || pz < 0 || pz >= BASE_SIZE * scale) continue;
 
             int color = name.equalsIgnoreCase(client.player.getName().getString())
                     ? 0xFFFFFFFF : 0xFFFFE68A;
@@ -128,14 +190,14 @@ public final class DungeonMapOverlay {
         }
     }
 
-    private static java.util.List<String> getOrderedPartyNames(MinecraftClient client) {
-        java.util.List<String> names = new java.util.ArrayList<>();
+    private static List<String> getOrderedPartyNames(MinecraftClient client) {
+        List<String> names = new ArrayList<>();
         if (client.player == null || client.world == null || client.getNetworkHandler() == null) return names;
 
         String self = client.player.getName().getString();
         names.add(self);
 
-        java.util.List<String> tabNames = new java.util.ArrayList<>();
+        List<String> tabNames = new ArrayList<>();
         for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
             if (entry == null || entry.getProfile() == null) continue;
             String name = entry.getProfile().getName();
@@ -146,7 +208,7 @@ public final class DungeonMapOverlay {
                 .getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
         if (objective == null) return names;
 
-        java.util.List<String> lines = new java.util.ArrayList<>();
+        List<String> lines = new ArrayList<>();
         for (ScoreboardEntry entry : client.world.getScoreboard().getScoreboardEntries(objective)) {
             if (entry.hidden()) continue;
             String line;
@@ -183,7 +245,7 @@ public final class DungeonMapOverlay {
         return hasLetter;
     }
 
-    private static boolean containsIgnoreCase(java.util.List<String> names, String value) {
+    private static boolean containsIgnoreCase(List<String> names, String value) {
         for (String name : names) if (name.equalsIgnoreCase(value)) return true;
         return false;
     }
@@ -198,21 +260,34 @@ public final class DungeonMapOverlay {
         try (InputStream input = Files.newInputStream(SETTINGS)) {
             properties.load(input);
             enabled = Boolean.parseBoolean(properties.getProperty("enabled", "false"));
-        } catch (IOException ignored) {
+            labelsEnabled = Boolean.parseBoolean(properties.getProperty("labelsEnabled", "true"));
+            positionX = Integer.parseInt(properties.getProperty("positionX", "-1"));
+            positionY = Integer.parseInt(properties.getProperty("positionY", "8"));
+            scale = Math.max(0.5F, Math.min(2.0F,
+                    Float.parseFloat(properties.getProperty("scale", "1.0"))));
+        } catch (Exception ignored) {
             enabled = false;
+            labelsEnabled = true;
+            positionX = -1;
+            positionY = 8;
+            scale = 1.0F;
         }
     }
 
     private static void save() {
         Properties properties = new Properties();
         properties.setProperty("enabled", Boolean.toString(enabled));
+        properties.setProperty("labelsEnabled", Boolean.toString(labelsEnabled));
+        properties.setProperty("positionX", Integer.toString(positionX));
+        properties.setProperty("positionY", Integer.toString(positionY));
+        properties.setProperty("scale", Float.toString(scale));
         try {
             Files.createDirectories(SETTINGS.getParent());
             try (OutputStream output = Files.newOutputStream(SETTINGS)) {
                 properties.store(output, "Skyblock QoL Dungeon Map Settings");
             }
         } catch (IOException ignored) {
-            // The HUD remains usable for the current session if persistence fails.
+            // The current-session HUD remains available if disk persistence fails.
         }
     }
 }
