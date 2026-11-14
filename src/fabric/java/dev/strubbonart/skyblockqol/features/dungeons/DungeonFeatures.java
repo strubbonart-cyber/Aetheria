@@ -94,6 +94,15 @@ public final class DungeonFeatures {
                             context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("data").executes(context -> {
+                            context.getSource().sendFeedback(Text.literal(DungeonDataRepository.getStatus()));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("refresh-data").executes(context -> {
+                            DungeonDataRepository.refresh();
+                            context.getSource().sendFeedback(Text.literal("Dungeon room and secret data refresh queued."));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.literal("status").executes(context -> {
                             context.getSource().sendFeedback(Text.literal(
                                     "Hide dungeon blessing messages: "
@@ -103,7 +112,8 @@ public final class DungeonFeatures {
                                             + " | Dungeon timer HUD: "
                                             + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")
                                             + " | Boss highlights: " + (bossHighlightsEnabled ? "ON" : "OFF")
-                                            + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")));
+                                            + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")
+                                            + " | " + DungeonDataRepository.getStatus()));
                             return 1;
                         }))));
     }

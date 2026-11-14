@@ -34,6 +34,11 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Pickobulus Preview is migrated: while holding an item with `Ability: Pickobulus` in its lore, it raycasts up to 30 blocks and renders a 7×7×7 pink wireframe/fill cube centred on the targeted block. Toggle with `/pickobuluspreview`. It follows the original preview geometry; the original commented-out cooldown handling remains intentionally absent.
 - Ghost Tracker limitations: start/stop is manual so enable it only in The Mist; the original location validation, scavenger/purse tracker, drop-value/profit calculation, all original overlay options, and full profile/session behavior are not yet migrated.
 
+## Dungeon data foundation
+
+- Runtime downloader/cache for the original Aetheria dungeon room and secret-location JSON. Files are stored in `config/skyblockqol/dungeon-data/`, fetched asynchronously, and retained with their GPL-3.0 attribution metadata. Check using `/dungeon data`; refresh using `/dungeon refresh-data`.
+- This data foundation does not yet identify the player's room or render secrets. The original detector hashes legacy block-state strings, so the 1.21 port still needs a verified legacy-state normalization layer before its hashes can match the source dataset.
+
 ## Dungeon features not yet ported
 
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
