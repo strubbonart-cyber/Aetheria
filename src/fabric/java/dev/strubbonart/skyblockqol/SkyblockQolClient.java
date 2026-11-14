@@ -3,6 +3,7 @@ package dev.strubbonart.skyblockqol;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.calculator.CalculatorCommand;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
+import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.mining.CommissionHighlight;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
@@ -36,6 +37,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         CommissionHighlight.initialize();
         GhostTrackerFeatures.initialize();
         DungeonFeatures.initialize();
+        DungeonRunOverlay.initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (toggleHudKey.wasPressed()) {
