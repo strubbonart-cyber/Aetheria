@@ -223,7 +223,7 @@ public final class DungeonMapOverlay {
         }
     }
 
-    private static List<String> getOrderedPartyNames(MinecraftClient client) {
+    public static List<String> getOrderedPartyNames(MinecraftClient client) {
         List<String> names = new ArrayList<>();
         if (client.player == null || client.world == null || client.getNetworkHandler() == null) return names;
 

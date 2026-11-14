@@ -43,9 +43,11 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 - Rectangular Dungeon room scanner and Secret Finder first slice: uses the original sorted block-frequency MD5 plus floor-hash disambiguation against the downloaded GPL-3.0 room/secret datasets. Shows matched room name/category/alias/relative coordinates in the HUD. Secret markers render coloured block boxes, track chest/lever interactions, nearby item pickups, entrance proximity, block disappearance, and the server Secrets Found action bar. Toggle with `/dungeon room` and `/dungeon secrets`, or in the Dungeon GUI. Only rectangular room geometry is supported at this stage; L-shaped rooms, full secret collection edge cases, tracers, custom labels, and 1.8-to-1.21 hash compatibility remain to be verified in-game. Unknown hashes are shown as unmatched rather than guessed.
 
+- Spirit Leap / InfiniLeap menu first slice: automatically replaces the matching chest screen while in a dungeon, shows the live map and party markers, and provides clickable teammate buttons. A button selects the matching player item in the original container using a normal vanilla slot click. Enable/disable with `/dungeon leap` or the Dungeon settings GUI. In-game server verification is still needed for both server menu title variants and item-name matching.
+
 ## Dungeon features not yet ported
 
-- L-shaped room detection, visited-room map labels/custom rank badges, advanced secret labels/tracers and Spirit Leap/InfiniLeap map menu
+- L-shaped room detection, visited-room map labels/custom rank badges and advanced secret labels/tracers
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - CSGO chest opening animation
 - Dungeon chest price estimator

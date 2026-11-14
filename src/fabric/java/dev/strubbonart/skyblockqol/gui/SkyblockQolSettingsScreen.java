@@ -155,6 +155,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Secret finder", DungeonRoomScanner.isSecretFinderEnabled(),
                         right, y, colWidth, () -> DungeonRoomScanner.setSecretFinderEnabled(!DungeonRoomScanner.isSecretFinderEnabled()));
 
+                y += 24;
+                addToggle("Spirit Leap / InfiniLeap menu", DungeonFeatures.isLeapMenuEnabled(),
+                        left, y, 300, () -> DungeonFeatures.setLeapMenuEnabled(!DungeonFeatures.isLeapMenuEnabled()));
+
                 y += 31;
                 String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER", "ROOM"};
                 int bx = left;

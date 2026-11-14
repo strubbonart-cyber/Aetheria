@@ -40,6 +40,7 @@ public final class DungeonFeatures {
     private static boolean breakerOverlayEnabled;
     private static boolean bossHighlightsEnabled = true;
     private static boolean bloodHighlightsEnabled = true;
+    private static boolean leapMenuEnabled = true;
 
     private DungeonFeatures() {}
 
@@ -68,6 +69,13 @@ public final class DungeonFeatures {
 
     public static boolean areBossHighlightsEnabled() {
         return bossHighlightsEnabled;
+    }
+
+    public static boolean isLeapMenuEnabled() { return leapMenuEnabled; }
+
+    public static void setLeapMenuEnabled(boolean value) {
+        leapMenuEnabled = value;
+        save();
     }
 
     public static boolean areBloodHighlightsEnabled() {
@@ -118,6 +126,12 @@ public final class DungeonFeatures {
                         .then(ClientCommandManager.literal("timer").executes(context -> {
                             boolean enabled = DungeonRunOverlay.toggle();
                             context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("leap").executes(context -> {
+                            leapMenuEnabled = !leapMenuEnabled;
+                            save();
+                            context.getSource().sendFeedback(Text.literal("Spirit Leap menu " + (leapMenuEnabled ? "enabled" : "disabled")));
                             return 1;
                         }))
                         .then(ClientCommandManager.literal("map").executes(context -> {
@@ -186,6 +200,7 @@ public final class DungeonFeatures {
                                             + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")
                                             + " | Boss highlights: " + (bossHighlightsEnabled ? "ON" : "OFF")
                                             + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")
+                                            + " | Spirit Leap menu: " + (leapMenuEnabled ? "ON" : "OFF")
                                             + " | Dungeon map HUD: " + (DungeonMapOverlay.isEnabled() ? "ON" : "OFF")
                                             + " | Room overlay: " + (DungeonRoomScanner.isRoomOverlayEnabled() ? "ON" : "OFF")
                                             + " | Secret finder: " + (DungeonRoomScanner.isSecretFinderEnabled() ? "ON" : "OFF")
@@ -250,6 +265,7 @@ public final class DungeonFeatures {
             breakerOverlayEnabled = Boolean.parseBoolean(properties.getProperty("breakerOverlayEnabled", "false"));
             bossHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bossHighlightsEnabled", "true"));
             bloodHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bloodHighlightsEnabled", "true"));
+            leapMenuEnabled = Boolean.parseBoolean(properties.getProperty("leapMenuEnabled", "true"));
         } catch (IOException ignored) {
             hideBlessingMessages = false;
         }
@@ -261,6 +277,7 @@ public final class DungeonFeatures {
         properties.setProperty("breakerOverlayEnabled", Boolean.toString(breakerOverlayEnabled));
         properties.setProperty("bossHighlightsEnabled", Boolean.toString(bossHighlightsEnabled));
         properties.setProperty("bloodHighlightsEnabled", Boolean.toString(bloodHighlightsEnabled));
+        properties.setProperty("leapMenuEnabled", Boolean.toString(leapMenuEnabled));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(DATA_FILE)) {
