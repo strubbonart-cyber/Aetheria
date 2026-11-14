@@ -16,6 +16,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 - Timer controls: `/timer show`, `pause`, `resume`, `cancel`, and `add <duration>`.
 - Timer HUD: remaining duration and pause state; expiration produces a chat notification.
 - Roman numeral conversion: `/roman <numeral>`, accepting canonical numerals from I through MMMCMXCIX.
+- Advanced calculator: `/calc <expression>` and `/athrcalc <expression>`, using the original expression evaluator with arithmetic, functions, constants, postfix multipliers, and factorial.
 
 ## Build verification
 
