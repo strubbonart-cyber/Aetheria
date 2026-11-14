@@ -45,11 +45,12 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 - Spirit Leap / InfiniLeap menu first slice: automatically replaces the matching chest screen while in a dungeon, shows the live map and party markers, and provides clickable teammate buttons. A button or clickable player map marker selects the matching player item in the original container using a normal vanilla slot click. Returning to the original chest is protected from automatically re-opening the overlay. Enable/disable with `/dungeon leap` or the Dungeon settings GUI. In-game server verification is still needed for both server menu title variants and item-name matching.
 
+- Dungeon chest reveal animation first slice: on Obsidian/Bedrock reward chests during a run, scans the server-populated reward slots after a short delay and selects the actual shown reward using the original Aetheria floor/material drop table. It displays a short visual carousel and the actual reward stack; it does not generate or change the reward. Toggle with `/dungeon chestanimation` or the Dungeon GUI. Croesus chest-list integration and original custom animated textures are not yet ported.
+
 ## Dungeon features not yet ported
 
 - L-shaped room detection, visited-room map labels/custom rank badges and advanced secret labels/tracers
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
-- CSGO chest opening animation
 - Dungeon chest price estimator
 - `/report-secret` workflow
 

@@ -159,6 +159,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Spirit Leap / InfiniLeap menu", DungeonFeatures.isLeapMenuEnabled(),
                         left, y, 300, () -> DungeonFeatures.setLeapMenuEnabled(!DungeonFeatures.isLeapMenuEnabled()));
 
+                y += 24;
+                addToggle("Chest reveal animation", DungeonFeatures.isCaseOpeningAnimationEnabled(),
+                        left, y, 300, () -> DungeonFeatures.setCaseOpeningAnimationEnabled(!DungeonFeatures.isCaseOpeningAnimationEnabled()));
+
                 y += 31;
                 String[] options = {"MAP", "TIMER", "SPLITS", "BREAKER", "ROOM"};
                 int bx = left;

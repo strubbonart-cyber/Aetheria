@@ -41,6 +41,7 @@ public final class DungeonFeatures {
     private static boolean bossHighlightsEnabled = true;
     private static boolean bloodHighlightsEnabled = true;
     private static boolean leapMenuEnabled = true;
+    private static boolean caseOpeningAnimationEnabled;
 
     private DungeonFeatures() {}
 
@@ -72,6 +73,13 @@ public final class DungeonFeatures {
     }
 
     public static boolean isLeapMenuEnabled() { return leapMenuEnabled; }
+
+    public static boolean isCaseOpeningAnimationEnabled() { return caseOpeningAnimationEnabled; }
+
+    public static void setCaseOpeningAnimationEnabled(boolean value) {
+        caseOpeningAnimationEnabled = value;
+        save();
+    }
 
     public static void setLeapMenuEnabled(boolean value) {
         leapMenuEnabled = value;
@@ -126,6 +134,13 @@ public final class DungeonFeatures {
                         .then(ClientCommandManager.literal("timer").executes(context -> {
                             boolean enabled = DungeonRunOverlay.toggle();
                             context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("chestanimation").executes(context -> {
+                            caseOpeningAnimationEnabled = !caseOpeningAnimationEnabled;
+                            save();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Dungeon chest reveal animation " + (caseOpeningAnimationEnabled ? "enabled" : "disabled")));
                             return 1;
                         }))
                         .then(ClientCommandManager.literal("leap").executes(context -> {
@@ -266,6 +281,8 @@ public final class DungeonFeatures {
             bossHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bossHighlightsEnabled", "true"));
             bloodHighlightsEnabled = Boolean.parseBoolean(properties.getProperty("bloodHighlightsEnabled", "true"));
             leapMenuEnabled = Boolean.parseBoolean(properties.getProperty("leapMenuEnabled", "true"));
+            caseOpeningAnimationEnabled = Boolean.parseBoolean(properties.getProperty("caseOpeningAnimationEnabled", "false"));
+            caseOpeningAnimationEnabled = Boolean.parseBoolean(properties.getProperty("caseOpeningAnimationEnabled", "false"));
         } catch (IOException ignored) {
             hideBlessingMessages = false;
         }
@@ -278,6 +295,8 @@ public final class DungeonFeatures {
         properties.setProperty("bossHighlightsEnabled", Boolean.toString(bossHighlightsEnabled));
         properties.setProperty("bloodHighlightsEnabled", Boolean.toString(bloodHighlightsEnabled));
         properties.setProperty("leapMenuEnabled", Boolean.toString(leapMenuEnabled));
+        properties.setProperty("caseOpeningAnimationEnabled", Boolean.toString(caseOpeningAnimationEnabled));
+        properties.setProperty("caseOpeningAnimationEnabled", Boolean.toString(caseOpeningAnimationEnabled));
         try {
             Files.createDirectories(DATA_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(DATA_FILE)) {
