@@ -31,7 +31,7 @@ public final class GhostTrackerFeatures {
             Pattern.CASE_INSENSITIVE
     );
     private static final Pattern COMBAT_XP = Pattern.compile(
-            "\\+([\\d.]+) Combat \\(([\\d,]+)(?:\\s*/[^)]*)?\\)"
+            "\\+([\\d.]+) Combat \\(([\\d,.]+)(?:\\s*/[^)]*)?\\)"
     );
     private static final Pattern COIN_DROP = Pattern.compile(
             "The ghost's death materialized [\\d,]+ coins from the mists!",
