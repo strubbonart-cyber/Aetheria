@@ -65,12 +65,19 @@ public final class DungeonFeatures {
                                             + (breakerOverlayEnabled ? "enabled" : "disabled")));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("timer").executes(context -> {
+                            boolean enabled = DungeonRunOverlay.toggle();
+                            context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.literal("status").executes(context -> {
                             context.getSource().sendFeedback(Text.literal(
                                     "Hide dungeon blessing messages: "
                                             + (hideBlessingMessages ? "ON" : "OFF")
                                             + " | Dungeon Breaker overlay: "
-                                            + (breakerOverlayEnabled ? "ON" : "OFF")));
+                                            + (breakerOverlayEnabled ? "ON" : "OFF")
+                                            + " | Dungeon timer HUD: "
+                                            + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")));
                             return 1;
                         }))));
     }
