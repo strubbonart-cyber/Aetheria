@@ -41,7 +41,7 @@ This branch is an unofficial, incomplete Fabric port based on the Aetheria sourc
 
 ## Dungeon features not yet ported
 
-- Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
+- Dungeon room detection/overlay, secret finder, visited-room labels, custom party names/ranks and Spirit Leap/InfiniLeap map menu
 - Dungeon room detection/overlay, secret finder, dungeon map/player markers, and Spirit Leap/InfiniLeap map menu
 - CSGO chest opening animation
 - Dungeon chest price estimator

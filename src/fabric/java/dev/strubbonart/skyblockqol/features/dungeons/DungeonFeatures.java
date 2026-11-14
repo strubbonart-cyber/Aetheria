@@ -94,6 +94,11 @@ public final class DungeonFeatures {
                             context.getSource().sendFeedback(Text.literal("Dungeon timer HUD " + (enabled ? "enabled" : "disabled")));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("map").executes(context -> {
+                            boolean enabled = DungeonMapOverlay.toggle();
+                            context.getSource().sendFeedback(Text.literal("Dungeon map HUD " + (enabled ? "enabled" : "disabled")));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.literal("data").executes(context -> {
                             context.getSource().sendFeedback(Text.literal(DungeonDataRepository.getStatus()));
                             return 1;
@@ -113,6 +118,7 @@ public final class DungeonFeatures {
                                             + (DungeonRunOverlay.isEnabled() ? "ON" : "OFF")
                                             + " | Boss highlights: " + (bossHighlightsEnabled ? "ON" : "OFF")
                                             + " | Blood highlights: " + (bloodHighlightsEnabled ? "ON" : "OFF")
+                                            + " | Dungeon map HUD: " + (DungeonMapOverlay.isEnabled() ? "ON" : "OFF")
                                             + " | " + DungeonDataRepository.getStatus()));
                             return 1;
                         }))));
