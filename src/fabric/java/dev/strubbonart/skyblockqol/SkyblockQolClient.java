@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.calculator.CalculatorCommand;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
+import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.roman.RomanNumeralCommands;
 import dev.strubbonart.skyblockqol.features.timer.CountdownTimer;
 import net.fabricmc.api.ClientModInitializer;
@@ -31,6 +32,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         RomanNumeralCommands.register();
         CalculatorCommand.register();
         MiningFeatures.initialize();
+        GhostTrackerFeatures.initialize();
         DungeonFeatures.initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
