@@ -2,6 +2,7 @@ package dev.strubbonart.skyblockqol.features.dungeons;
 
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.text.Text;

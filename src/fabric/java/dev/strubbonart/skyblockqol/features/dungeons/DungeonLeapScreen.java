@@ -118,7 +118,7 @@ public final class DungeonLeapScreen extends Screen {
     }
 
     @Override
-    protected boolean mouseClicked(double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (button == 0 && mouseX >= mapX && mouseX <= mapX + mapSize
                 && mouseY >= mapY && mouseY <= mapY + mapSize) {
             String player = playerAtMapPosition(mouseX, mouseY);
