@@ -11,6 +11,12 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.map.MapState;
+import net.minecraft.item.map.MapDecoration;
+import net.minecraft.scoreboard.ScoreboardDisplaySlot;
+import net.minecraft.scoreboard.ScoreboardEntry;
+import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 
 import java.io.IOException;
@@ -92,6 +98,98 @@ public final class DungeonMapOverlay {
                 0x00F000F0
         );
         matrices.pop();
+        drawPlayerLabels(context, mapState, x, y, client);
+    }
+
+    private static void drawPlayerLabels(DrawContext context, MapState mapState,
+                                          int mapX, int mapY, MinecraftClient client) {
+        java.util.List<String> names = getOrderedPartyNames(client);
+        if (names.isEmpty()) return;
+
+        int playerIndex = 0;
+        for (MapDecoration decoration : mapState.getDecorations()) {
+            String asset = decoration.getAssetId().getPath();
+            if (!asset.startsWith("player")) continue;
+
+            String name = decoration.name().map(Text::getString).orElse(null);
+            if (name == null || name.isBlank()) {
+                if (playerIndex >= names.size()) break;
+                name = names.get(playerIndex);
+            }
+            playerIndex++;
+
+            int px = (int) Math.round(decoration.x() / 2.0 + 64.0);
+            int pz = (int) Math.round(decoration.z() / 2.0 + 64.0);
+            if (px < 0 || px >= MAP_SIZE || pz < 0 || pz >= MAP_SIZE) continue;
+
+            int color = name.equalsIgnoreCase(client.player.getName().getString())
+                    ? 0xFFFFFFFF : 0xFFFFE68A;
+            context.drawTextWithShadow(client.textRenderer, name, mapX + px + 3, mapY + pz - 4, color);
+        }
+    }
+
+    private static java.util.List<String> getOrderedPartyNames(MinecraftClient client) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        if (client.player == null || client.world == null || client.getNetworkHandler() == null) return names;
+
+        String self = client.player.getName().getString();
+        names.add(self);
+
+        java.util.List<String> tabNames = new java.util.ArrayList<>();
+        for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
+            if (entry == null || entry.getProfile() == null) continue;
+            String name = entry.getProfile().getName();
+            if (isPlausibleUsername(name) && !tabNames.contains(name)) tabNames.add(name);
+        }
+
+        ScoreboardObjective objective = client.world.getScoreboard()
+                .getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+        if (objective == null) return names;
+
+        java.util.List<String> lines = new java.util.ArrayList<>();
+        for (ScoreboardEntry entry : client.world.getScoreboard().getScoreboardEntries(objective)) {
+            if (entry.hidden()) continue;
+            String line;
+            if (entry.display() != null) {
+                line = stripFormatting(entry.display().getString());
+            } else {
+                Team team = client.world.getScoreboard().getScoreHolderTeam(entry.owner());
+                line = stripFormatting(team == null
+                        ? entry.name().getString()
+                        : team.decorateName(entry.name()).getString());
+            }
+            lines.add(line);
+        }
+
+        for (String line : lines) {
+            for (String tabName : tabNames) {
+                boolean matches = line.contains(tabName)
+                        || (tabName.length() > 12 && line.contains(tabName.substring(0, 12)));
+                if (matches && !containsIgnoreCase(names, tabName)) names.add(tabName);
+            }
+        }
+        return names;
+    }
+
+    private static boolean isPlausibleUsername(String name) {
+        if (name == null || name.length() < 3 || name.length() > 16) return false;
+        boolean hasLetter = false;
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+                    || (c >= '0' && c <= '9') || c == '_')) return false;
+            if (Character.isLetter(c)) hasLetter = true;
+        }
+        return hasLetter;
+    }
+
+    private static boolean containsIgnoreCase(java.util.List<String> names, String value) {
+        for (String name : names) if (name.equalsIgnoreCase(value)) return true;
+        return false;
+    }
+
+    private static String stripFormatting(String text) {
+        return text.replaceAll("§[0-9A-FK-ORa-fk-or]", "").trim();
     }
 
     private static void load() {
