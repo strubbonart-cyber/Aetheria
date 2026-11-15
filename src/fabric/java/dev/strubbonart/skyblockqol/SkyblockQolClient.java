@@ -21,6 +21,8 @@ import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventoryButtonsFeature;
+import dev.strubbonart.skyblockqol.features.calculator.CalculatorCommand;
+import dev.strubbonart.skyblockqol.features.calculator.SignCalculatorFeature;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import dev.strubbonart.skyblockqol.features.fishing.FishingTimerFeature;
@@ -73,6 +75,8 @@ public final class SkyblockQolClient implements ClientModInitializer {
         InventorySearchFeature.initialize();
         ProtectedItemFeature.initialize();
         InventoryButtonsFeature.initialize();
+        CalculatorCommand.register();
+        SignCalculatorFeature.initialize();
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         ExtraQolFeatures.initialize();

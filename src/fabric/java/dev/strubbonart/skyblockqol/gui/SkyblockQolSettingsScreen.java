@@ -9,6 +9,7 @@ import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventoryButtonsFeature;
+import dev.strubbonart.skyblockqol.features.calculator.SignCalculatorFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
@@ -283,6 +284,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
             }
             case MORE -> {
+                addToggle("Sign Calculator (line 2: ^^^^^^)",
+                        SignCalculatorFeature.isEnabled(), left, y, 300,
+                        () -> SignCalculatorFeature.setEnabled(!SignCalculatorFeature.isEnabled()));
+                y += 28;
                 addToggle("Inventory Buttons (" + InventoryButtonsFeature.getButtonCount() + ")",
                         InventoryButtonsFeature.isEnabled(), left, y, 300,
                         () -> InventoryButtonsFeature.setEnabled(!InventoryButtonsFeature.isEnabled()));

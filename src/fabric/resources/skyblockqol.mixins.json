@@ -15,7 +15,8 @@
     "EntityDisplayNameMixin",
     "MouseCursorMixin",
     "ScreenAccessorMixin",
-    "ProtectedDropMixin"
+    "ProtectedDropMixin",
+    "SignCalculatorMixin"
   ],
   "injectors": {
     "defaultRequire": 1
