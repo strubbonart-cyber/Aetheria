@@ -1,4 +1,4 @@
-name: Build Skyblock QoL Fabric Port 1.21
+name: Build Skyblock QoL Fabric Port 1.21.11
 
 on:
   workflow_dispatch:
@@ -38,7 +38,7 @@ jobs:
       - name: Upload Fabric mod JAR
         uses: actions/upload-artifact@v4
         with:
-          name: skyblock-qol-fabric-port-1.21
-          path: build/libs/skyblock-qol-fabric-port-1.21-1.0.0-fabric.jar
+          name: skyblock-qol-fabric-port-1.21.11
+          path: build/libs/skyblock-qol-fabric-port-1.21.11-1.0.0-fabric-1.21.11.jar
           if-no-files-found: error
           retention-days: 7
