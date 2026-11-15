@@ -286,6 +286,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setNoSwapAnimationEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isNoSwapAnimationEnabled()));
+                y += 28;
+                addToggle("Item Stack Tips (books / Catacombs passes)",
+                        dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isItemStackTipsEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setItemStackTipsEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isItemStackTipsEnabled()));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),

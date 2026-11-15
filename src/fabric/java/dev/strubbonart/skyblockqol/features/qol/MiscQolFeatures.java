@@ -23,6 +23,8 @@ public final class MiscQolFeatures {
     private static boolean skyblockXpInChat;
     private static boolean disableEntityFire;
     private static boolean noSwapAnimation;
+    private static boolean itemStackTips = true;
+    private static String lastSkyblockXpAmount;
 
     private MiscQolFeatures() {}
 
@@ -31,13 +33,19 @@ public final class MiscQolFeatures {
         initialized = true;
         load();
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (!skyblockXpInChat || !overlay) return;
+            if (!overlay) return;
             String plain = message.getString().replaceAll("§[0-9A-FK-ORa-fk-or]", "");
             Matcher matcher = SKYBLOCK_XP.matcher(plain);
-            if (!matcher.find()) return;
+            if (!matcher.find()) {
+                lastSkyblockXpAmount = null;
+                return;
+            }
+            String amount = matcher.group(1);
+            if (!skyblockXpInChat || amount.equals(lastSkyblockXpAmount)) return;
+            lastSkyblockXpAmount = amount;
             MinecraftClient client = MinecraftClient.getInstance();
             if (client.player != null) {
-                client.player.sendMessage(Text.literal("+" + matcher.group(1) + " SkyBlock XP"), false);
+                client.player.sendMessage(Text.literal("+" + amount + " SkyBlock XP"), false);
             }
         });
     }
@@ -49,6 +57,8 @@ public final class MiscQolFeatures {
     }
     public static boolean isDisableEntityFireEnabled() { return disableEntityFire; }
     public static boolean isNoSwapAnimationEnabled() { return noSwapAnimation; }
+    public static boolean isItemStackTipsEnabled() { return itemStackTips; }
+    public static void setItemStackTipsEnabled(boolean value) { itemStackTips = value; save(); }
     public static void setNoSwapAnimationEnabled(boolean value) { noSwapAnimation = value; save(); }
     public static void setDisableEntityFireEnabled(boolean value) {
         disableEntityFire = value;
@@ -63,10 +73,12 @@ public final class MiscQolFeatures {
             skyblockXpInChat = Boolean.parseBoolean(properties.getProperty("skyblockXpInChat", "false"));
             disableEntityFire = Boolean.parseBoolean(properties.getProperty("disableEntityFire", "false"));
             noSwapAnimation = Boolean.parseBoolean(properties.getProperty("noSwapAnimation", "false"));
+            itemStackTips = Boolean.parseBoolean(properties.getProperty("itemStackTips", "true"));
         } catch (IOException ignored) {
             skyblockXpInChat = false;
             disableEntityFire = false;
             noSwapAnimation = false;
+            itemStackTips = true;
         }
     }
 
@@ -75,6 +87,7 @@ public final class MiscQolFeatures {
         properties.setProperty("skyblockXpInChat", Boolean.toString(skyblockXpInChat));
         properties.setProperty("disableEntityFire", Boolean.toString(disableEntityFire));
         properties.setProperty("noSwapAnimation", Boolean.toString(noSwapAnimation));
+        properties.setProperty("itemStackTips", Boolean.toString(itemStackTips));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream output = Files.newOutputStream(FILE)) {
