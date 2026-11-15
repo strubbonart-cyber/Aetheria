@@ -137,6 +137,14 @@ public final class GardenPestFeatures {
                                             + ", threshold " + cooldownThreshold + "s"));
                             return 1;
                         }))
+                        .then(ClientCommandManager.literal("test").executes(context -> {
+                            long now = System.currentTimeMillis();
+                            lastCooldownMs = cooldownThreshold * 1000L;
+                            cooldownReadAt = now;
+                            alertUntil = now + 3_000L;
+                            context.getSource().sendFeedback(Text.literal("Pest cooldown alert test triggered."));
+                            return 1;
+                        }))
                         .then(ClientCommandManager.argument("seconds", IntegerArgumentType.integer(5, 300))
                                 .executes(context -> {
                                     cooldownThreshold = IntegerArgumentType.getInteger(context, "seconds");

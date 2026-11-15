@@ -177,6 +177,18 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setHideEnchantDescriptionsEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isHideEnchantDescriptionsEnabled()));
                 y += 26;
+                addToggle("SkyBlock XP in chat (server support required)",
+                        dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isSkyblockXpInChatEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setSkyblockXpInChatEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isSkyblockXpInChatEnabled()));
+                y += 26;
+                addToggle("Disable entity fire overlay",
+                        dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDisableEntityFireEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setDisableEntityFireEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDisableEntityFireEnabled()));
+                y += 26;
                 addToggle("Watched player join/leave (" +
                                 dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.getWatchedCount() + ")",
                         dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isJoinLeaveEnabled(),
