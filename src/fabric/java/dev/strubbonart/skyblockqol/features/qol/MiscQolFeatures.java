@@ -22,6 +22,7 @@ public final class MiscQolFeatures {
     private static boolean initialized;
     private static boolean skyblockXpInChat;
     private static boolean disableEntityFire;
+    private static boolean noSwapAnimation;
 
     private MiscQolFeatures() {}
 
@@ -47,6 +48,8 @@ public final class MiscQolFeatures {
         save();
     }
     public static boolean isDisableEntityFireEnabled() { return disableEntityFire; }
+    public static boolean isNoSwapAnimationEnabled() { return noSwapAnimation; }
+    public static void setNoSwapAnimationEnabled(boolean value) { noSwapAnimation = value; save(); }
     public static void setDisableEntityFireEnabled(boolean value) {
         disableEntityFire = value;
         save();
@@ -59,9 +62,11 @@ public final class MiscQolFeatures {
             properties.load(input);
             skyblockXpInChat = Boolean.parseBoolean(properties.getProperty("skyblockXpInChat", "false"));
             disableEntityFire = Boolean.parseBoolean(properties.getProperty("disableEntityFire", "false"));
+            noSwapAnimation = Boolean.parseBoolean(properties.getProperty("noSwapAnimation", "false"));
         } catch (IOException ignored) {
             skyblockXpInChat = false;
             disableEntityFire = false;
+            noSwapAnimation = false;
         }
     }
 
@@ -69,6 +74,7 @@ public final class MiscQolFeatures {
         Properties properties = new Properties();
         properties.setProperty("skyblockXpInChat", Boolean.toString(skyblockXpInChat));
         properties.setProperty("disableEntityFire", Boolean.toString(disableEntityFire));
+        properties.setProperty("noSwapAnimation", Boolean.toString(noSwapAnimation));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream output = Files.newOutputStream(FILE)) {

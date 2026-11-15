@@ -1,6 +1,8 @@
 package dev.strubbonart.skyblockqol.features.farming;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.loader.api.FabricLoader;
@@ -53,6 +55,30 @@ public final class GardenOrganicMatterTracker {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> onGameMessage(message.getString()));
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         HudRenderCallback.EVENT.register((context, tickCounter) -> render(context));
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(ClientCommandManager.literal("asmorganicmatter")
+                        .executes(context -> {
+                            context.getSource().sendFeedback(Text.literal("Organic Matter Tracker "
+                                    + (enabled ? "ON" : "OFF") + " | " + formatMatter(totalOrganicMatter()) + " OM"));
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("on").executes(context -> {
+                            setEnabled(true);
+                            context.getSource().sendFeedback(Text.literal("Organic Matter Tracker enabled."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("off").executes(context -> {
+                            setEnabled(false);
+                            context.getSource().sendFeedback(Text.literal("Organic Matter Tracker disabled."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("reset").executes(context -> {
+                            reset();
+                            context.getSource().sendFeedback(Text.literal("Organic Matter Tracker reset."));
+                            return 1;
+                        }))
+                ));
     }
 
     public static boolean isEnabled() { return enabled; }

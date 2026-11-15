@@ -280,6 +280,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Brewing Stand timer highlight", BrewingStandFeature.isEnabled(),
                         left, y, 300,
                         () -> BrewingStandFeature.setEnabled(!BrewingStandFeature.isEnabled()));
+                y += 28;
+                addToggle("No item swap lowering animation",
+                        dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isNoSwapAnimationEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setNoSwapAnimationEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isNoSwapAnimationEnabled()));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),

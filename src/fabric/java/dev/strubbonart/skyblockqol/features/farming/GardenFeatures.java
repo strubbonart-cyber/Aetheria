@@ -1,6 +1,8 @@
 package dev.strubbonart.skyblockqol.features.farming;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -51,7 +53,9 @@ public final class GardenFeatures {
     private static boolean plotNumbersEnabled = true;
     private static boolean plotHighlightsEnabled = true;
     private static long totalHarvests;
-    private static long sessionStartedAt = System.currentTimeMillis();
+    private static long trackedActiveTimeMs;
+    private static long lastActivityAt;
+    private static long lastTickAt;
     private static long lastSaveAt;
 
     private static final class Layout {
@@ -81,6 +85,7 @@ public final class GardenFeatures {
             String crop = cropId(state);
             if (crop != null) {
                 BLOCK_BREAKS.addLast(now);
+                lastActivityAt = now;
                 CROP_BREAKS.merge(crop, 1L, Long::sum);
                 totalHarvests++;
             }
@@ -88,13 +93,43 @@ public final class GardenFeatures {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             long now = System.currentTimeMillis();
+            if (lastTickAt == 0L) lastTickAt = now;
+            long delta = Math.max(0L, Math.min(1_000L, now - lastTickAt));
+            lastTickAt = now;
             while (!BLOCK_BREAKS.isEmpty() && now - BLOCK_BREAKS.peekFirst() > 1_000L) {
                 BLOCK_BREAKS.removeFirst();
+            }
+            if (isGarden() && lastActivityAt > 0L && now - lastActivityAt <= 5_000L) {
+                trackedActiveTimeMs += delta;
             }
             if (now - lastSaveAt > 30_000L) save();
         });
 
         HudRenderCallback.EVENT.register((context, tickCounter) -> render(context));
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(ClientCommandManager.literal("asmfarming")
+                        .executes(context -> {
+                            context.getSource().sendFeedback(Text.literal("Farming Tracker "
+                                    + (trackerEnabled ? "ON" : "OFF") + " | mature crop blocks: " + totalHarvests));
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("on").executes(context -> {
+                            setTrackerEnabled(true);
+                            context.getSource().sendFeedback(Text.literal("Farming Tracker enabled."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("off").executes(context -> {
+                            setTrackerEnabled(false);
+                            context.getSource().sendFeedback(Text.literal("Farming Tracker disabled."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("reset").executes(context -> {
+                            resetTracker();
+                            context.getSource().sendFeedback(Text.literal("Farming Tracker reset."));
+                            return 1;
+                        }))
+                ));
     }
 
     public static boolean isBpsEnabled() { return bpsEnabled; }
@@ -132,8 +167,10 @@ public final class GardenFeatures {
 
     public static void resetTracker() {
         totalHarvests = 0L;
+        trackedActiveTimeMs = 0L;
+        lastActivityAt = 0L;
+        lastTickAt = System.currentTimeMillis();
         CROP_BREAKS.clear();
-        sessionStartedAt = System.currentTimeMillis();
         save();
     }
 
@@ -191,13 +228,13 @@ public final class GardenFeatures {
         }
 
         if (trackerEnabled) {
-            long elapsed = Math.max(1_000L, System.currentTimeMillis() - sessionStartedAt);
-            long perHour = Math.round(totalHarvests * 3_600_000.0 / elapsed);
+            long elapsed = trackedActiveTimeMs;
+            long perHour = elapsed <= 0L ? 0L : Math.round(totalHarvests * 3_600_000.0 / elapsed);
             String[] cropLines = new String[4];
             cropLines[0] = "Farming Tracker";
             cropLines[1] = "Mature crop blocks: " + totalHarvests;
             cropLines[2] = "Rate: " + perHour + " blocks/hour";
-            cropLines[3] = "Session: " + formatDuration(elapsed);
+            cropLines[3] = "Active farming time: " + formatDuration(elapsed);
             renderPanel(context, "tracker", cropLines);
         }
 
@@ -293,7 +330,7 @@ public final class GardenFeatures {
             plotHighlightsEnabled = Boolean.parseBoolean(p.getProperty("plotHighlightsEnabled", "true"));
             GardenPlotNumbers.loadSettings(plotNumbersEnabled, plotHighlightsEnabled);
             totalHarvests = Long.parseLong(p.getProperty("totalHarvests", "0"));
-            sessionStartedAt = System.currentTimeMillis();
+            trackedActiveTimeMs = Long.parseLong(p.getProperty("trackedActiveTimeMs", "0"));
             for (String key : p.stringPropertyNames()) {
                 if (key.startsWith("crop.")) CROP_BREAKS.put(key.substring(5),
                         Long.parseLong(p.getProperty(key, "0")));
@@ -320,6 +357,7 @@ public final class GardenFeatures {
         p.setProperty("plotNumbersEnabled", Boolean.toString(plotNumbersEnabled));
         p.setProperty("plotHighlightsEnabled", Boolean.toString(plotHighlightsEnabled));
         p.setProperty("totalHarvests", Long.toString(totalHarvests));
+        p.setProperty("trackedActiveTimeMs", Long.toString(trackedActiveTimeMs));
         for (Map.Entry<String, Long> entry : CROP_BREAKS.entrySet()) {
             p.setProperty("crop." + entry.getKey(), Long.toString(entry.getValue()));
         }

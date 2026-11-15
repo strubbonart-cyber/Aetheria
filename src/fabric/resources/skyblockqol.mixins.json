@@ -10,7 +10,8 @@
     "HandledScreenMixin",
     "EntityLookMixin",
     "ChatScreenMixin",
-    "EntityRenderDispatcherMixin"
+    "EntityRenderDispatcherMixin",
+    "HeldItemRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
