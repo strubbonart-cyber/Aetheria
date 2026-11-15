@@ -57,6 +57,18 @@ public final class GardenSettingsScreen extends Screen {
                 GardenTrevorFeatures.isTrapperWarpEnabled(), x, y,
                 () -> GardenTrevorFeatures.setTrapperWarpEnabled(!GardenTrevorFeatures.isTrapperWarpEnabled()));
         y += 28;
+        addToggle("Desert warp helper during Oasis / Desert hunts (default G)",
+                GardenTrevorFeatures.isDesertWarpEnabled(), x, y,
+                () -> GardenTrevorFeatures.setDesertWarpEnabled(!GardenTrevorFeatures.isDesertWarpEnabled()));
+        y += 28;
+        addToggle("Trevor first-detection chat alert",
+                GardenTrevorFeatures.isDetectAlertEnabled(), x, y,
+                () -> GardenTrevorFeatures.setDetectAlertEnabled(!GardenTrevorFeatures.isDetectAlertEnabled()));
+        y += 28;
+        addToggle("Trevor animal beacon beam",
+                GardenTrevorFeatures.isAnimalBeaconEnabled(), x, y,
+                () -> GardenTrevorFeatures.setAnimalBeaconEnabled(!GardenTrevorFeatures.isAnimalBeaconEnabled()));
+        y += 28;
         addToggle("Lock camera yaw / pitch", GardenMouseFeatures.isLockEnabled(), x, y,
                 () -> GardenMouseFeatures.setLockEnabled(!GardenMouseFeatures.isLockEnabled()));
         y += 28;

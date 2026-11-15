@@ -52,8 +52,13 @@ public final class GardenTrevorFeatures {
     private static boolean solverEnabled = true;
     private static boolean peltTrackerEnabled = true;
     private static boolean trapperWarpEnabled;
+    private static boolean desertWarpEnabled;
+    private static boolean detectAlertEnabled = true;
+    private static boolean animalBeaconEnabled = true;
     private static long trapperWarpAvailableUntil;
     private static KeyBinding trapperWarpKey;
+    private static KeyBinding desertWarpKey;
+    private static int lastDetectedAnimalId = -1;
     private static String questRarity = "";
     private static String questAnimal = "";
     private static String questArea = "";
@@ -83,6 +88,12 @@ public final class GardenTrevorFeatures {
                 GLFW.GLFW_KEY_F,
                 "category.skyblockqol"
         ));
+        desertWarpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.skyblockqol.desert_warp",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_G,
+                "category.skyblockqol"
+        ));
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> onMessage(message.getString()));
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
@@ -93,6 +104,12 @@ public final class GardenTrevorFeatures {
     public static boolean isPeltTrackerEnabled() { return peltTrackerEnabled; }
     public static boolean isTrapperWarpEnabled() { return trapperWarpEnabled; }
     public static void setTrapperWarpEnabled(boolean value) { trapperWarpEnabled = value; save(); }
+    public static boolean isDesertWarpEnabled() { return desertWarpEnabled; }
+    public static void setDesertWarpEnabled(boolean value) { desertWarpEnabled = value; save(); }
+    public static boolean isDetectAlertEnabled() { return detectAlertEnabled; }
+    public static void setDetectAlertEnabled(boolean value) { detectAlertEnabled = value; save(); }
+    public static boolean isAnimalBeaconEnabled() { return animalBeaconEnabled; }
+    public static void setAnimalBeaconEnabled(boolean value) { animalBeaconEnabled = value; save(); }
 
     public static void setSolverEnabled(boolean value) { solverEnabled = value; save(); }
     public static void setPeltTrackerEnabled(boolean value) { peltTrackerEnabled = value; save(); }
@@ -137,6 +154,13 @@ public final class GardenTrevorFeatures {
             lastActivityAt = cooldownStartedAt;
             peltVisible = true;
             trackedAnimal = null;
+            lastDetectedAnimalId = -1;
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (desertWarpEnabled && isDesertArea(questArea) && client.player != null) {
+                client.player.sendMessage(Text.literal("§6[Garden] §ePress §b"
+                        + desertWarpKey.getBoundKeyLocalizedText().getString()
+                        + "§e to warp to the Desert for this hunt."), false);
+            }
             return;
         }
 
@@ -190,6 +214,15 @@ public final class GardenTrevorFeatures {
                 }
             }
         }
+        if (desertWarpKey != null) {
+            while (desertWarpKey.wasPressed()) {
+                if (desertWarpEnabled && !questAnimal.isEmpty() && isDesertArea(questArea)
+                        && client.currentScreen == null && client.player != null
+                        && client.getNetworkHandler() != null && GardenFeatures.isInGarden()) {
+                    client.getNetworkHandler().sendChatCommand("warp desert");
+                }
+            }
+        }
         if (!solverEnabled || questAnimal.isEmpty() || client.world == null || client.player == null) {
             trackedAnimal = null;
             return;
@@ -209,6 +242,12 @@ public final class GardenTrevorFeatures {
                 nearestDistance = distance;
                 trackedAnimal = entity;
             }
+        }
+        if (trackedAnimal != null && detectAlertEnabled
+                && trackedAnimal.getId() != lastDetectedAnimalId) {
+            lastDetectedAnimalId = trackedAnimal.getId();
+            client.player.sendMessage(Text.literal("§6[Garden] §eAnimal detected: §b"
+                    + titleCase(questRarity) + " " + titleCase(questAnimal)), false);
         }
     }
 
@@ -272,6 +311,12 @@ public final class GardenTrevorFeatures {
         if (trackedAnimal != null && !trackedAnimal.isRemoved()) {
             Box animalBox = trackedAnimal.getBoundingBox().expand(0.2);
             WorldRenderer.drawBox(matrices, lines, animalBox, 1.0F, 0.75F, 0.15F, 1.0F);
+            if (animalBeaconEnabled) {
+                Box beam = new Box(trackedAnimal.getX() - 0.12D, trackedAnimal.getY(),
+                        trackedAnimal.getZ() - 0.12D, trackedAnimal.getX() + 0.12D,
+                        trackedAnimal.getY() + 40.0D, trackedAnimal.getZ() + 0.12D);
+                WorldRenderer.drawBox(matrices, lines, beam, 1.0F, 0.72F, 0.12F, 0.85F);
+            }
         }
         matrices.pop();
     }
@@ -292,6 +337,21 @@ public final class GardenTrevorFeatures {
         return Map.copyOf(spots);
     }
 
+    private static boolean isDesertArea(String value) {
+        return "desert settlement".equals(value) || "oasis".equals(value);
+    }
+
+    private static String titleCase(String value) {
+        if (value == null || value.isBlank()) return "";
+        StringBuilder result = new StringBuilder();
+        for (String word : value.split("\\s+")) {
+            if (word.isEmpty()) continue;
+            if (result.length() > 0) result.append(' ');
+            result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        return result.toString();
+    }
+
     private static String stripFormatting(String value) {
         return value == null ? "" : value.replaceAll("§[0-9A-FK-ORa-fk-or]", "");
     }
@@ -304,6 +364,9 @@ public final class GardenTrevorFeatures {
             solverEnabled = Boolean.parseBoolean(p.getProperty("solverEnabled", "true"));
             peltTrackerEnabled = Boolean.parseBoolean(p.getProperty("peltTrackerEnabled", "true"));
             trapperWarpEnabled = Boolean.parseBoolean(p.getProperty("trapperWarpEnabled", "false"));
+            desertWarpEnabled = Boolean.parseBoolean(p.getProperty("desertWarpEnabled", "false"));
+            detectAlertEnabled = Boolean.parseBoolean(p.getProperty("detectAlertEnabled", "true"));
+            animalBeaconEnabled = Boolean.parseBoolean(p.getProperty("animalBeaconEnabled", "true"));
             hudX = Integer.parseInt(p.getProperty("hudX", "8"));
             hudY = Integer.parseInt(p.getProperty("hudY", "420"));
             hudScale = Math.max(0.5F, Math.min(3.0F,
@@ -319,6 +382,9 @@ public final class GardenTrevorFeatures {
         p.setProperty("solverEnabled", Boolean.toString(solverEnabled));
         p.setProperty("peltTrackerEnabled", Boolean.toString(peltTrackerEnabled));
         p.setProperty("trapperWarpEnabled", Boolean.toString(trapperWarpEnabled));
+        p.setProperty("desertWarpEnabled", Boolean.toString(desertWarpEnabled));
+        p.setProperty("detectAlertEnabled", Boolean.toString(detectAlertEnabled));
+        p.setProperty("animalBeaconEnabled", Boolean.toString(animalBeaconEnabled));
         p.setProperty("hudX", Integer.toString(hudX));
         p.setProperty("hudY", Integer.toString(hudY));
         p.setProperty("hudScale", Float.toString(hudScale));

@@ -342,18 +342,20 @@ public final class GardenPestFeatures {
         if (trackerEnabled && overlayVisible) {
             long kills = KILLS.values().stream().mapToLong(Long::longValue).sum();
             long drops = DROPS.values().stream().mapToLong(Long::longValue).sum();
-            String[] lines = new String[Math.min(6, 3 + KILLS.size())];
-            lines[0] = "Pest Tracker";
-            lines[1] = "Kills: " + kills + " | Drops: " + drops;
+            List<String> lines = new java.util.ArrayList<>();
+            lines.add("Pest Tracker");
+            lines.add("Total pests: " + kills + " | Total drops: " + drops);
             long elapsed = Math.max(1_000L, System.currentTimeMillis() - sessionStartedAt);
-            lines[2] = "Session: " + formatDuration(elapsed);
-            int index = 3;
-            for (Map.Entry<String, Long> entry : KILLS.entrySet().stream()
-                    .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder())).limit(3).toList()) {
-                if (index >= lines.length) break;
-                lines[index++] = entry.getKey() + ": " + entry.getValue();
-            }
-            renderPanel(context, lines);
+            lines.add("Session: " + formatDuration(elapsed));
+            KILLS.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
+                    .limit(2)
+                    .forEach(entry -> lines.add(entry.getKey() + ": " + entry.getValue() + " kills"));
+            DROPS.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
+                    .limit(2)
+                    .forEach(entry -> lines.add(entry.getKey() + ": " + entry.getValue() + " drops"));
+            renderPanel(context, lines.toArray(String[]::new));
         }
 
         if (finderEnabled && (!showFinderOnlyWithVacuum || isHoldingVacuum(client))) {
@@ -582,6 +584,7 @@ public final class GardenPestFeatures {
         Integer best = null;
         for (Integer candidate : ACTIVE_PEST_PLOTS.keySet()) {
             if (candidate < 1 || candidate > GARDEN_PLOT_BOUNDS.length) continue;
+            if (isPlayerInsidePlot(candidate, client)) continue;
             if (best == null || beatsTarget(candidate, best, client)) best = candidate;
         }
         return best;
