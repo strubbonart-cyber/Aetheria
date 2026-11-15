@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.qol.GyroWandFeature;
 import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
+import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
@@ -299,6 +300,15 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setDamageFormatterEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDamageFormatterEnabled()));
+                y += 28;
+                addToggle("Slot Binds (bind inventory slots to hotbar slots)",
+                        SlotBindsFeature.isEnabled(), left, y, 300,
+                        () -> SlotBindsFeature.setEnabled(!SlotBindsFeature.isEnabled()));
+                y += 28;
+                addToggle("Always show Slot Bind lines",
+                        SlotBindsFeature.isAlwaysShowLinesEnabled(), left, y, 300,
+                        () -> SlotBindsFeature.setAlwaysShowLinesEnabled(
+                                !SlotBindsFeature.isAlwaysShowLinesEnabled()));
                 y += 28;
                 addToggle("Trophy Fish HUD", dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature.isEnabled(),
                         left, y, 300,

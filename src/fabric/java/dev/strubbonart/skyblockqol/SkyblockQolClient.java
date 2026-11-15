@@ -14,6 +14,7 @@ import dev.strubbonart.skyblockqol.features.qol.GyroWandFeature;
 import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures;
+import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import dev.strubbonart.skyblockqol.features.fishing.FishingTimerFeature;
@@ -59,6 +60,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         PartyFinderFloorTip.initialize();
         BrewingStandFeature.initialize();
         MiscQolFeatures.initialize();
+        SlotBindsFeature.initialize();
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         ExtraQolFeatures.initialize();
