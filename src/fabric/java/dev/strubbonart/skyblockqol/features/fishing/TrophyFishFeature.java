@@ -83,7 +83,7 @@ public final class TrophyFishFeature {
         load();
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> recordCatch(message.getString()));
         HudRenderCallback.EVENT.register((context, tickCounter) -> render(context));
-        ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> appendOdgerTotal(stack, lines));
+        ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> appendOdgerTotal(stack, context, type, lines));
 
         net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback.EVENT.register(
                 (dispatcher, registryAccess) ->
@@ -247,6 +247,10 @@ public final class TrophyFishFeature {
     private static int getCount(String fish, Rarity rarity) {
         Map<Rarity, Integer> counts = COUNTS.get(fish);
         return counts == null ? 0 : counts.getOrDefault(rarity, 0);
+    }
+
+    private static void setCount(String fish, Rarity rarity, int count) {
+        COUNTS.computeIfAbsent(fish, key -> new EnumMap<>(Rarity.class)).put(rarity, Math.max(0, count));
     }
 
     private static int getTotal(String fish) {
