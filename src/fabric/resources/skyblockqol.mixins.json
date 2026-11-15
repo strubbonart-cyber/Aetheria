@@ -7,7 +7,8 @@
     "ItemStackMixin",
     "PlayerEntityMixin",
     "GameMenuScreenMixin",
-    "HandledScreenMixin"
+    "HandledScreenMixin",
+    "EntityLookMixin"
   ],
   "injectors": {
     "defaultRequire": 1

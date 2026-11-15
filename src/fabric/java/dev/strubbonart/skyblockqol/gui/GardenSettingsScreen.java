@@ -5,6 +5,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import dev.strubbonart.skyblockqol.features.farming.GardenTrevorFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenMouseFeatures;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -47,6 +48,20 @@ public final class GardenSettingsScreen extends Screen {
         y += 28;
         addToggle("Trevor Pelt Tracker", GardenTrevorFeatures.isPeltTrackerEnabled(), x, y,
                 () -> GardenTrevorFeatures.setPeltTrackerEnabled(!GardenTrevorFeatures.isPeltTrackerEnabled()));
+        y += 28;
+        addToggle("Lock camera yaw / pitch", GardenMouseFeatures.isLockEnabled(), x, y,
+                () -> GardenMouseFeatures.setLockEnabled(!GardenMouseFeatures.isLockEnabled()));
+        y += 28;
+        addToggle("Reduce sensitivity with farming tools", GardenMouseFeatures.isSensitivityEnabled(), x, y,
+                () -> GardenMouseFeatures.setSensitivityEnabled(!GardenMouseFeatures.isSensitivityEnabled()));
+        y += 28;
+        addToggle("Sensitivity requires Garden", GardenMouseFeatures.isRequireGarden(), x, y,
+                () -> GardenMouseFeatures.setRequireGarden(!GardenMouseFeatures.isRequireGarden()));
+        y += 28;
+        addButton("Sensitivity: " + GardenMouseFeatures.getSensitivityPercent() + "%  (-5)",
+                x, y, 146, 22, () -> GardenMouseFeatures.adjustSensitivityPercent(-5));
+        addButton("Sensitivity: " + GardenMouseFeatures.getSensitivityPercent() + "%  (+5)",
+                x + 154, y, 146, 22, () -> GardenMouseFeatures.adjustSensitivityPercent(5));
         y += 28;
         addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
                 () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));

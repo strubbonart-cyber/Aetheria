@@ -8,6 +8,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import dev.strubbonart.skyblockqol.features.farming.GardenTrevorFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenMouseFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
@@ -44,6 +45,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         GardenPestFeatures.initialize();
         GardenOrganicMatterTracker.initialize();
         GardenTrevorFeatures.initialize();
+        GardenMouseFeatures.initialize();
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skyblockqol.open_settings",
                 InputUtil.Type.KEYSYM,

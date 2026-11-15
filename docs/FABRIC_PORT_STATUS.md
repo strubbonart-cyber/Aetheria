@@ -121,3 +121,6 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Trevor's original automatic warp/confirm hotkeys and some visual polish are not included in this migration slice.
 
 - Garden Pest Finder information HUD parses the tablist's Alive, Plots, Spray, Repellent, Bonus, Cooldown, and Bonus Pest Chance fields. It lists infested plot numbers/counts and has independent enable and drag-position/scale settings. It is informational only; optional warp-to-infested-plot hotkeys remain unported.
+
+- Mouse camera lock: `/lockyp` toggles camera yaw/pitch locking, the optional keyboard binding is available under Controls, and an on-screen indicator is shown while locked.
+- Farming Sensitivity Reducer scales local player look deltas while holding a recognized SkyBlock farming tool, defaults to 5%, is off by default, and optionally requires the Garden. It shares the mouse-look mixin with camera lock.
