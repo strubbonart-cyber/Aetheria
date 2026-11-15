@@ -35,6 +35,9 @@ public final class ExtraQolFeatures {
     private static boolean initialized;
     private static boolean joinLeaveEnabled = true;
     private static boolean hoppityHighlightEnabled = true;
+    private static boolean chatStateRestoreEnabled = false;
+    private static String savedChatDraft = "";
+    private static boolean restoreChatDraft;
     private static long lastPresenceScan;
 
     private ExtraQolFeatures() {}
@@ -94,6 +97,25 @@ public final class ExtraQolFeatures {
     public static boolean isJoinLeaveEnabled() { return joinLeaveEnabled; }
     public static boolean isHoppityHighlightEnabled() { return hoppityHighlightEnabled; }
     public static int getWatchedCount() { return WATCHED.size(); }
+    public static boolean isChatStateRestoreEnabled() { return chatStateRestoreEnabled; }
+    public static void setChatStateRestoreEnabled(boolean value) {
+        chatStateRestoreEnabled = value;
+        if (!value) clearChatDraft();
+        save();
+    }
+    public static String getSavedChatDraft() { return savedChatDraft; }
+    public static boolean shouldRestoreChatDraft() { return chatStateRestoreEnabled && restoreChatDraft && !savedChatDraft.isEmpty(); }
+    public static void updateChatDraft(String value) {
+        if (!chatStateRestoreEnabled) return;
+        savedChatDraft = value == null ? "" : value;
+        restoreChatDraft = !savedChatDraft.isEmpty();
+        save();
+    }
+    public static void clearChatDraft() {
+        savedChatDraft = "";
+        restoreChatDraft = false;
+        save();
+    }
 
     public static void setJoinLeaveEnabled(boolean value) {
         joinLeaveEnabled = value;
@@ -175,6 +197,9 @@ public final class ExtraQolFeatures {
             p.load(in);
             joinLeaveEnabled = Boolean.parseBoolean(p.getProperty("joinLeaveEnabled", "true"));
             hoppityHighlightEnabled = Boolean.parseBoolean(p.getProperty("hoppityHighlightEnabled", "true"));
+            chatStateRestoreEnabled = Boolean.parseBoolean(p.getProperty("chatStateRestoreEnabled", "false"));
+            savedChatDraft = p.getProperty("savedChatDraft", "");
+            restoreChatDraft = Boolean.parseBoolean(p.getProperty("restoreChatDraft", "false"));
             String watched = p.getProperty("watchedPlayers", "");
             WATCHED.addAll(Arrays.stream(watched.split(","))
                     .map(String::trim).filter(value -> !value.isEmpty())
@@ -188,6 +213,9 @@ public final class ExtraQolFeatures {
         Properties p = new Properties();
         p.setProperty("joinLeaveEnabled", Boolean.toString(joinLeaveEnabled));
         p.setProperty("hoppityHighlightEnabled", Boolean.toString(hoppityHighlightEnabled));
+        p.setProperty("chatStateRestoreEnabled", Boolean.toString(chatStateRestoreEnabled));
+        p.setProperty("savedChatDraft", savedChatDraft);
+        p.setProperty("restoreChatDraft", Boolean.toString(restoreChatDraft));
         p.setProperty("watchedPlayers", WATCHED.stream().sorted().collect(Collectors.joining(",")));
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());

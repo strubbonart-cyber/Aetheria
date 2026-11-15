@@ -10,6 +10,7 @@ import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
+import dev.strubbonart.skyblockqol.features.qol.KillComboFeature;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -24,7 +25,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
         FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
-        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST
+        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST, QOL_KILL_COMBO
     }
 
     private final Screen parent;
@@ -170,6 +171,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.getX();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getX();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutX();
+            case QOL_KILL_COMBO -> KillComboFeature.getX();
         };
     }
 
@@ -188,6 +190,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.getY();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getY();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutY();
+            case QOL_KILL_COMBO -> KillComboFeature.getY();
         };
     }
 
@@ -206,6 +209,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.getScale();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getScale();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutScale();
+            case QOL_KILL_COMBO -> KillComboFeature.getScale();
         };
     }
 
@@ -228,6 +232,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.updateLayout(x, y, scale);
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.updateLayout(x, y, scale);
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.updateLayout(x, y, scale);
+            case QOL_KILL_COMBO -> KillComboFeature.updateLayout(x, y, scale);
         }
         dirty = true;
     }
@@ -246,6 +251,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.saveLayout();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.saveLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.saveLayout();
+            case QOL_KILL_COMBO -> KillComboFeature.saveLayout();
         }
         dirty = false;
     }
@@ -267,6 +273,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> GardenVisitorFeatures.resetLayout();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.resetLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.resetLayout();
+            case QOL_KILL_COMBO -> KillComboFeature.resetLayout();
         }
         if (client != null && client.currentScreen == this) {
             client.setScreen(new OverlayPositionEditorScreen(parent, target));
@@ -283,6 +290,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> "visitor";
             case GARDEN_OM_TRACKER -> "om";
             case GARDEN_PELT_TRACKER -> "pelt";
+            case QOL_KILL_COMBO -> "killcombo";
             default -> "bps";
         };
     }
@@ -328,6 +336,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_VISITOR_LIST -> new String[]{"Visitor Shopping List", "Carrot: 10/64 (Need 54)", "Potato: 32/32 (READY)", "Rewards: +Copper"};
             case GARDEN_OM_TRACKER -> new String[]{"Organic Matter Tracker", "Organic Matter: 0", "0.0/h | 0 items"};
             case GARDEN_PELT_TRACKER -> new String[]{"Pelt Tracker", "Pelts: 42 | Pelts/h: 120", "Cooldown: Ready!"};
+            case QOL_KILL_COMBO -> new String[]{"Kill Combo Tracker", "Current: +15 | Highest: 30", "+3% Magic Find"};
         };
     }
 

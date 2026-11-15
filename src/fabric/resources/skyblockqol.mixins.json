@@ -8,7 +8,8 @@
     "PlayerEntityMixin",
     "GameMenuScreenMixin",
     "HandledScreenMixin",
-    "EntityLookMixin"
+    "EntityLookMixin",
+    "ChatScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

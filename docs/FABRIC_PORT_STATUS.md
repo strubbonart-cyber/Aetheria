@@ -131,3 +131,6 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 
 - Watched Player Join/Leave notifier scans the live tab list once per second and reports presence changes for names entered with `/watchplayer add <name>`. Use `/watchplayer remove|clear|list|on|off`. It is local-only and saves the watch list.
 - Hoppity New Rabbit Highlight outlines `NEW RABBIT!` items in inventory screens whose title contains Hoppity. It has a QOL toggle.
+
+- Chat State Restore stores the unfinished chat input after each edit, restores it when the chat screen is reopened, and clears the draft on Escape or Enter. It is off by default and configurable in Quality of Life.
+- Kill Combo Tracker parses Hypixel `+N Kill Combo` milestone and expiry messages, accumulates stat bonuses, tracks the current/highest combo, and shows an independently draggable/scalable HUD. Use `/killcombo status|reset`.

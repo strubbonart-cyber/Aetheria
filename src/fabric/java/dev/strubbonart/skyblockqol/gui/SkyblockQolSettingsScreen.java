@@ -182,6 +182,21 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.setHoppityHighlightEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isHoppityHighlightEnabled()));
+                y += 26;
+                addToggle("Restore unfinished chat draft",
+                        dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isChatStateRestoreEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.setChatStateRestoreEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isChatStateRestoreEnabled()));
+                y += 26;
+                addToggle("Kill Combo HUD",
+                        dev.strubbonart.skyblockqol.features.qol.KillComboFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.KillComboFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.KillComboFeature.isEnabled()));
+                y += 26;
+                addButton("EDIT KILL COMBO POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.QOL_KILL_COMBO));
 
             }
             case PETS -> {
