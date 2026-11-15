@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
+import dev.strubbonart.skyblockqol.features.farming.GardenTrevorFeatures;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -41,6 +42,12 @@ public final class GardenSettingsScreen extends Screen {
         addToggle("Organic Matter Tracker", GardenOrganicMatterTracker.isEnabled(), x, y,
                 () -> GardenOrganicMatterTracker.setEnabled(!GardenOrganicMatterTracker.isEnabled()));
         y += 28;
+        addToggle("Trevor Solver (spawn markers)", GardenTrevorFeatures.isSolverEnabled(), x, y,
+                () -> GardenTrevorFeatures.setSolverEnabled(!GardenTrevorFeatures.isSolverEnabled()));
+        y += 28;
+        addToggle("Trevor Pelt Tracker", GardenTrevorFeatures.isPeltTrackerEnabled(), x, y,
+                () -> GardenTrevorFeatures.setPeltTrackerEnabled(!GardenTrevorFeatures.isPeltTrackerEnabled()));
+        y += 28;
         addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
                 () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));
         y += 28;
@@ -66,10 +73,14 @@ public final class GardenSettingsScreen extends Screen {
         y += 26;
         addButton("EDIT ORGANIC MATTER POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_OM_TRACKER));
+        y += 26;
+        addButton("EDIT PELT TRACKER POSITION", x, y, 300, 22,
+                () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PELT_TRACKER));
         y += 32;
         addButton("RESET FARMING STATS", x, y, 100, 22, GardenFeatures::resetTracker);
         addButton("RESET PEST STATS", x + 104, y, 96, 22, GardenPestFeatures::resetTracker);
         addButton("RESET OM STATS", x + 204, y, 96, 22, GardenOrganicMatterTracker::reset);
+        addButton("RESET PELTS", x, y + 26, 300, 20, GardenTrevorFeatures::resetPeltTracker);
         addButton("BACK", x, height - 32, 300, 20, this::close);
     }
 

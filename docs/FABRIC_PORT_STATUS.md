@@ -115,3 +115,7 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Garden Plot Numbers hook into the 1.21 handled-inventory slot renderer. On the Garden's "Configure Plots" menu, plot slots are numbered and unlocked/buyable/missing-material states receive separate border colors. Both the number overlay and highlights can be toggled in Garden settings.
 
 - Organic Matter Tracker listens for Hypixel's `DROP! ... dropped Nx Item!` system messages while on the Garden, maps crop item names to SkyBlock IDs, and applies the original Aetheria Organic Matter per-item values. It persists item counts and active time and has its own adjustable HUD position/scale and reset control.
+
+- Trevor Solver now parses quest announcements and rewards, highlights the original Aetheria candidate spawn blocks for Desert Settlement, Oasis, Mushroom Gorge and Overgrown Mushroom Cave, and marks a matching rarity/animal armor-stand when loaded nearby.
+- Trevor Pelt Tracker counts the server's pelt reward messages, estimates pelts/hour from active time, shows the 20-second new-quest cooldown, has an adjustable HUD layout, and includes a reset control.
+- Trevor's original automatic warp/confirm hotkeys and some visual polish are not included in this migration slice.
