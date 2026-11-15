@@ -1,6 +1,7 @@
 package dev.strubbonart.skyblockqol.gui;
 
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
+import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;

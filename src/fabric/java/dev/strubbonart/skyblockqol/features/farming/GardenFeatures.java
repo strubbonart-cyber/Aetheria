@@ -71,7 +71,7 @@ public final class GardenFeatures {
         createDefaultLayouts();
         load();
 
-        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state) -> {
+        PlayerBlockBreakEvents.AFTER.register((world, player, pos, state, blockEntity) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if (!world.isClient || player != client.player || !isGarden()) return;
 
