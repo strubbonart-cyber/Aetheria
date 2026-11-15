@@ -84,3 +84,5 @@ Enchant Parser and its layouts/chroma, Gyro Wand ring/cooldown helper, cursor re
 ## Pets, Wardrobe, and Garden remaining
 
 The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet collection/profile data, and Wardrobe profile/slot data are not yet ported. Garden work has not started on this branch. Planned Garden order: plot numbers, farming/organic-matter trackers, BPS and precision overlays, visitor shopping list, then pest finder/tracker/alerts and Trevor tools.
+
+- Mixin-backed QoL options: Disable Enchant Glint, Show Own Nametag, and Confirm Disconnect (first click asks for a second click within three seconds). All three settings are saved and individually configurable in the Quality of Life page.

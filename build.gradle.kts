@@ -39,6 +39,10 @@ sourceSets {
 }
 
 loom {
+    mixin {
+        defaultRefmapName = "skyblockqol.refmap.json"
+    }
+
     mods {
         create("skyblockqol") {
             sourceSet(sourceSets.main.get())

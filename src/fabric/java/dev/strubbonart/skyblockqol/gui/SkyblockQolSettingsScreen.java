@@ -130,6 +130,24 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setBlockSelectionOverlayEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isBlockSelectionOverlayEnabled()));
+                y += 26;
+                addToggle("Disable enchant glint",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isDisableEnchantGlintEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setDisableEnchantGlintEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isDisableEnchantGlintEnabled()));
+                y += 26;
+                addToggle("Show own nametag",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isShowOwnNametagEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setShowOwnNametagEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isShowOwnNametagEnabled()));
+                y += 26;
+                addToggle("Confirm disconnect",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isConfirmDisconnectEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setConfirmDisconnectEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isConfirmDisconnectEnabled()));
             }
             case PETS -> {
                 addToggle("Current Pet HUD",

@@ -41,6 +41,9 @@ public final class QolFeatures {
 
     private static boolean showSkyblockId = true;
     private static boolean blockSelectionOverlay;
+    private static boolean disableEnchantGlint;
+    private static boolean showOwnNametag;
+    private static boolean confirmDisconnect = true;
     private static boolean initialized;
 
     private QolFeatures() {}
@@ -60,6 +63,33 @@ public final class QolFeatures {
 
     public static void setBlockSelectionOverlayEnabled(boolean value) {
         blockSelectionOverlay = value;
+        save();
+    }
+
+    public static boolean isDisableEnchantGlintEnabled() {
+        return disableEnchantGlint;
+    }
+
+    public static void setDisableEnchantGlintEnabled(boolean value) {
+        disableEnchantGlint = value;
+        save();
+    }
+
+    public static boolean isShowOwnNametagEnabled() {
+        return showOwnNametag;
+    }
+
+    public static void setShowOwnNametagEnabled(boolean value) {
+        showOwnNametag = value;
+        save();
+    }
+
+    public static boolean isConfirmDisconnectEnabled() {
+        return confirmDisconnect;
+    }
+
+    public static void setConfirmDisconnectEnabled(boolean value) {
+        confirmDisconnect = value;
         save();
     }
 
@@ -130,9 +160,18 @@ public final class QolFeatures {
             showSkyblockId = Boolean.parseBoolean(properties.getProperty("showSkyblockId", "true"));
             blockSelectionOverlay = Boolean.parseBoolean(
                     properties.getProperty("blockSelectionOverlay", "false"));
+            disableEnchantGlint = Boolean.parseBoolean(
+                    properties.getProperty("disableEnchantGlint", "false"));
+            showOwnNametag = Boolean.parseBoolean(
+                    properties.getProperty("showOwnNametag", "false"));
+            confirmDisconnect = Boolean.parseBoolean(
+                    properties.getProperty("confirmDisconnect", "true"));
         } catch (IOException ignored) {
             showSkyblockId = true;
             blockSelectionOverlay = false;
+            disableEnchantGlint = false;
+            showOwnNametag = false;
+            confirmDisconnect = true;
         }
     }
 
@@ -140,6 +179,9 @@ public final class QolFeatures {
         Properties properties = new Properties();
         properties.setProperty("showSkyblockId", Boolean.toString(showSkyblockId));
         properties.setProperty("blockSelectionOverlay", Boolean.toString(blockSelectionOverlay));
+        properties.setProperty("disableEnchantGlint", Boolean.toString(disableEnchantGlint));
+        properties.setProperty("showOwnNametag", Boolean.toString(showOwnNametag));
+        properties.setProperty("confirmDisconnect", Boolean.toString(confirmDisconnect));
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(SETTINGS_FILE)) {
