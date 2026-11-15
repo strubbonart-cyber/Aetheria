@@ -2,6 +2,7 @@ package dev.strubbonart.skyblockqol.gui;
 
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
@@ -20,7 +21,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
         FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
-        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW
+        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER
     }
 
     private final Screen parent;
@@ -161,6 +162,7 @@ public final class OverlayPositionEditorScreen extends Screen {
                     DungeonOverlaySettings.x(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudX();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutX(gardenLayoutKey());
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutX();
         };
     }
 
@@ -174,6 +176,7 @@ public final class OverlayPositionEditorScreen extends Screen {
                     DungeonOverlaySettings.y(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudY();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutY(gardenLayoutKey());
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutY();
         };
     }
 
@@ -187,6 +190,7 @@ public final class OverlayPositionEditorScreen extends Screen {
                     DungeonOverlaySettings.scale(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudScale();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutScale(gardenLayoutKey());
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutScale();
         };
     }
 
@@ -204,6 +208,7 @@ public final class OverlayPositionEditorScreen extends Screen {
                     DungeonOverlaySettings.updateLayout(dungeonWidget(), x, y, scale);
             case CURRENT_PET -> CurrentPetFeature.updateHudLayout(x, y, scale);
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.updateLayout(gardenLayoutKey(), x, y, scale);
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.updateLayout(x, y, scale);
         }
         dirty = true;
     }
@@ -217,6 +222,7 @@ public final class OverlayPositionEditorScreen extends Screen {
                     DungeonOverlaySettings.saveLayout();
             case CURRENT_PET -> CurrentPetFeature.saveHudLayout();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.saveLayout();
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.saveLayout();
         }
         dirty = false;
     }
@@ -233,6 +239,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_ROOM -> DungeonOverlaySettings.set(DungeonOverlaySettings.Widget.ROOM, 8, 212, 1.0F);
             case CURRENT_PET -> CurrentPetFeature.resetHudLayout();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.resetLayout(gardenLayoutKey());
+            case GARDEN_PEST_TRACKER -> GardenPestFeatures.resetLayout();
         }
         if (client != null && client.currentScreen == this) {
             client.setScreen(new OverlayPositionEditorScreen(parent, target));
@@ -244,6 +251,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_BPS -> "bps";
             case GARDEN_TRACKER -> "tracker";
             case GARDEN_PITCH_YAW -> "pitch";
+            case GARDEN_PEST_TRACKER -> "pest";
             default -> "bps";
         };
     }
@@ -284,6 +292,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_BPS -> new String[]{"Garden BPS", "Blocks broken: 0", "Rate: 0.0 blocks/s"};
             case GARDEN_TRACKER -> new String[]{"Farming Tracker", "Crop blocks: 0", "Session rate: 0/hour"};
             case GARDEN_PITCH_YAW -> new String[]{"Yaw: 0.00°", "Pitch: 0.00°"};
+            case GARDEN_PEST_TRACKER -> new String[]{"Pest Tracker", "Kills: 0 | Drops: 0", "Use /pesttracker reset"};
         };
     }
 

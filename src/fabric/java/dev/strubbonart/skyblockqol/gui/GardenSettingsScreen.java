@@ -28,7 +28,18 @@ public final class GardenSettingsScreen extends Screen {
         y += 28;
         addToggle("Precise yaw / pitch HUD", GardenFeatures.isPitchEnabled(), x, y,
                 () -> GardenFeatures.setPitchEnabled(!GardenFeatures.isPitchEnabled()));
-        y += 40;
+        y += 28;
+        addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
+                () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));
+        y += 28;
+        addToggle("Pest Cooldown Alert", GardenPestFeatures.isCooldownAlertEnabled(), x, y,
+                () -> GardenPestFeatures.setCooldownAlertEnabled(!GardenPestFeatures.isCooldownAlertEnabled()));
+        y += 28;
+        addButton("Cooldown threshold: " + GardenPestFeatures.getCooldownThreshold() + "s  (-5)",
+                x, y, 146, 22, () -> GardenPestFeatures.adjustCooldownThreshold(-5));
+        addButton("Cooldown threshold: " + GardenPestFeatures.getCooldownThreshold() + "s  (+5)",
+                x + 154, y, 146, 22, () -> GardenPestFeatures.adjustCooldownThreshold(5));
+        y += 32;
         addButton("EDIT BPS POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_BPS));
         y += 26;
@@ -38,7 +49,8 @@ public final class GardenSettingsScreen extends Screen {
         addButton("EDIT YAW / PITCH POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PITCH_YAW));
         y += 32;
-        addButton("RESET FARMING STATS", x, y, 300, 22, GardenFeatures::resetTracker);
+        addButton("RESET FARMING STATS", x, y, 146, 22, GardenFeatures::resetTracker);
+        addButton("RESET PEST STATS", x + 154, y, 146, 22, GardenPestFeatures::resetTracker);
         addButton("BACK", x, height - 32, 300, 20, this::close);
     }
 

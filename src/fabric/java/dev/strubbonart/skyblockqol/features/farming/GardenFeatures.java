@@ -219,6 +219,8 @@ public final class GardenFeatures {
         context.getMatrices().pop();
     }
 
+    public static boolean isInGarden() { return isGarden(); }
+
     private static boolean isGarden() {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.world == null) return false;

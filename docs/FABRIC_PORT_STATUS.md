@@ -104,3 +104,10 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Precise Yaw/Pitch HUD displays the player rotation to two decimal places.
 - The three HUDs each have independent saved X/Y/scale values and use the shared drag editor. Configure them from the new **Garden** settings page.
 - Plot-number overlays, visitor shopping list, pest finder/tracker/cooldown alert, Trevor Solver, mouse lock/sensitivity reducer, Organic Matter Tracker and the remaining Garden features are not yet ported.
+
+
+## Garden pest features
+
+- Pest Tracker parses the server kill message format `You received Nx <drop> for killing a/an <pest>!`, counts kills and reported drop quantities, saves them locally, and provides a HUD plus `/pesttracker reset|show|hide|toggle|status`.
+- Pest Cooldown Alert reads the tab-list `Cooldown:` entry while in the Garden. It is off by default, supports a 5-300 second threshold, fires once when the cooldown crosses below the threshold, and can be configured in the Garden page or with `/asmpest <seconds>|off|status`.
+- Pest Tracker uses the server-reported drop quantities. It does not estimate item prices or profit without the shared price service.
