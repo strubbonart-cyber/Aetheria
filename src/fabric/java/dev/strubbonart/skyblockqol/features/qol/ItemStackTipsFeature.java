@@ -43,10 +43,8 @@ public final class ItemStackTipsFeature {
         String clean = strip(rawName).trim();
         if (clean.isEmpty()) return null;
         String[] parts = clean.split("\\s+");
-        String numeral = parts[parts.length - 1].replaceAll("[^IVXLCDM]", "");
-        if (numeral.isEmpty() || !numeral.equals(parts[parts.length - 1].replaceAll("[^IVXLCDM]", ""))) {
-            return null;
-        }
+        String numeral = parts[parts.length - 1];
+        if (numeral.isEmpty() || !numeral.matches("[IVXLCDM]+")) return null;
         int level = romanToInt(numeral);
         return level > 0 ? Integer.toString(level) : null;
     }
