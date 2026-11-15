@@ -3,6 +3,7 @@ package dev.strubbonart.skyblockqol.gui;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
+import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -37,6 +38,9 @@ public final class GardenSettingsScreen extends Screen {
         addToggle("Highlight unlocked / buyable plots", GardenPlotNumbers.isHighlightSlotsEnabled(), x, y,
                 () -> GardenPlotNumbers.setHighlightSlotsEnabled(!GardenPlotNumbers.isHighlightSlotsEnabled()));
         y += 28;
+        addToggle("Organic Matter Tracker", GardenOrganicMatterTracker.isEnabled(), x, y,
+                () -> GardenOrganicMatterTracker.setEnabled(!GardenOrganicMatterTracker.isEnabled()));
+        y += 28;
         addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
                 () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));
         y += 28;
@@ -56,9 +60,16 @@ public final class GardenSettingsScreen extends Screen {
         y += 26;
         addButton("EDIT YAW / PITCH POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PITCH_YAW));
+        y += 26;
+        addButton("EDIT PEST TRACKER POSITION", x, y, 300, 22,
+                () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PEST_TRACKER));
+        y += 26;
+        addButton("EDIT ORGANIC MATTER POSITION", x, y, 300, 22,
+                () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_OM_TRACKER));
         y += 32;
-        addButton("RESET FARMING STATS", x, y, 146, 22, GardenFeatures::resetTracker);
-        addButton("RESET PEST STATS", x + 154, y, 146, 22, GardenPestFeatures::resetTracker);
+        addButton("RESET FARMING STATS", x, y, 100, 22, GardenFeatures::resetTracker);
+        addButton("RESET PEST STATS", x + 104, y, 96, 22, GardenPestFeatures::resetTracker);
+        addButton("RESET OM STATS", x + 204, y, 96, 22, GardenOrganicMatterTracker::reset);
         addButton("BACK", x, height - 32, 300, 20, this::close);
     }
 

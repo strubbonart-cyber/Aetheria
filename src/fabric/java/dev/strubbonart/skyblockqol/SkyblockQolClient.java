@@ -40,6 +40,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         CurrentPetFeature.initialize();
         GardenFeatures.initialize();
         GardenPestFeatures.initialize();
+        GardenOrganicMatterTracker.initialize();
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skyblockqol.open_settings",
                 InputUtil.Type.KEYSYM,

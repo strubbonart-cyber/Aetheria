@@ -113,3 +113,5 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Pest Tracker uses the server-reported drop quantities. It does not estimate item prices or profit without the shared price service.
 
 - Garden Plot Numbers hook into the 1.21 handled-inventory slot renderer. On the Garden's "Configure Plots" menu, plot slots are numbered and unlocked/buyable/missing-material states receive separate border colors. Both the number overlay and highlights can be toggled in Garden settings.
+
+- Organic Matter Tracker listens for Hypixel's `DROP! ... dropped Nx Item!` system messages while on the Garden, maps crop item names to SkyBlock IDs, and applies the original Aetheria Organic Matter per-item values. It persists item counts and active time and has its own adjustable HUD position/scale and reset control.
