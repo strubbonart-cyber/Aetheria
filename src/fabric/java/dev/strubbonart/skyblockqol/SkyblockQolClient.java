@@ -2,6 +2,7 @@ package dev.strubbonart.skyblockqol;
 
 import dev.strubbonart.skyblockqol.gui.SkyblockQolSettingsScreen;
 import dev.strubbonart.skyblockqol.features.qol.QolFeatures;
+import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
@@ -33,6 +34,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         QolFeatures.initialize();
+        EnchantTooltipFeature.initialize();
         CurrentPetFeature.initialize();
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skyblockqol.open_settings",

@@ -44,6 +44,9 @@ public final class QolFeatures {
     private static boolean disableEnchantGlint;
     private static boolean showOwnNametag;
     private static boolean confirmDisconnect = true;
+    private static boolean enchantHighlight = true;
+    private static boolean missingEnchants = true;
+    private static boolean hideEnchantDescriptions = true;
     private static boolean initialized;
 
     private QolFeatures() {}
@@ -90,6 +93,33 @@ public final class QolFeatures {
 
     public static void setConfirmDisconnectEnabled(boolean value) {
         confirmDisconnect = value;
+        save();
+    }
+
+    public static boolean isEnchantHighlightEnabled() {
+        return enchantHighlight;
+    }
+
+    public static void setEnchantHighlightEnabled(boolean value) {
+        enchantHighlight = value;
+        save();
+    }
+
+    public static boolean isMissingEnchantsEnabled() {
+        return missingEnchants;
+    }
+
+    public static void setMissingEnchantsEnabled(boolean value) {
+        missingEnchants = value;
+        save();
+    }
+
+    public static boolean isHideEnchantDescriptionsEnabled() {
+        return hideEnchantDescriptions;
+    }
+
+    public static void setHideEnchantDescriptionsEnabled(boolean value) {
+        hideEnchantDescriptions = value;
         save();
     }
 
@@ -166,12 +196,21 @@ public final class QolFeatures {
                     properties.getProperty("showOwnNametag", "false"));
             confirmDisconnect = Boolean.parseBoolean(
                     properties.getProperty("confirmDisconnect", "true"));
+            enchantHighlight = Boolean.parseBoolean(
+                    properties.getProperty("enchantHighlight", "true"));
+            missingEnchants = Boolean.parseBoolean(
+                    properties.getProperty("missingEnchants", "true"));
+            hideEnchantDescriptions = Boolean.parseBoolean(
+                    properties.getProperty("hideEnchantDescriptions", "true"));
         } catch (IOException ignored) {
             showSkyblockId = true;
             blockSelectionOverlay = false;
             disableEnchantGlint = false;
             showOwnNametag = false;
             confirmDisconnect = true;
+            enchantHighlight = true;
+            missingEnchants = true;
+            hideEnchantDescriptions = true;
         }
     }
 
@@ -182,6 +221,9 @@ public final class QolFeatures {
         properties.setProperty("disableEnchantGlint", Boolean.toString(disableEnchantGlint));
         properties.setProperty("showOwnNametag", Boolean.toString(showOwnNametag));
         properties.setProperty("confirmDisconnect", Boolean.toString(confirmDisconnect));
+        properties.setProperty("enchantHighlight", Boolean.toString(enchantHighlight));
+        properties.setProperty("missingEnchants", Boolean.toString(missingEnchants));
+        properties.setProperty("hideEnchantDescriptions", Boolean.toString(hideEnchantDescriptions));
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(SETTINGS_FILE)) {

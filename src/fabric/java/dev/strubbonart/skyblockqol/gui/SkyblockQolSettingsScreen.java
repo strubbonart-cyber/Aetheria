@@ -58,7 +58,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> open(Page.DUNGEONS, LayoutTarget.MAP));
                 addButton("QUALITY OF LIFE", width / 2 - 110, y + 76, 220, 28,
                         () -> open(Page.QOL, LayoutTarget.POWDER));
-                addButton("PETS & WARDROBE", width / 2 - 110, y + 114, 220, 28,
+                addButton("PETS", width / 2 - 110, y + 114, 220, 28,
                         () -> open(Page.PETS, LayoutTarget.POWDER));
                 addButton("DONE", width / 2 - 110, y + 152, 220, 24, this::close);
             }
@@ -148,6 +148,24 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setConfirmDisconnectEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isConfirmDisconnectEnabled()));
+                y += 26;
+                addToggle("Enchant level coloring",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isEnchantHighlightEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setEnchantHighlightEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isEnchantHighlightEnabled()));
+                y += 26;
+                addToggle("Missing enchants (hold Shift)",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isMissingEnchantsEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setMissingEnchantsEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isMissingEnchantsEnabled()));
+                y += 26;
+                addToggle("Hide enchant descriptions",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isHideEnchantDescriptionsEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setHideEnchantDescriptionsEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isHideEnchantDescriptionsEnabled()));
             }
             case PETS -> {
                 addToggle("Current Pet HUD",
@@ -353,7 +371,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case FILTER -> "Powder Chat Filter";
             case DUNGEONS -> "Dungeon Settings";
             case QOL -> "Quality of Life";
-            case PETS -> "Pets & Wardrobe";
+            case PETS -> "Pets";
         };
         context.drawTextWithShadow(textRenderer, heading, width / 2 - textRenderer.getWidth(heading) / 2,
                 42, 0xFFFFFFFF);
