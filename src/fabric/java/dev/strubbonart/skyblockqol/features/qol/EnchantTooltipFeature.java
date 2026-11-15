@@ -104,7 +104,7 @@ public final class EnchantTooltipFeature {
     }
 
     private static void onTooltip(ItemStack stack, net.minecraft.item.Item.TooltipContext tooltipContext,
-                                  net.minecraft.item.TooltipType tooltipType, List<Text> lines) {
+                                  net.minecraft.item.tooltip.TooltipType tooltipType, List<Text> lines) {
         if (stack == null || stack.isEmpty() || ROOT == null) return;
 
         if (QolFeatures.isEnchantHighlightEnabled()) {
