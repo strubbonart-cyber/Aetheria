@@ -51,7 +51,7 @@ public final class ItemLogAlertsFeature {
             if (client.world == null) FIRST_TIME_ALERTED.clear();
             if (System.currentTimeMillis() > activeUntil) activeMessage = "";
         });
-        HudRenderCallback.EVENT.register(ItemLogAlertsFeature::render);
+        HudRenderCallback.EVENT.register((context, tickCounter) -> render(context));
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             dispatcher.register(ClientCommandManager.literal("itemlogalert")
@@ -148,7 +148,7 @@ public final class ItemLogAlertsFeature {
 
         MinecraftClient client = MinecraftClient.getInstance();
         if (playSound && client.player != null) {
-            client.player.playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING, 2.0F, 2.0F);
+            client.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, 1.0F, 1.8F);
         }
     }
 
@@ -163,14 +163,13 @@ public final class ItemLogAlertsFeature {
         int textWidth = client.textRenderer.getWidth(measured);
         float scale = Math.min(3.0F, Math.max(1.0F, (width - 24.0F) / Math.max(1, textWidth)));
         int scaledWidth = (int) (textWidth * scale);
-        int x = Math.max(4, (width - scaledWidth) / 2);
         int y = height / 2 - 14;
 
         context.getMatrices().push();
         context.getMatrices().translate(width / 2.0F, y, 0.0F);
         context.getMatrices().scale(scale, scale, 1.0F);
-        Text text = Text.literal(activeMessage.replaceAll("§[0-9A-FK-ORa-fk-or]", ""));
-        text = text.styled(style -> style.withColor(Formatting.RED).withBold(true));
+        var text = Text.literal(activeMessage.replaceAll("§[0-9A-FK-ORa-fk-or]", ""))
+                .styled(style -> style.withColor(Formatting.RED).withBold(true));
         context.drawCenteredTextWithShadow(client.textRenderer, text, 0, 0, 0xFFFF5555);
         context.getMatrices().pop();
     }
