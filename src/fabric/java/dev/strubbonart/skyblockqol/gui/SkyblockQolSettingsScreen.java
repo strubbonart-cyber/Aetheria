@@ -9,6 +9,7 @@ import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventoryButtonsFeature;
+import dev.strubbonart.skyblockqol.features.qol.BetterContainersFeature;
 import dev.strubbonart.skyblockqol.features.calculator.SignCalculatorFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
@@ -284,6 +285,20 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
             }
             case MORE -> {
+                addToggle("Better Containers", BetterContainersFeature.isEnabled(),
+                        left, y, 300,
+                        () -> BetterContainersFeature.setEnabled(!BetterContainersFeature.isEnabled()));
+                y += 28;
+                addButton("Container style: " + (BetterContainersFeature.getStyle() + 1) + " / 7",
+                        left, y, 300, 20, BetterContainersFeature::cycleStyle);
+                y += 28;
+                addToggle("Container watermark", BetterContainersFeature.isWatermarkEnabled(),
+                        left, y, 300,
+                        () -> BetterContainersFeature.setWatermarkEnabled(!BetterContainersFeature.isWatermarkEnabled()));
+                y += 28;
+                addButton("Watermark color: next preset", left, y, 300, 20,
+                        BetterContainersFeature::cycleWatermarkColor);
+                y += 32;
                 addToggle("Sign Calculator (line 2: ^^^^^^)",
                         SignCalculatorFeature.isEnabled(), left, y, 300,
                         () -> SignCalculatorFeature.setEnabled(!SignCalculatorFeature.isEnabled()));

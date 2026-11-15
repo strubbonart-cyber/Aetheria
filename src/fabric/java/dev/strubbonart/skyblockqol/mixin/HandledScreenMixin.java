@@ -10,6 +10,7 @@ import dev.strubbonart.skyblockqol.features.qol.ItemStackTipsFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
+import dev.strubbonart.skyblockqol.features.qol.BetterContainersFeature;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -27,6 +28,14 @@ public abstract class HandledScreenMixin {
     @Shadow protected int x;
     @Shadow protected int y;
     @Shadow protected Slot focusedSlot;
+
+    @Inject(method = "drawSlot", at = @At("HEAD"), cancellable = true)
+    private void skyblockqol$hideBlankBetterContainerPane(DrawContext context, Slot slot, CallbackInfo ci) {
+        if (BetterContainersFeature.isEnabled() && slot != null
+                && !BetterContainersFeature.shouldRenderStack(slot.getStack())) {
+            ci.cancel();
+        }
+    }
 
     @Inject(method = "drawSlot", at = @At("TAIL"))
     private void skyblockqol$drawGardenPlotNumber(DrawContext context, Slot slot, CallbackInfo ci) {

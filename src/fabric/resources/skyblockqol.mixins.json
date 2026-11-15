@@ -16,7 +16,8 @@
     "MouseCursorMixin",
     "ScreenAccessorMixin",
     "ProtectedDropMixin",
-    "SignCalculatorMixin"
+    "SignCalculatorMixin",
+    "GenericContainerScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
