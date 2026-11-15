@@ -377,6 +377,7 @@ public final class GardenPestFeatures {
         if (client.getNetworkHandler() == null) return;
 
         Map<Integer, Integer> plots = new java.util.TreeMap<>();
+        ACTIVE_PEST_PLOTS.clear();
         for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
             Text display = entry.getDisplayName();
             String line = stripFormatting(display == null
@@ -385,7 +386,6 @@ public final class GardenPestFeatures {
                 gardenAlive = line.substring("Alive: ".length()).trim();
             } else if (line.startsWith("Plots: ")) {
                 String value = line.substring("Plots: ".length()).trim();
-                ACTIVE_PEST_PLOTS.clear();
                 for (String part : value.split(",")) {
                     Matcher matcher = PLOT_ENTRY.matcher(part.trim());
                     if (!matcher.matches()) continue;

@@ -23,6 +23,9 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -230,12 +233,16 @@ public final class GardenFeatures {
         if (trackerEnabled) {
             long elapsed = trackedActiveTimeMs;
             long perHour = elapsed <= 0L ? 0L : Math.round(totalHarvests * 3_600_000.0 / elapsed);
-            String[] cropLines = new String[4];
-            cropLines[0] = "Farming Tracker";
-            cropLines[1] = "Mature crop blocks: " + totalHarvests;
-            cropLines[2] = "Rate: " + perHour + " blocks/hour";
-            cropLines[3] = "Active farming time: " + formatDuration(elapsed);
-            renderPanel(context, "tracker", cropLines);
+            List<String> cropLines = new ArrayList<>();
+            cropLines.add("Farming Tracker");
+            cropLines.add("Mature crop blocks: " + totalHarvests);
+            cropLines.add("Rate: " + perHour + " blocks/hour");
+            cropLines.add("Active farming time: " + formatDuration(elapsed));
+            CROP_BREAKS.entrySet().stream()
+                    .sorted(Map.Entry.<String, Long>comparingByValue(Comparator.reverseOrder()))
+                    .limit(4)
+                    .forEach(entry -> cropLines.add(formatCropName(entry.getKey()) + ": " + entry.getValue()));
+            renderPanel(context, "tracker", cropLines.toArray(String[]::new));
         }
 
         if (pitchEnabled) {
@@ -306,6 +313,17 @@ public final class GardenFeatures {
             if (state.contains(Properties.AGE_2) && state.get(Properties.AGE_2) < 2) return null;
         }
         return id;
+    }
+
+    private static String formatCropName(String value) {
+        if (value == null || value.isBlank()) return "Crop";
+        StringBuilder result = new StringBuilder();
+        for (String word : value.replace('_', ' ').split("\\s+")) {
+            if (word.isEmpty()) continue;
+            if (result.length() > 0) result.append(' ');
+            result.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
+        }
+        return result.toString();
     }
 
     private static String stripFormatting(String value) {
