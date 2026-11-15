@@ -12,7 +12,8 @@
     "ChatScreenMixin",
     "EntityRenderDispatcherMixin",
     "HeldItemRendererMixin",
-    "EntityDisplayNameMixin"
+    "EntityDisplayNameMixin",
+    "MouseCursorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

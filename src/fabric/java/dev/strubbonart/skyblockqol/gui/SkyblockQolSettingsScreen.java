@@ -6,6 +6,7 @@ import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
+import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
@@ -164,6 +165,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setConfirmDisconnectEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isConfirmDisconnectEnabled()));
+                y += 26;
+                addToggle("Prevent cursor reset when opening GUIs",
+                        CursorResetFeature.isEnabled(), left, y, 300,
+                        () -> CursorResetFeature.setEnabled(!CursorResetFeature.isEnabled()));
                 y += 26;
                 addToggle("Enchant level coloring",
                         dev.strubbonart.skyblockqol.features.qol.QolFeatures.isEnchantHighlightEnabled(),
