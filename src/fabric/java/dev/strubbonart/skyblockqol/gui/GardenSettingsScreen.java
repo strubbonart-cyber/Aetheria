@@ -16,6 +16,8 @@ import net.minecraft.text.Text;
 /** Dedicated settings page for the first Garden feature slice. */
 public final class GardenSettingsScreen extends Screen {
     private final Screen parent;
+    private int scrollOffset;
+    private int contentBottom;
 
     public GardenSettingsScreen(Screen parent) {
         super(Text.literal("Garden Settings"));
@@ -25,7 +27,8 @@ public final class GardenSettingsScreen extends Screen {
     @Override
     protected void init() {
         int x = width / 2 - 150;
-        int y = 72;
+        int y = 72 - scrollOffset;
+        contentBottom = y;
         addToggle("Blocks-per-second HUD", GardenFeatures.isBpsEnabled(), x, y,
                 () -> GardenFeatures.setBpsEnabled(!GardenFeatures.isBpsEnabled()));
         y += 28;
@@ -110,19 +113,50 @@ public final class GardenSettingsScreen extends Screen {
         addButton("RESET OM STATS", x + 204, y, 96, 22, GardenOrganicMatterTracker::reset);
         addButton("RESET PELTS", x, y + 26, 300, 20, GardenTrevorFeatures::resetPeltTracker);
         addButton("BACK", x, height - 32, 300, 20, this::close);
+        contentBottom = y + scrollOffset + 52;
     }
 
     private void addToggle(String label, boolean enabled, int x, int y, Runnable action) {
-        addDrawableChild(ButtonWidget.builder(Text.literal(label + ": " + (enabled ? "ON" : "OFF")),
+        ButtonWidget widget = ButtonWidget.builder(Text.literal(label + ": " + (enabled ? "ON" : "OFF")),
                 button -> {
                     action.run();
-                    if (client != null) client.setScreen(new GardenSettingsScreen(parent));
-                }).dimensions(x, y, 300, 22).build());
+                    refreshSettings();
+                }).dimensions(x, y, 300, 22).build();
+        widget.visible = isInsideContent(widget.getY(), widget.getHeight());
+        addDrawableChild(widget);
     }
 
     private void addButton(String label, int x, int y, int w, int h, Runnable action) {
-        addDrawableChild(ButtonWidget.builder(Text.literal(label), button -> action.run())
-                .dimensions(x, y, w, h).build());
+        ButtonWidget widget = ButtonWidget.builder(Text.literal(label), button -> action.run())
+                .dimensions(x, y, w, h).build();
+        widget.visible = label.equals("BACK") || isInsideContent(widget.getY(), widget.getHeight());
+        addDrawableChild(widget);
+    }
+
+    private boolean isInsideContent(int buttonY, int buttonHeight) {
+        return buttonY >= 64 && buttonY + buttonHeight <= height - 42;
+    }
+
+    private void refreshSettings() {
+        if (client == null) return;
+        GardenSettingsScreen next = new GardenSettingsScreen(parent);
+        next.scrollOffset = scrollOffset;
+        client.setScreen(next);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        if (mouseY >= 60 && mouseY <= height - 42) {
+            int maxScroll = Math.max(0, contentBottom - (height - 48));
+            int next = Math.max(0, Math.min(maxScroll,
+                    scrollOffset + (verticalAmount < 0 ? 34 : -34)));
+            if (next != scrollOffset) {
+                scrollOffset = next;
+                clearAndInit();
+            }
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
 
     private void openEditor(OverlayPositionEditorScreen.Target target) {
@@ -136,6 +170,11 @@ public final class GardenSettingsScreen extends Screen {
         context.drawCenteredTextWithShadow(textRenderer,
                 "Harvest counts record mature crop-block breaks, not exact drop stacks.",
                 width / 2, 48, 0xFFB8D8FF);
+        int maxScroll = Math.max(0, contentBottom - (height - 48));
+        if (maxScroll > 0) {
+            context.drawTextWithShadow(textRenderer, "Scroll to see more settings",
+                    width / 2 + 165, 58, 0xFFB8D8FF);
+        }
         super.render(context, mouseX, mouseY, delta);
     }
 
