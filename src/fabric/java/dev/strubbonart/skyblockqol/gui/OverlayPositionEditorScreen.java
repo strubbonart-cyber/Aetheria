@@ -11,6 +11,8 @@ import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.qol.KillComboFeature;
+import dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature;
+import dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -25,7 +27,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
         FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
-        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST, QOL_KILL_COMBO
+        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST, QOL_KILL_COMBO, QOL_ITEM_LOG, QOL_RARE_DROP
     }
 
     private final Screen parent;
@@ -172,6 +174,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getX();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutX();
             case QOL_KILL_COMBO -> KillComboFeature.getX();
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.getX();
+            case QOL_RARE_DROP -> RareDropTrackerFeature.getX();
         };
     }
 
@@ -191,6 +195,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getY();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutY();
             case QOL_KILL_COMBO -> KillComboFeature.getY();
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.getY();
+            case QOL_RARE_DROP -> RareDropTrackerFeature.getY();
         };
     }
 
@@ -210,6 +216,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getScale();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutScale();
             case QOL_KILL_COMBO -> KillComboFeature.getScale();
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.getScale();
+            case QOL_RARE_DROP -> RareDropTrackerFeature.getScale();
         };
     }
 
@@ -233,6 +241,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.updateLayout(x, y, scale);
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.updateLayout(x, y, scale);
             case QOL_KILL_COMBO -> KillComboFeature.updateLayout(x, y, scale);
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.updateLayout(x, y, scale);
+            case QOL_RARE_DROP -> RareDropTrackerFeature.updateLayout(x, y, scale);
         }
         dirty = true;
     }
@@ -252,6 +262,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.saveLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.saveLayout();
             case QOL_KILL_COMBO -> KillComboFeature.saveLayout();
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.saveLayout();
+            case QOL_RARE_DROP -> RareDropTrackerFeature.saveLayout();
         }
         dirty = false;
     }
@@ -274,6 +286,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.resetLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.resetLayout();
             case QOL_KILL_COMBO -> KillComboFeature.resetLayout();
+            case QOL_ITEM_LOG -> ItemPickupLogFeature.resetLayout();
+            case QOL_RARE_DROP -> RareDropTrackerFeature.resetLayout();
         }
         if (client != null && client.currentScreen == this) {
             client.setScreen(new OverlayPositionEditorScreen(parent, target));
@@ -291,6 +305,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> "om";
             case GARDEN_PELT_TRACKER -> "pelt";
             case QOL_KILL_COMBO -> "killcombo";
+            case QOL_ITEM_LOG -> "itemlog";
+            case QOL_RARE_DROP -> "raredrop";
             default -> "bps";
         };
     }
@@ -337,6 +353,8 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_OM_TRACKER -> new String[]{"Organic Matter Tracker", "Organic Matter: 0", "0.0/h | 0 items"};
             case GARDEN_PELT_TRACKER -> new String[]{"Pelt Tracker", "Pelts: 42 | Pelts/h: 120", "Cooldown: Ready!"};
             case QOL_KILL_COMBO -> new String[]{"Kill Combo Tracker", "Current: +15 | Highest: 30", "+3% Magic Find"};
+            case QOL_ITEM_LOG -> new String[]{"Item Pickup Log", "+ 1x Aspect of the Void", "- 32x Enchanted Cobblestone"};
+            case QOL_RARE_DROP -> new String[]{"Rare Drop Tracker", "Giant's Sword: 3/10", "Summoning Eye: 27"};
         };
     }
 

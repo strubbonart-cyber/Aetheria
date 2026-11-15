@@ -210,6 +210,30 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature.setEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature.isEnabled()));
                 y += 26;
+                addToggle("Item Pickup Log HUD",
+                        dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature.isEnabled()));
+                y += 26;
+                addButton("EDIT ITEM LOG POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.QOL_ITEM_LOG));
+                y += 26;
+                addToggle("Rare Drop Tracker HUD",
+                        dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.isEnabled()));
+                y += 26;
+                addToggle("Rare Drop chat alerts",
+                        dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.isChatAlertsEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.setChatAlertsEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature.isChatAlertsEnabled()));
+                y += 26;
+                addButton("EDIT RARE DROP POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.QOL_RARE_DROP));
+                y += 26;
                 addButton("DVD size: " + dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.getSize() + "  (+/-)",
                         left, y, 146, 20,
                         () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSize(12));
