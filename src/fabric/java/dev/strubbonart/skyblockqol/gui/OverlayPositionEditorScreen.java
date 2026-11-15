@@ -19,7 +19,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
         FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
-        CURRENT_PET
+        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW
     }
 
     private final Screen parent;
@@ -159,6 +159,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM ->
                     DungeonOverlaySettings.x(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudX();
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutX(gardenLayoutKey());
         };
     }
 
@@ -171,6 +172,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM ->
                     DungeonOverlaySettings.y(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudY();
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutY(gardenLayoutKey());
         };
     }
 
@@ -183,6 +185,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM ->
                     DungeonOverlaySettings.scale(dungeonWidget());
             case CURRENT_PET -> CurrentPetFeature.getHudScale();
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutScale(gardenLayoutKey());
         };
     }
 
@@ -199,6 +202,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM ->
                     DungeonOverlaySettings.updateLayout(dungeonWidget(), x, y, scale);
             case CURRENT_PET -> CurrentPetFeature.updateHudLayout(x, y, scale);
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.updateLayout(gardenLayoutKey(), x, y, scale);
         }
         dirty = true;
     }
@@ -211,6 +215,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM ->
                     DungeonOverlaySettings.saveLayout();
             case CURRENT_PET -> CurrentPetFeature.saveHudLayout();
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.saveLayout();
         }
         dirty = false;
     }
@@ -226,10 +231,20 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_BREAKER -> DungeonOverlaySettings.set(DungeonOverlaySettings.Widget.BREAKER, 8, 112, 1.0F);
             case DUNGEON_ROOM -> DungeonOverlaySettings.set(DungeonOverlaySettings.Widget.ROOM, 8, 212, 1.0F);
             case CURRENT_PET -> CurrentPetFeature.resetHudLayout();
+            case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.resetLayout(gardenLayoutKey());
         }
         if (client != null && client.currentScreen == this) {
             client.setScreen(new OverlayPositionEditorScreen(parent, target));
         }
+    }
+
+    private String gardenLayoutKey() {
+        return switch (target) {
+            case GARDEN_BPS -> "bps";
+            case GARDEN_TRACKER -> "tracker";
+            case GARDEN_PITCH_YAW -> "pitch";
+            default -> "bps";
+        };
     }
 
     private DungeonOverlaySettings.Widget dungeonWidget() {
@@ -265,6 +280,9 @@ public final class OverlayPositionEditorScreen extends Screen {
             case DUNGEON_BREAKER -> new String[]{"Dungeon Breaker", "Charges: 0/0"};
             case DUNGEON_ROOM -> new String[]{"Dungeon Room", "Secrets: 0 / 0"};
             case CURRENT_PET -> new String[]{"Pet: [Lvl 100] Example Pet"};
+            case GARDEN_BPS -> new String[]{"Garden BPS", "Blocks broken: 0", "Rate: 0.0 blocks/s"};
+            case GARDEN_TRACKER -> new String[]{"Farming Tracker", "Crop blocks: 0", "Session rate: 0/hour"};
+            case GARDEN_PITCH_YAW -> new String[]{"Yaw: 0.00°", "Pitch: 0.00°"};
         };
     }
 

@@ -94,3 +94,13 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - A common drag-and-drop editor is now used for every active HUD: Fetchur, Powder, Pristine, Gold, Ghost Tracker, Dungeon Map, Dungeon Timer, Dungeon Splits, Dungeon Breaker, Dungeon Room, and Current Pet.
 - Select an overlay in its feature page and choose **Edit Position**. Drag the preview with the left mouse button. The editor shows X/Y and scale, supports SIZE - / SIZE +, RESET, and DONE, and saves the position in the same configuration used by the live HUD.
 - Garden and future QoL overlays should register with this shared editor instead of implementing separate position controls.
+
+
+## Garden first Fabric slice
+
+- Garden detection reads the visible sidebar and activates the Garden HUDs only when a sidebar line contains "Garden".
+- Blocks-per-second HUD counts client-side block-break events in a rolling one-second window.
+- Farming Tracker counts mature crop-block breaks in the Garden and saves the lifetime total. It does not claim to count exact item stacks or calculate Bazaar profit.
+- Precise Yaw/Pitch HUD displays the player rotation to two decimal places.
+- The three HUDs each have independent saved X/Y/scale values and use the shared drag editor. Configure them from the new **Garden** settings page.
+- Plot-number overlays, visitor shopping list, pest finder/tracker/cooldown alert, Trevor Solver, mouse lock/sensitivity reducer, Organic Matter Tracker and the remaining Garden features are not yet ported.

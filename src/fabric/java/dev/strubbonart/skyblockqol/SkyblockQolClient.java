@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.gui.SkyblockQolSettingsScreen;
 import dev.strubbonart.skyblockqol.features.qol.QolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
+import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
@@ -36,6 +37,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         CurrentPetFeature.initialize();
+        GardenFeatures.initialize();
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skyblockqol.open_settings",
                 InputUtil.Type.KEYSYM,

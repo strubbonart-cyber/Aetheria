@@ -60,7 +60,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> open(Page.QOL, LayoutTarget.POWDER));
                 addButton("PETS", width / 2 - 110, y + 114, 220, 28,
                         () -> open(Page.PETS, LayoutTarget.POWDER));
-                addButton("DONE", width / 2 - 110, y + 152, 220, 24, this::close);
+                addButton("GARDEN", width / 2 - 110, y + 152, 220, 28,
+                        () -> client.setScreen(new GardenSettingsScreen(this)));
+                addButton("DONE", width / 2 - 110, y + 190, 220, 24, this::close);
             }
             case MINING -> {
                 addToggle("Powder chat filter", MiningFeatures.isPowderFilterEnabled(),
