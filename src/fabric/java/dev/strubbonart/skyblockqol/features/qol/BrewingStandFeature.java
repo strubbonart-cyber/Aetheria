@@ -11,7 +11,9 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.scoreboard.ScoreboardDisplaySlot;
 import net.minecraft.scoreboard.ScoreboardEntry;
@@ -75,8 +77,7 @@ public final class BrewingStandFeature {
         for (var slot : handler.slots) {
             ItemStack stack = slot.getStack();
             if (stack.isEmpty()) continue;
-            for (Text line : stack.getTooltip(ItemStack.TooltipContext.DEFAULT, client.player,
-                    net.minecraft.item.tooltip.TooltipType.BASIC)) {
+            for (Text line : stack.getTooltip(Item.TooltipContext.DEFAULT, client.player, TooltipType.BASIC)) {
                 Matcher matcher = TIMER.matcher(strip(line.getString()));
                 if (!matcher.find()) continue;
                 try {
