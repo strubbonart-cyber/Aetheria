@@ -141,3 +141,5 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 
 - Item Pickup Log aggregates the player's 36-slot inventory by SkyBlock ID (or vanilla registry ID), detects net item-count gains/losses, shows a short-lived draggable HUD, and feeds positive deltas to Rare Drop Tracker. It pauses snapshots while any screen is open so container transfers are included when the player returns to the world. It is an inventory-difference log, not a server pickup-packet feed, so trades or purchases that add items can also be recorded as gains.
 - Rare Drop Tracker supports a manual ID watch list with `/rdt add <SkyBlock ID>`, `remove`, `goal <ID> <count>`, `list`, `clear`, `reset`, `on`, and `off`. Tracked counts persist, gains can trigger chat alerts, and the count HUD has its own drag position/scale. Unlike the original GUI search, this first port does not use Aetheria's external item registry.
+
+- Skill XP Tooltip adds an XP-to-max line to the SkyBlock Skills/Dungeon Stats menu item tooltip. It uses the original XP tables and only shows the remaining XP while Shift is held; otherwise it displays a small Shift hint. It has a QOL toggle.

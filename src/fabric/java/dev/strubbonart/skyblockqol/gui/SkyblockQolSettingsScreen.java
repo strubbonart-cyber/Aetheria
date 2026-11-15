@@ -234,6 +234,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addButton("EDIT RARE DROP POSITION", left, y, 300, 20,
                         () -> openPositionEditor(OverlayPositionEditorScreen.Target.QOL_RARE_DROP));
                 y += 26;
+                addToggle("Skill XP tooltip (hold Shift for remaining XP)",
+                        dev.strubbonart.skyblockqol.features.qol.SkillXpTooltipFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.SkillXpTooltipFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.SkillXpTooltipFeature.isEnabled()));
+                y += 26;
                 addButton("DVD size: " + dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.getSize() + "  (+/-)",
                         left, y, 146, 20,
                         () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSize(12));

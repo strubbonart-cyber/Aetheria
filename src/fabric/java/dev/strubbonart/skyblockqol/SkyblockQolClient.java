@@ -9,6 +9,7 @@ import dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature;
 import dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature;
 import dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature;
+import dev.strubbonart.skyblockqol.features.qol.SkillXpTooltipFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
