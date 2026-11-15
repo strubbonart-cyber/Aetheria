@@ -10,6 +10,7 @@ import net.minecraft.component.type.LoreComponent;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
+import dev.strubbonart.skyblockqol.gui.PetCollectionScreen;
 import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
