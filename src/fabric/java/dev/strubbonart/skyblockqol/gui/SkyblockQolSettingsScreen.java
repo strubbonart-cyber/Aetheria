@@ -197,6 +197,20 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 y += 26;
                 addButton("EDIT KILL COMBO POSITION", left, y, 300, 20,
                         () -> openPositionEditor(OverlayPositionEditorScreen.Target.QOL_KILL_COMBO));
+                y += 26;
+                addToggle("DVD screensaver", 
+                        dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.isEnabled()));
+                y += 26;
+                addButton("DVD size: " + dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.getSize() + "  (+/-)",
+                        left, y, 146, 20,
+                        () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSize(12));
+                addButton("DVD speed: " + dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.getSpeed() + "  (+/-)",
+                        right, y, 146, 20,
+                        () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSpeed(5));
+
 
             }
             case PETS -> {
