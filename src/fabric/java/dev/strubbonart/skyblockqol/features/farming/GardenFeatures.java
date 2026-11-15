@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties as JavaProperties;
 import java.util.Set;
 
 /**
@@ -138,7 +137,6 @@ public final class GardenFeatures {
     public static void saveLayout() { save(); }
 
     public static void resetLayout(String id) {
-        createDefaultLayouts();
         Layout defaults = defaults(id);
         Layout target = layout(id);
         target.x = defaults.x;
