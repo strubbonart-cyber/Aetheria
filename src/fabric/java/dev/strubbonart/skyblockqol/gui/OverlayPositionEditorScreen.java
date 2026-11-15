@@ -5,6 +5,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import dev.strubbonart.skyblockqol.features.farming.GardenTrevorFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenVisitorFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.mining.GhostTrackerFeatures;
 import dev.strubbonart.skyblockqol.features.mining.MiningFeatures;
