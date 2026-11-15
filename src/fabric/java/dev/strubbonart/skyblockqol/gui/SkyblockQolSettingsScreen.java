@@ -306,6 +306,17 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 y += 28;
                 addButton("EDIT TROPHY FISH POSITION", left, y, 300, 20,
                         () -> openPositionEditor(OverlayPositionEditorScreen.Target.TROPHY_FISH));
+                y += 28;
+                addToggle("Fishing Timer", FishingTimerFeature.isEnabled(),
+                        left, y, 300, () -> FishingTimerFeature.setEnabled(!FishingTimerFeature.isEnabled()));
+                y += 28;
+                addButton("Alert time: " + FishingTimerFeature.getAlertTimeSeconds() + "s  (-5)",
+                        left, y, 146, 20, () -> FishingTimerFeature.adjustAlertTime(-5));
+                addButton("Alert time: " + FishingTimerFeature.getAlertTimeSeconds() + "s  (+5)",
+                        right, y, 146, 20, () -> FishingTimerFeature.adjustAlertTime(5));
+                y += 28;
+                addButton("EDIT FISHING TIMER POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.FISHING_TIMER));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),

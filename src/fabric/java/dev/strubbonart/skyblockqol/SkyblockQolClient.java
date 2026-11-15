@@ -16,6 +16,7 @@ import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
+import dev.strubbonart.skyblockqol.features.fishing.FishingTimerFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
@@ -72,6 +73,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         GardenMouseFeatures.initialize();
         GardenVisitorFeatures.initialize();
         TrophyFishFeature.initialize();
+        FishingTimerFeature.initialize();
         openSettingsKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.skyblockqol.open_settings",
                 InputUtil.Type.KEYSYM,
