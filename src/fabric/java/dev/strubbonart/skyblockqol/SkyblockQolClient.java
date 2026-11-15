@@ -3,6 +3,7 @@ package dev.strubbonart.skyblockqol;
 import dev.strubbonart.skyblockqol.gui.SkyblockQolSettingsScreen;
 import dev.strubbonart.skyblockqol.features.qol.QolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
+import dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
@@ -42,6 +43,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
     public void onInitializeClient() {
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
+        ExtraQolFeatures.initialize();
         CurrentPetFeature.initialize();
         PetCollectionFeature.initialize();
         GardenFeatures.initialize();

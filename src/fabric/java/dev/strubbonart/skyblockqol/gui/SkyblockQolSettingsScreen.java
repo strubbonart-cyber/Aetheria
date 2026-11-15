@@ -169,6 +169,20 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setHideEnchantDescriptionsEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isHideEnchantDescriptionsEnabled()));
+                y += 26;
+                addToggle("Watched player join/leave (" +
+                                dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.getWatchedCount() + ")",
+                        dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isJoinLeaveEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.setJoinLeaveEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isJoinLeaveEnabled()));
+                y += 26;
+                addToggle("Hoppity new rabbit highlight",
+                        dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isHoppityHighlightEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.setHoppityHighlightEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures.isHoppityHighlightEnabled()));
+
             }
             case PETS -> {
                 addToggle("Current Pet HUD",

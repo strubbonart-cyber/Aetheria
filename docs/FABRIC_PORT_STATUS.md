@@ -128,3 +128,6 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Visitor Shopping List captures the server-provided "Accept Offer" item tooltip when hovered in a Garden menu. It parses the Items Required and Rewards sections, counts matching display-name stacks in the player's inventory, and shows amounts owned/missing plus Copper/Bits bonuses. It can be shown/hidden/reset with `/visitlist show|hide|reset|status` and has its own drag position/scale. It does not yet access Bazaar price APIs, calculate profit, or automate purchases.
 
 - Local Pet Collection scans the player's Pets menu every 500 ms, caches discovered levelled pet names, rarity text color, special-skin marker and active status, and saves the collection to a config file. It adds a read-only paged collection screen and `/petcollection` command. It does not fetch or display remote player profiles, and it does not yet cache/re-render pet skull textures.
+
+- Watched Player Join/Leave notifier scans the live tab list once per second and reports presence changes for names entered with `/watchplayer add <name>`. Use `/watchplayer remove|clear|list|on|off`. It is local-only and saves the watch list.
+- Hoppity New Rabbit Highlight outlines `NEW RABBIT!` items in inventory screens whose title contains Hoppity. It has a QOL toggle.
