@@ -73,6 +73,26 @@ public final class GardenMouseFeatures {
         });
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
+                dispatcher.register(ClientCommandManager.literal("lockmouse")
+                        .executes(context -> {
+                            toggleLock();
+                            context.getSource().sendFeedback(Text.literal(
+                                    "Mouse camera lock " + (lockEnabled ? "enabled." : "disabled.")));
+                            return 1;
+                        })
+                        .then(ClientCommandManager.literal("on").executes(context -> {
+                            setLockEnabled(true);
+                            context.getSource().sendFeedback(Text.literal("Mouse camera lock enabled."));
+                            return 1;
+                        }))
+                        .then(ClientCommandManager.literal("off").executes(context -> {
+                            setLockEnabled(false);
+                            context.getSource().sendFeedback(Text.literal("Mouse camera lock disabled."));
+                            return 1;
+                        }))
+                ));
+
+        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
                 dispatcher.register(ClientCommandManager.literal("lockyp")
                         .executes(context -> {
                             toggleLock();
@@ -162,7 +182,7 @@ public final class GardenMouseFeatures {
                 Text.literal("CAMERA LOCKED").styled(style -> style.withBold(true).withColor(0xFFFFCC55)),
                 context.getScaledWindowWidth() / 2, centerY + 18, 0xFFFFCC55);
         context.drawCenteredTextWithShadow(client.textRenderer,
-                Text.literal("Use /lockyp or your configured key to unlock"),
+                Text.literal("Use /lockmouse or your configured key to unlock"),
                 context.getScaledWindowWidth() / 2, centerY + 30, 0xFFE0E0E0);
     }
 

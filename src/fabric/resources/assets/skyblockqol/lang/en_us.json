@@ -1,4 +1,6 @@
 {
   "key.skyblockqol.open_settings": "Open Mining & Dungeon Settings",
-  "category.skyblockqol": "Skyblock QoL"
+  "category.skyblockqol": "Skyblock QoL",
+  "key.skyblockqol.trapper_warp": "Trevor: Warp to Trapper after a hunt",
+  "key.skyblockqol.pest_warp": "Garden: Warp to infested plot"
 }

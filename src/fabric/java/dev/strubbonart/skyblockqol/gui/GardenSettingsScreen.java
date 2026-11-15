@@ -53,6 +53,10 @@ public final class GardenSettingsScreen extends Screen {
         addToggle("Trevor Pelt Tracker", GardenTrevorFeatures.isPeltTrackerEnabled(), x, y,
                 () -> GardenTrevorFeatures.setPeltTrackerEnabled(!GardenTrevorFeatures.isPeltTrackerEnabled()));
         y += 28;
+        addToggle("Trapper warp within 5s after hunt (default F)",
+                GardenTrevorFeatures.isTrapperWarpEnabled(), x, y,
+                () -> GardenTrevorFeatures.setTrapperWarpEnabled(!GardenTrevorFeatures.isTrapperWarpEnabled()));
+        y += 28;
         addToggle("Lock camera yaw / pitch", GardenMouseFeatures.isLockEnabled(), x, y,
                 () -> GardenMouseFeatures.setLockEnabled(!GardenMouseFeatures.isLockEnabled()));
         y += 28;
@@ -75,6 +79,15 @@ public final class GardenSettingsScreen extends Screen {
         y += 28;
         addToggle("Pest Finder info HUD", GardenPestFeatures.isFinderEnabled(), x, y,
                 () -> GardenPestFeatures.setFinderEnabled(!GardenPestFeatures.isFinderEnabled()));
+        y += 28;
+        addToggle("Show Pest Finder only while holding vacuum", GardenPestFeatures.isShowFinderOnlyWithVacuum(), x, y,
+                () -> GardenPestFeatures.setShowFinderOnlyWithVacuum(!GardenPestFeatures.isShowFinderOnlyWithVacuum()));
+        y += 28;
+        addToggle("Pest Finder warp key", GardenPestFeatures.isWarpEnabled(), x, y,
+                () -> GardenPestFeatures.setWarpEnabled(!GardenPestFeatures.isWarpEnabled()));
+        y += 28;
+        addButton("Warp target: " + (GardenPestFeatures.getWarpTargetMode() == 0 ? "CLOSEST" : "MOST PESTS"),
+                x, y, 300, 22, GardenPestFeatures::cycleWarpTargetMode);
         y += 28;
         addToggle("Pest Cooldown Alert", GardenPestFeatures.isCooldownAlertEnabled(), x, y,
                 () -> GardenPestFeatures.setCooldownAlertEnabled(!GardenPestFeatures.isCooldownAlertEnabled()));

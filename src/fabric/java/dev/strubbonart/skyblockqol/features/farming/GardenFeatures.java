@@ -78,9 +78,9 @@ public final class GardenFeatures {
             if (!world.isClient || player != client.player || !isGarden()) return;
 
             long now = System.currentTimeMillis();
-            BLOCK_BREAKS.addLast(now);
             String crop = cropId(state);
             if (crop != null) {
+                BLOCK_BREAKS.addLast(now);
                 CROP_BREAKS.merge(crop, 1L, Long::sum);
                 totalHarvests++;
             }

@@ -6,6 +6,14 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Box;
+import org.lwjgl.glfw.GLFW;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -36,11 +44,17 @@ public final class GardenPestFeatures {
 
     private static final Map<String, Long> KILLS = new HashMap<>();
     private static final Map<String, Long> DROPS = new HashMap<>();
+    private static final Map<Integer, Integer> ACTIVE_PEST_PLOTS = new java.util.TreeMap<>();
+    private static final Box[] GARDEN_PLOT_BOUNDS = createPlotBounds();
     private static boolean initialized;
     private static boolean trackerEnabled = true;
     private static boolean overlayVisible;
     private static boolean cooldownAlertEnabled;
     private static boolean finderEnabled = true;
+    private static boolean warpEnabled = true;
+    private static boolean showFinderOnlyWithVacuum = true;
+    private static int warpTargetMode;
+    private static KeyBinding warpKey;
     private static int cooldownThreshold = 30;
     private static boolean cooldownArmed = true;
     private static long alertUntil;
@@ -71,6 +85,12 @@ public final class GardenPestFeatures {
         if (initialized) return;
         initialized = true;
         load();
+        warpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.skyblockqol.pest_warp",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_UNKNOWN,
+                "category.skyblockqol"
+        ));
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> recordMessage(message.getString()));
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
@@ -134,6 +154,12 @@ public final class GardenPestFeatures {
     public static int getCooldownThreshold() { return cooldownThreshold; }
     public static boolean isFinderEnabled() { return finderEnabled; }
     public static void setFinderEnabled(boolean value) { finderEnabled = value; save(); }
+    public static boolean isWarpEnabled() { return warpEnabled; }
+    public static void setWarpEnabled(boolean value) { warpEnabled = value; save(); }
+    public static boolean isShowFinderOnlyWithVacuum() { return showFinderOnlyWithVacuum; }
+    public static void setShowFinderOnlyWithVacuum(boolean value) { showFinderOnlyWithVacuum = value; save(); }
+    public static int getWarpTargetMode() { return warpTargetMode; }
+    public static void cycleWarpTargetMode() { warpTargetMode = (warpTargetMode + 1) % 2; save(); }
 
     public static int getFinderLayoutX() { return finderX; }
     public static int getFinderLayoutY() { return finderY; }
@@ -223,6 +249,20 @@ public final class GardenPestFeatures {
     private static void tick() {
         boolean inGarden = GardenFeatures.isInGarden();
         if (inGarden) readGardenTablistData();
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (warpKey != null) {
+            while (warpKey.wasPressed()) {
+                if (warpEnabled && inGarden && client.currentScreen == null
+                        && client.player != null && client.getNetworkHandler() != null) {
+                    Integer plot = selectTargetPlot();
+                    if (plot != null && !isPlayerInsidePlot(plot, client)) {
+                        client.getNetworkHandler().sendChatCommand("tptoplot " + plot);
+                    } else if (client.player != null) {
+                        client.player.sendMessage(Text.literal("§6[Garden] §eNo other infested plot to warp to."), true);
+                    }
+                }
+            }
+        }
 
         if (!cooldownAlertEnabled || !inGarden) {
             cooldownArmed = true;
@@ -309,7 +349,7 @@ public final class GardenPestFeatures {
             renderPanel(context, lines);
         }
 
-        if (finderEnabled) {
+        if (finderEnabled && (!showFinderOnlyWithVacuum || isHoldingVacuum(client))) {
             renderFinder(context);
         }
 
@@ -335,13 +375,17 @@ public final class GardenPestFeatures {
                 gardenAlive = line.substring("Alive: ".length()).trim();
             } else if (line.startsWith("Plots: ")) {
                 String value = line.substring("Plots: ".length()).trim();
+                ACTIVE_PEST_PLOTS.clear();
                 for (String part : value.split(",")) {
                     Matcher matcher = PLOT_ENTRY.matcher(part.trim());
                     if (!matcher.matches()) continue;
                     try {
                         int plot = Integer.parseInt(matcher.group(1));
                         int count = matcher.group(2) == null ? 1 : Integer.parseInt(matcher.group(2));
-                        if (plot >= 1 && plot <= 24 && count > 0) plots.put(plot, count);
+                        if (plot >= 1 && plot <= 24 && count > 0) {
+                            plots.put(plot, count);
+                            ACTIVE_PEST_PLOTS.put(plot, count);
+                        }
                     } catch (NumberFormatException ignored) {
                         // Ignore malformed tablist plot values.
                     }
@@ -374,6 +418,10 @@ public final class GardenPestFeatures {
 
     private static void renderFinder(DrawContext context) {
         MinecraftClient client = MinecraftClient.getInstance();
+        Integer targetPlot = selectTargetPlot();
+        String warpHint = warpEnabled && targetPlot != null
+                ? "Warp key: " + warpKey.getBoundKeyLocalizedText().getString() + " -> Plot " + targetPlot
+                : "Warp key: unbound / no infested plots";
         String[] lines = {
                 "Pest Finder",
                 "Total alive: " + gardenAlive,
@@ -382,7 +430,8 @@ public final class GardenPestFeatures {
                 "Repellent: " + gardenRepellent,
                 "Bonus: " + gardenBonus,
                 "Cooldown: " + gardenCooldown,
-                "Bonus pest chance: " + gardenBonusPestChance
+                "Bonus pest chance: " + gardenBonusPestChance,
+                warpHint
         };
         int width = 0;
         for (String line : lines) width = Math.max(width, client.textRenderer.getWidth(line));
@@ -451,6 +500,9 @@ public final class GardenPestFeatures {
             overlayVisible = Boolean.parseBoolean(properties.getProperty("overlayVisible", "false"));
             cooldownAlertEnabled = Boolean.parseBoolean(properties.getProperty("cooldownAlertEnabled", "false"));
             finderEnabled = Boolean.parseBoolean(properties.getProperty("finderEnabled", "true"));
+            warpEnabled = Boolean.parseBoolean(properties.getProperty("warpEnabled", "true"));
+            showFinderOnlyWithVacuum = Boolean.parseBoolean(properties.getProperty("showFinderOnlyWithVacuum", "true"));
+            warpTargetMode = Math.max(0, Math.min(1, Integer.parseInt(properties.getProperty("warpTargetMode", "0"))));
             cooldownThreshold = Math.max(5, Math.min(300,
                     Integer.parseInt(properties.getProperty("cooldownThreshold", "30"))));
             hudX = Integer.parseInt(properties.getProperty("hudX", "8"));
@@ -478,6 +530,9 @@ public final class GardenPestFeatures {
         properties.setProperty("overlayVisible", Boolean.toString(overlayVisible));
         properties.setProperty("cooldownAlertEnabled", Boolean.toString(cooldownAlertEnabled));
         properties.setProperty("finderEnabled", Boolean.toString(finderEnabled));
+        properties.setProperty("warpEnabled", Boolean.toString(warpEnabled));
+        properties.setProperty("showFinderOnlyWithVacuum", Boolean.toString(showFinderOnlyWithVacuum));
+        properties.setProperty("warpTargetMode", Integer.toString(warpTargetMode));
         properties.setProperty("finderX", Integer.toString(finderX));
         properties.setProperty("finderY", Integer.toString(finderY));
         properties.setProperty("finderScale", Float.toString(finderScale));
@@ -501,4 +556,67 @@ public final class GardenPestFeatures {
         }
         lastSaveAt = System.currentTimeMillis();
     }
+
+    private static boolean isHoldingVacuum(MinecraftClient client) {
+        if (client.player == null) return false;
+        var stack = client.player.getMainHandStack();
+        if (stack.isEmpty()) return false;
+        NbtComponent customData = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if (customData == null || customData.isEmpty()) return false;
+        NbtCompound root = customData.copyNbt();
+        NbtCompound extra = root.contains("ExtraAttributes") ? root.getCompound("ExtraAttributes") : root;
+        return extra.getString("id").toUpperCase(Locale.ROOT).contains("VACUUM");
+    }
+
+    private static Integer selectTargetPlot() {
+        if (ACTIVE_PEST_PLOTS.isEmpty()) return null;
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player == null) return ACTIVE_PEST_PLOTS.keySet().iterator().next();
+        Integer best = null;
+        for (Integer candidate : ACTIVE_PEST_PLOTS.keySet()) {
+            if (candidate < 1 || candidate > GARDEN_PLOT_BOUNDS.length) continue;
+            if (best == null || beatsTarget(candidate, best, client)) best = candidate;
+        }
+        return best;
+    }
+
+    private static boolean beatsTarget(int candidate, int current, MinecraftClient client) {
+        if (warpTargetMode == 1) {
+            int candidateCount = ACTIVE_PEST_PLOTS.getOrDefault(candidate, 0);
+            int currentCount = ACTIVE_PEST_PLOTS.getOrDefault(current, 0);
+            if (candidateCount != currentCount) return candidateCount > currentCount;
+        }
+        return distanceToPlotSquared(candidate, client) < distanceToPlotSquared(current, client);
+    }
+
+    private static double distanceToPlotSquared(int plot, MinecraftClient client) {
+        if (client.player == null || plot < 1 || plot > GARDEN_PLOT_BOUNDS.length) return Double.MAX_VALUE;
+        Box box = GARDEN_PLOT_BOUNDS[plot - 1];
+        double dx = client.player.getX() - (box.minX + box.maxX) * 0.5D;
+        double dz = client.player.getZ() - (box.minZ + box.maxZ) * 0.5D;
+        return dx * dx + dz * dz;
+    }
+
+    private static boolean isPlayerInsidePlot(int plot, MinecraftClient client) {
+        if (client.player == null || plot < 1 || plot > GARDEN_PLOT_BOUNDS.length) return false;
+        return GARDEN_PLOT_BOUNDS[plot - 1].contains(client.player.getPos());
+    }
+
+    private static Box[] createPlotBounds() {
+        return new Box[]{
+                new Box(192, 67, 96, 288, 100, 192), new Box(96, 67, 192, 192, 100, 288),
+                new Box(192, 67, 288, 288, 100, 384), new Box(288, 67, 192, 384, 100, 288),
+                new Box(96, 67, 96, 192, 100, 192), new Box(288, 67, 96, 384, 100, 192),
+                new Box(96, 67, 288, 192, 100, 384), new Box(288, 67, 288, 384, 100, 384),
+                new Box(192, 67, 0, 288, 100, 96), new Box(0, 67, 192, 96, 100, 288),
+                new Box(384, 67, 192, 480, 100, 288), new Box(192, 67, 384, 288, 100, 480),
+                new Box(96, 67, 0, 192, 100, 96), new Box(288, 67, 0, 384, 100, 96),
+                new Box(0, 67, 96, 96, 100, 192), new Box(384, 67, 96, 480, 100, 192),
+                new Box(0, 67, 288, 96, 100, 384), new Box(384, 67, 288, 480, 100, 384),
+                new Box(96, 67, 384, 192, 100, 480), new Box(288, 67, 384, 384, 100, 480),
+                new Box(0, 67, 0, 96, 100, 96), new Box(384, 67, 0, 480, 100, 96),
+                new Box(0, 67, 384, 96, 100, 480), new Box(384, 67, 384, 480, 100, 480)
+        };
+    }
+
 }

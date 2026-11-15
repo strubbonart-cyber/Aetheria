@@ -5,6 +5,10 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.util.InputUtil;
+import org.lwjgl.glfw.GLFW;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderLayer;
@@ -47,6 +51,9 @@ public final class GardenTrevorFeatures {
     private static boolean initialized;
     private static boolean solverEnabled = true;
     private static boolean peltTrackerEnabled = true;
+    private static boolean trapperWarpEnabled;
+    private static long trapperWarpAvailableUntil;
+    private static KeyBinding trapperWarpKey;
     private static String questRarity = "";
     private static String questAnimal = "";
     private static String questArea = "";
@@ -70,6 +77,12 @@ public final class GardenTrevorFeatures {
         if (initialized) return;
         initialized = true;
         load();
+        trapperWarpKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.skyblockqol.trapper_warp",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_F,
+                "category.skyblockqol"
+        ));
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> onMessage(message.getString()));
         ClientTickEvents.END_CLIENT_TICK.register(client -> tick());
         HudRenderCallback.EVENT.register((context, tickCounter) -> renderHud(context));
@@ -78,6 +91,8 @@ public final class GardenTrevorFeatures {
 
     public static boolean isSolverEnabled() { return solverEnabled; }
     public static boolean isPeltTrackerEnabled() { return peltTrackerEnabled; }
+    public static boolean isTrapperWarpEnabled() { return trapperWarpEnabled; }
+    public static void setTrapperWarpEnabled(boolean value) { trapperWarpEnabled = value; save(); }
 
     public static void setSolverEnabled(boolean value) { solverEnabled = value; save(); }
     public static void setPeltTrackerEnabled(boolean value) { peltTrackerEnabled = value; save(); }
@@ -134,6 +149,15 @@ public final class GardenTrevorFeatures {
             }
             lastActivityAt = System.currentTimeMillis();
             peltVisible = true;
+            if (trapperWarpEnabled) {
+                trapperWarpAvailableUntil = System.currentTimeMillis() + 5_000L;
+                MinecraftClient client = MinecraftClient.getInstance();
+                if (client.player != null) {
+                    client.player.sendMessage(Text.literal("§6[Garden] §ePress §b"
+                            + trapperWarpKey.getBoundKeyLocalizedText().getString()
+                            + "§e within 5 seconds to warp to the Trapper."), false);
+                }
+            }
             questRarity = "";
             questAnimal = "";
             questArea = "";
@@ -157,6 +181,15 @@ public final class GardenTrevorFeatures {
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
+        if (trapperWarpKey != null) {
+            while (trapperWarpKey.wasPressed()) {
+                if (trapperWarpEnabled && client.currentScreen == null && client.player != null
+                        && client.getNetworkHandler() != null && now <= trapperWarpAvailableUntil) {
+                    client.getNetworkHandler().sendChatCommand("warp trapper");
+                    trapperWarpAvailableUntil = 0L;
+                }
+            }
+        }
         if (!solverEnabled || questAnimal.isEmpty() || client.world == null || client.player == null) {
             trackedAnimal = null;
             return;
@@ -270,6 +303,7 @@ public final class GardenTrevorFeatures {
             p.load(in);
             solverEnabled = Boolean.parseBoolean(p.getProperty("solverEnabled", "true"));
             peltTrackerEnabled = Boolean.parseBoolean(p.getProperty("peltTrackerEnabled", "true"));
+            trapperWarpEnabled = Boolean.parseBoolean(p.getProperty("trapperWarpEnabled", "false"));
             hudX = Integer.parseInt(p.getProperty("hudX", "8"));
             hudY = Integer.parseInt(p.getProperty("hudY", "420"));
             hudScale = Math.max(0.5F, Math.min(3.0F,
@@ -284,6 +318,7 @@ public final class GardenTrevorFeatures {
         Properties p = new Properties();
         p.setProperty("solverEnabled", Boolean.toString(solverEnabled));
         p.setProperty("peltTrackerEnabled", Boolean.toString(peltTrackerEnabled));
+        p.setProperty("trapperWarpEnabled", Boolean.toString(trapperWarpEnabled));
         p.setProperty("hudX", Integer.toString(hudX));
         p.setProperty("hudY", Integer.toString(hudY));
         p.setProperty("hudScale", Float.toString(hudScale));
