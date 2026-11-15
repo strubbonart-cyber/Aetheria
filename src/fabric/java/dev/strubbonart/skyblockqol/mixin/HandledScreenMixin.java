@@ -1,6 +1,7 @@
 package dev.strubbonart.skyblockqol.mixin;
 
 import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
+import dev.strubbonart.skyblockqol.features.farming.GardenVisitorFeatures;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -14,9 +15,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class HandledScreenMixin {
     @Shadow protected int x;
     @Shadow protected int y;
+    @Shadow protected Slot focusedSlot;
 
     @Inject(method = "drawSlot", at = @At("TAIL"))
     private void skyblockqol$drawGardenPlotNumber(DrawContext context, Slot slot, CallbackInfo ci) {
         GardenPlotNumbers.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void skyblockqol$captureVisitorOffer(DrawContext context, int mouseX, int mouseY,
+                                                 float delta, CallbackInfo ci) {
+        if (focusedSlot != null && !focusedSlot.getStack().isEmpty()) {
+            GardenVisitorFeatures.captureOffer((HandledScreen<?>) (Object) this, focusedSlot.getStack());
+        }
     }
 }

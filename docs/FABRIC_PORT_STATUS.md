@@ -124,3 +124,5 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 
 - Mouse camera lock: `/lockyp` toggles camera yaw/pitch locking, the optional keyboard binding is available under Controls, and an on-screen indicator is shown while locked.
 - Farming Sensitivity Reducer scales local player look deltas while holding a recognized SkyBlock farming tool, defaults to 5%, is off by default, and optionally requires the Garden. It shares the mouse-look mixin with camera lock.
+
+- Visitor Shopping List captures the server-provided "Accept Offer" item tooltip when hovered in a Garden menu. It parses the Items Required and Rewards sections, counts matching display-name stacks in the player's inventory, and shows amounts owned/missing plus Copper/Bits bonuses. It can be shown/hidden/reset with `/visitlist show|hide|reset|status` and has its own drag position/scale. It does not yet access Bazaar price APIs, calculate profit, or automate purchases.

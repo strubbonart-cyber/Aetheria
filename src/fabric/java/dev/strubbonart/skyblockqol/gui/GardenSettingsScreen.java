@@ -6,6 +6,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import dev.strubbonart.skyblockqol.features.farming.GardenTrevorFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenMouseFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenVisitorFeatures;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -58,6 +59,9 @@ public final class GardenSettingsScreen extends Screen {
         addToggle("Sensitivity requires Garden", GardenMouseFeatures.isRequireGarden(), x, y,
                 () -> GardenMouseFeatures.setRequireGarden(!GardenMouseFeatures.isRequireGarden()));
         y += 28;
+        addToggle("Visitor shopping list", GardenVisitorFeatures.isEnabled(), x, y,
+                () -> GardenVisitorFeatures.setEnabled(!GardenVisitorFeatures.isEnabled()));
+        y += 28;
         addButton("Sensitivity: " + GardenMouseFeatures.getSensitivityPercent() + "%  (-5)",
                 x, y, 146, 22, () -> GardenMouseFeatures.adjustSensitivityPercent(-5));
         addButton("Sensitivity: " + GardenMouseFeatures.getSensitivityPercent() + "%  (+5)",
@@ -97,6 +101,9 @@ public final class GardenSettingsScreen extends Screen {
         y += 26;
         addButton("EDIT PELT TRACKER POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PELT_TRACKER));
+        y += 26;
+        addButton("EDIT VISITOR LIST POSITION", x, y, 300, 22,
+                () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_VISITOR_LIST));
         y += 32;
         addButton("RESET FARMING STATS", x, y, 100, 22, GardenFeatures::resetTracker);
         addButton("RESET PEST STATS", x + 104, y, 96, 22, GardenPestFeatures::resetTracker);
