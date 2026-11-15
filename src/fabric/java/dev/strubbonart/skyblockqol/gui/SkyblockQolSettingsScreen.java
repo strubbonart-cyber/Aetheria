@@ -25,7 +25,7 @@ import java.util.Locale;
  * persist changes to the config directory.
  */
 public final class SkyblockQolSettingsScreen extends Screen {
-    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS, PERFORMANCE }
+    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS, PERFORMANCE, MORE }
     private enum LayoutTarget { FETCHUR, POWDER, PRISTINE, GOLD, GHOST, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
@@ -64,7 +64,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> client.setScreen(new GardenSettingsScreen(this)));
                 addButton("PERFORMANCE HUD", width / 2 - 110, y + 190, 220, 28,
                         () -> open(Page.PERFORMANCE, LayoutTarget.POWDER));
-                addButton("DONE", width / 2 - 110, y + 228, 220, 24, this::close);
+                addButton("MORE FEATURES", width / 2 - 110, y + 228, 220, 28,
+                        () -> open(Page.MORE, LayoutTarget.POWDER));
+                addButton("DONE", width / 2 - 110, y + 266, 220, 24, this::close);
             }
             case MINING -> {
                 addToggle("Powder chat filter", MiningFeatures.isPowderFilterEnabled(),
@@ -251,6 +253,15 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
 
             }
+            case MORE -> {
+                addToggle("Gyro Wand area ring", GyroWandFeature.isEnabled(),
+                        left, y, 300,
+                        () -> GyroWandFeature.setEnabled(!GyroWandFeature.isEnabled()));
+                y += 28;
+                addToggle("Party Finder floor labels", PartyFinderFloorTip.isEnabled(),
+                        left, y, 300,
+                        () -> PartyFinderFloorTip.setEnabled(!PartyFinderFloorTip.isEnabled()));
+            }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),
                         left, y, 300,
@@ -356,7 +367,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             if (page == Page.FILTER) {
                 addButton("BACK TO MINING", left, height - 32, 300, 20,
                         () -> open(Page.MINING, LayoutTarget.POWDER));
-            } else if (page == Page.QOL || page == Page.PETS) {
+            } else if (page == Page.QOL || page == Page.PETS || page == Page.MORE || page == Page.PERFORMANCE) {
                 addButton("BACK", left, height - 32, 300, 20,
                         () -> open(Page.HOME, LayoutTarget.POWDER));
             } else {
@@ -475,6 +486,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case QOL -> "Quality of Life";
             case PETS -> "Pets";
             case PERFORMANCE -> "Performance HUD";
+            case MORE -> "More Features";
         };
         context.drawTextWithShadow(textRenderer, heading, width / 2 - textRenderer.getWidth(heading) / 2,
                 42, 0xFFFFFFFF);

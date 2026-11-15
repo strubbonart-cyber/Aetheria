@@ -10,6 +10,8 @@ import dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature;
 import dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature;
 import dev.strubbonart.skyblockqol.features.qol.SkillXpTooltipFeature;
+import dev.strubbonart.skyblockqol.features.qol.GyroWandFeature;
+import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
@@ -49,6 +51,8 @@ public final class SkyblockQolClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         PerformanceHud.initialize();
+        GyroWandFeature.initialize();
+        PartyFinderFloorTip.initialize();
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         ExtraQolFeatures.initialize();

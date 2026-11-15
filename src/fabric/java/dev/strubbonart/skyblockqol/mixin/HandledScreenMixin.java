@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
 import dev.strubbonart.skyblockqol.features.farming.GardenVisitorFeatures;
 import dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature;
+import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -24,6 +25,7 @@ public abstract class HandledScreenMixin {
         GardenPlotNumbers.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         ExtraQolFeatures.renderHoppitySlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         AnvilCombineFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
+        PartyFinderFloorTip.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
