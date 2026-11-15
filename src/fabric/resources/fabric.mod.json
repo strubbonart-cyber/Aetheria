@@ -3,7 +3,7 @@
   "id": "skyblockqol",
   "version": "${version}",
   "name": "Skyblock QoL: Aetheria Fabric Port",
-  "description": "Unofficial, incremental Minecraft 1.21 Fabric port of Aetheria. Includes a dedicated in-game settings GUI, Mining trackers with separate Powder/Pristine per-gem quality breakdowns, adjustable Gold Tracker units and rates, and filters, Fetchur, HOTM tooltip, Commission Highlight, Pickobulus Preview, Ghost Tracker, Dungeon timers and split tracking, boss/Blood highlights, cached Dungeon data, rectangular/L-shaped room detection, secret markers, an adjustable Dungeon map, a clickable Spirit Leap/InfiniLeap menu, SkyBlock item ID tooltips, a custom block selection highlight, a Current Pet HUD, enchant level coloring, and Shift-to-show missing enchants.",
+  "description": "Unofficial, incremental Minecraft 1.21.11 Fabric port of Aetheria. Includes a dedicated in-game settings GUI, mining trackers, Garden and pest tools, dungeon overlays and map tools, item utilities, and calculator features.",
   "authors": [
     "Original Aetheria contributors",
     "strubbonart-cyber"
@@ -23,8 +23,8 @@
     "skyblockqol.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": "~1.21",
+    "fabricloader": ">=0.18.1",
+    "minecraft": "~1.21.11",
     "java": ">=21",
     "fabric-api": "*"
   }
