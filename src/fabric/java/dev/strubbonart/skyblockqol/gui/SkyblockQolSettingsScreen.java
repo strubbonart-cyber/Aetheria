@@ -1,6 +1,9 @@
 package dev.strubbonart.skyblockqol.gui;
 
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
+import dev.strubbonart.skyblockqol.features.qol.GyroWandFeature;
+import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
+import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;

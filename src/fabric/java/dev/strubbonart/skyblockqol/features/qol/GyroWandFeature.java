@@ -87,9 +87,9 @@ public final class GyroWandFeature {
             float x1 = (float) (center.x + Math.cos(a1) * RADIUS);
             float z1 = (float) (center.z + Math.sin(a1) * RADIUS);
             lines.vertex(matrix, x0, (float) center.y, z0).color(0.72F, 0.24F, 1.0F, 0.82F)
-                    .normal(matrix, 0.0F, 1.0F, 0.0F).next();
+                    .normal(matrix, 0.0F, 1.0F, 0.0F);
             lines.vertex(matrix, x1, (float) center.y, z1).color(0.72F, 0.24F, 1.0F, 0.82F)
-                    .normal(matrix, 0.0F, 1.0F, 0.0F).next();
+                    .normal(matrix, 0.0F, 1.0F, 0.0F);
         }
         matrices.pop();
     }
