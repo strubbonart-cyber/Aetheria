@@ -1,5 +1,7 @@
 package dev.strubbonart.skyblockqol.features.qol;
 
+import net.minecraft.item.Item;
+
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;

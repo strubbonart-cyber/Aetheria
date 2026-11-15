@@ -284,7 +284,6 @@ public final class GardenPestFeatures {
         if (cooldownArmed && remaining <= threshold) {
             cooldownArmed = false;
             alertUntil = System.currentTimeMillis() + 3_000L;
-            MinecraftClient client = MinecraftClient.getInstance();
             if (client.player != null) {
                 client.player.sendMessage(Text.literal("§6[Garden] §cPest cooldown is below "
                         + cooldownThreshold + "s!"), false);
