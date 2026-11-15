@@ -9,6 +9,7 @@ import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemStackTipsFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
+import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -35,6 +36,7 @@ public abstract class HandledScreenMixin {
         PartyFinderFloorTip.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         ItemStackTipsFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         InventorySearchFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
+        ProtectedItemFeature.renderStar((HandledScreen<?>) (Object) this, context, slot, x, y);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
@@ -61,6 +63,11 @@ public abstract class HandledScreenMixin {
             at = @At("HEAD"), cancellable = true)
     private void skyblockqol$boundSlotSwap(Slot slot, int slotId, int button,
                                            SlotActionType actionType, CallbackInfo ci) {
+        if (ProtectedItemFeature.shouldBlockSlotClick((HandledScreen<?>) (Object) this,
+                slot, slotId, actionType)) {
+            ci.cancel();
+            return;
+        }
         if (SlotBindsFeature.onShiftClick((HandledScreen<?>) (Object) this,
                 slot, slotId, button, actionType)) {
             ci.cancel();

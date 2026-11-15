@@ -14,7 +14,8 @@
     "HeldItemRendererMixin",
     "EntityDisplayNameMixin",
     "MouseCursorMixin",
-    "ScreenAccessorMixin"
+    "ScreenAccessorMixin",
+    "ProtectedDropMixin"
   ],
   "injectors": {
     "defaultRequire": 1

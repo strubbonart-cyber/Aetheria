@@ -7,6 +7,7 @@ import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
+import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
@@ -281,6 +282,15 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
             }
             case MORE -> {
+                addToggle("Item Protection (toggle held item with /asmprotect)", ProtectedItemFeature.isEnabled(),
+                        left, y, 300, () -> ProtectedItemFeature.setEnabled(!ProtectedItemFeature.isEnabled()));
+                y += 28;
+                addToggle("Show protected-item star", ProtectedItemFeature.isShowStar(),
+                        left, y, 300, () -> ProtectedItemFeature.setShowStar(!ProtectedItemFeature.isShowStar()));
+                y += 28;
+                addToggle("Protection chat notifications", ProtectedItemFeature.isChatNotifications(),
+                        left, y, 300, () -> ProtectedItemFeature.setChatNotifications(!ProtectedItemFeature.isChatNotifications()));
+                y += 28;
                 addToggle("Inventory Search Bar", InventorySearchFeature.isEnabled(),
                         left, y, 300, () -> InventorySearchFeature.setEnabled(!InventorySearchFeature.isEnabled()));
                 y += 28;

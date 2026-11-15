@@ -19,6 +19,7 @@ import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
+import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import dev.strubbonart.skyblockqol.features.fishing.FishingTimerFeature;
@@ -69,6 +70,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         ItemCooldownsFeature.initialize();
         CursorResetFeature.initialize();
         InventorySearchFeature.initialize();
+        ProtectedItemFeature.initialize();
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         ExtraQolFeatures.initialize();
