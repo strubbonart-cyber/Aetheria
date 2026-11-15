@@ -13,6 +13,7 @@ import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.qol.KillComboFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemPickupLogFeature;
 import dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature;
+import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -26,7 +27,7 @@ import net.minecraft.text.Text;
  */
 public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
-        PERFORMANCE_HUD, FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
+        PERFORMANCE_HUD, TROPHY_FISH, FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
         CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST, QOL_KILL_COMBO, QOL_ITEM_LOG, QOL_RARE_DROP
     }
@@ -162,6 +163,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private int getX() {
         return switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.getX();
+            case TROPHY_FISH -> TrophyFishFeature.getX();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudX(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudX();
@@ -184,6 +186,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private int getY() {
         return switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.getY();
+            case TROPHY_FISH -> TrophyFishFeature.getY();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudY(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudY();
@@ -206,6 +209,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private float getScale() {
         return switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.getScale();
+            case TROPHY_FISH -> TrophyFishFeature.getScale();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudScale(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudScale();
@@ -232,6 +236,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private void setLayout(int x, int y, float scale) {
         switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.updateLayout(x, y, scale);
+            case TROPHY_FISH -> TrophyFishFeature.updateLayout(x, y, scale);
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.updateHudLayout(target.name().toLowerCase(java.util.Locale.ROOT), x, y, scale);
             case GHOST -> GhostTrackerFeatures.updateHudLayout(x, y, scale);
@@ -255,6 +260,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private void saveLayout() {
         switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.saveLayout();
+            case TROPHY_FISH -> TrophyFishFeature.saveLayout();
             case FETCHUR, POWDER, PRISTINE, GOLD -> MiningFeatures.saveHudLayout();
             case GHOST -> GhostTrackerFeatures.saveHudLayout();
             case DUNGEON_MAP -> DungeonMapOverlay.saveLayout();
@@ -277,6 +283,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     private void resetLayout() {
         switch (target) {
             case PERFORMANCE_HUD -> PerformanceHud.resetLayout();
+            case TROPHY_FISH -> TrophyFishFeature.resetLayout();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.resetHudLayout(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.resetHudLayout();
@@ -340,6 +347,7 @@ public final class OverlayPositionEditorScreen extends Screen {
 
     private String[] getPreviewLines() {
         return switch (target) {
+            case TROPHY_FISH -> new String[]{"Trophy Fish", "Lavahorse  8  5  2  1", "Soul Fish  40  20  1  0"};
             case PERFORMANCE_HUD -> new String[]{"Performance HUD", "FPS: 180 | Ping: 38 ms", "XYZ: 0 64 0", "Yaw: 90 | Pitch: 0"};
             case FETCHUR -> new String[]{"Fetchur: Example Item"};
             case POWDER -> new String[]{"Powder: Gemstone | Mithril", "Chests: 0 | Gems: 0", "Mining active: 00:00"};

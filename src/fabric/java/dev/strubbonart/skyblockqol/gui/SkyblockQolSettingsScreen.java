@@ -298,6 +298,14 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setDamageFormatterEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDamageFormatterEnabled()));
+                y += 28;
+                addToggle("Trophy Fish HUD", dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature.isEnabled()));
+                y += 28;
+                addButton("EDIT TROPHY FISH POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.TROPHY_FISH));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),
