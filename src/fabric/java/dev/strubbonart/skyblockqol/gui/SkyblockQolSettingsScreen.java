@@ -5,6 +5,7 @@ import dev.strubbonart.skyblockqol.features.qol.GyroWandFeature;
 import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
+import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonOverlaySettings;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
@@ -309,6 +310,22 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         SlotBindsFeature.isAlwaysShowLinesEnabled(), left, y, 300,
                         () -> SlotBindsFeature.setAlwaysShowLinesEnabled(
                                 !SlotBindsFeature.isAlwaysShowLinesEnabled()));
+                y += 28;
+                addToggle("Item Log Alerts (" + ItemLogAlertsFeature.getAlertCount() + " tracked)",
+                        ItemLogAlertsFeature.isEnabled(), left, y, 300,
+                        () -> ItemLogAlertsFeature.setEnabled(!ItemLogAlertsFeature.isEnabled()));
+                y += 28;
+                addToggle("Item Log Alerts: First Time Only",
+                        ItemLogAlertsFeature.isFirstTimeOnly(), left, y, 300,
+                        () -> ItemLogAlertsFeature.setFirstTimeOnly(!ItemLogAlertsFeature.isFirstTimeOnly()));
+                y += 28;
+                addToggle("Use original item display name",
+                        ItemLogAlertsFeature.isUseDisplayName(), left, y, 300,
+                        () -> ItemLogAlertsFeature.setUseDisplayName(!ItemLogAlertsFeature.isUseDisplayName()));
+                y += 28;
+                addToggle("Play alert sound",
+                        ItemLogAlertsFeature.isPlaySound(), left, y, 300,
+                        () -> ItemLogAlertsFeature.setPlaySound(!ItemLogAlertsFeature.isPlaySound()));
                 y += 28;
                 addToggle("Trophy Fish HUD", dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature.isEnabled(),
                         left, y, 300,

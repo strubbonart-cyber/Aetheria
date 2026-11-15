@@ -108,7 +108,10 @@ public final class ItemPickupLogFeature {
                 if (delta == 0) continue;
                 String name = names.getOrDefault(id, LAST_NAMES.getOrDefault(id, prettyId(id)));
                 addLog(name, delta);
-                if (delta > 0) RareDropTrackerFeature.onItemChange(id, name, delta);
+                if (delta > 0) {
+                    RareDropTrackerFeature.onItemChange(id, name, delta);
+                    ItemLogAlertsFeature.onItemChange(id, name, delta);
+                }
             }
         }
 
