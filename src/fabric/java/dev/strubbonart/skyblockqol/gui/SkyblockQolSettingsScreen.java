@@ -25,7 +25,7 @@ import java.util.Locale;
  * persist changes to the config directory.
  */
 public final class SkyblockQolSettingsScreen extends Screen {
-    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS }
+    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS, PERFORMANCE }
     private enum LayoutTarget { FETCHUR, POWDER, PRISTINE, GOLD, GHOST, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
@@ -62,7 +62,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> open(Page.PETS, LayoutTarget.POWDER));
                 addButton("GARDEN", width / 2 - 110, y + 152, 220, 28,
                         () -> client.setScreen(new GardenSettingsScreen(this)));
-                addButton("DONE", width / 2 - 110, y + 190, 220, 24, this::close);
+                addButton("PERFORMANCE HUD", width / 2 - 110, y + 190, 220, 28,
+                        () -> open(Page.PERFORMANCE, LayoutTarget.POWDER));
+                addButton("DONE", width / 2 - 110, y + 228, 220, 24, this::close);
             }
             case MINING -> {
                 addToggle("Powder chat filter", MiningFeatures.isPowderFilterEnabled(),
@@ -248,6 +250,18 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSpeed(5));
 
 
+            }
+            case PERFORMANCE -> {
+                addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.hud.PerformanceHud.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled()));
+                y += 28;
+                addButton("EDIT PERFORMANCE HUD POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.PERFORMANCE_HUD));
+                y += 26;
+                addButton("RESET POSITION", left, y, 300, 20,
+                        dev.strubbonart.skyblockqol.features.hud.PerformanceHud::resetLayout);
             }
             case PETS -> {
                 addToggle("Current Pet HUD",
@@ -460,6 +474,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case DUNGEONS -> "Dungeon Settings";
             case QOL -> "Quality of Life";
             case PETS -> "Pets";
+            case PERFORMANCE -> "Performance HUD";
         };
         context.drawTextWithShadow(textRenderer, heading, width / 2 - textRenderer.getWidth(heading) / 2,
                 42, 0xFFFFFFFF);
