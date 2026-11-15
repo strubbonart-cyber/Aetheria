@@ -4,6 +4,7 @@ import dev.strubbonart.skyblockqol.gui.SkyblockQolSettingsScreen;
 import dev.strubbonart.skyblockqol.features.qol.QolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
+import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
@@ -42,6 +43,7 @@ public final class SkyblockQolClient implements ClientModInitializer {
         QolFeatures.initialize();
         EnchantTooltipFeature.initialize();
         CurrentPetFeature.initialize();
+        PetCollectionFeature.initialize();
         GardenFeatures.initialize();
         GardenPestFeatures.initialize();
         GardenOrganicMatterTracker.initialize();

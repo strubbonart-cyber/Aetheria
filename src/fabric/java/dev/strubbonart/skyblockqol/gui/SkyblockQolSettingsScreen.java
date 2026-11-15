@@ -179,6 +179,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 y += 26;
                 addButton("EDIT PET HUD POSITION", left, y, 300, 20,
                         () -> openPositionEditor(OverlayPositionEditorScreen.Target.CURRENT_PET));
+                y += 28;
+                addButton("VIEW PET COLLECTION (" + dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature.getPetCount() + ")",
+                        left, y, 300, 20,
+                        () -> client.setScreen(new PetCollectionScreen(this)));
             }
             case FILTER -> {
                 String[] names = {"chest", "already-looted", "breaking-power", "compact", "wrappers",

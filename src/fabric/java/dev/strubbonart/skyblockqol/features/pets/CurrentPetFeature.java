@@ -104,6 +104,7 @@ public final class CurrentPetFeature {
             ScreenEvents.afterRender(screen).register((renderedScreen, context, mouseX, mouseY, tickDelta) -> {
                 if (renderedScreen instanceof HandledScreen<?> petScreen) {
                     scanPetsMenu(petScreen);
+                    PetCollectionFeature.scanPetsMenu(petScreen);
                 }
             });
         });
