@@ -51,6 +51,9 @@ public final class GardenSettingsScreen extends Screen {
         addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
                 () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));
         y += 28;
+        addToggle("Pest Finder info HUD", GardenPestFeatures.isFinderEnabled(), x, y,
+                () -> GardenPestFeatures.setFinderEnabled(!GardenPestFeatures.isFinderEnabled()));
+        y += 28;
         addToggle("Pest Cooldown Alert", GardenPestFeatures.isCooldownAlertEnabled(), x, y,
                 () -> GardenPestFeatures.setCooldownAlertEnabled(!GardenPestFeatures.isCooldownAlertEnabled()));
         y += 28;
@@ -70,6 +73,9 @@ public final class GardenSettingsScreen extends Screen {
         y += 26;
         addButton("EDIT PEST TRACKER POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PEST_TRACKER));
+        y += 26;
+        addButton("EDIT PEST FINDER POSITION", x, y, 300, 22,
+                () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_PEST_FINDER));
         y += 26;
         addButton("EDIT ORGANIC MATTER POSITION", x, y, 300, 22,
                 () -> openEditor(OverlayPositionEditorScreen.Target.GARDEN_OM_TRACKER));

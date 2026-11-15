@@ -23,7 +23,7 @@ public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
         FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
-        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER
+        CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER
     }
 
     private final Screen parent;
@@ -165,6 +165,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.getHudX();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutX(gardenLayoutKey());
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutX();
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.getFinderLayoutX();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getX();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutX();
         };
@@ -181,6 +182,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.getHudY();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutY(gardenLayoutKey());
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutY();
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.getFinderLayoutY();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getY();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutY();
         };
@@ -197,6 +199,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.getHudScale();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.getLayoutScale(gardenLayoutKey());
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.getLayoutScale();
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.getFinderLayoutScale();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.getScale();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.getLayoutScale();
         };
@@ -217,6 +220,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.updateHudLayout(x, y, scale);
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.updateLayout(gardenLayoutKey(), x, y, scale);
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.updateLayout(x, y, scale);
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.updateFinderLayout(x, y, scale);
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.updateLayout(x, y, scale);
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.updateLayout(x, y, scale);
         }
@@ -233,6 +237,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.saveHudLayout();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.saveLayout();
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.saveLayout();
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.saveFinderLayout();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.saveLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.saveLayout();
         }
@@ -252,6 +257,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case CURRENT_PET -> CurrentPetFeature.resetHudLayout();
             case GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW -> GardenFeatures.resetLayout(gardenLayoutKey());
             case GARDEN_PEST_TRACKER -> GardenPestFeatures.resetLayout();
+            case GARDEN_PEST_FINDER -> GardenPestFeatures.resetFinderLayout();
             case GARDEN_OM_TRACKER -> GardenOrganicMatterTracker.resetLayout();
             case GARDEN_PELT_TRACKER -> GardenTrevorFeatures.resetLayout();
         }
@@ -266,6 +272,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_TRACKER -> "tracker";
             case GARDEN_PITCH_YAW -> "pitch";
             case GARDEN_PEST_TRACKER -> "pest";
+            case GARDEN_PEST_FINDER -> "pestfinder";
             case GARDEN_OM_TRACKER -> "om";
             case GARDEN_PELT_TRACKER -> "pelt";
             default -> "bps";
@@ -309,6 +316,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case GARDEN_TRACKER -> new String[]{"Farming Tracker", "Crop blocks: 0", "Session rate: 0/hour"};
             case GARDEN_PITCH_YAW -> new String[]{"Yaw: 0.00°", "Pitch: 0.00°"};
             case GARDEN_PEST_TRACKER -> new String[]{"Pest Tracker", "Kills: 0 | Drops: 0", "Use /pesttracker reset"};
+            case GARDEN_PEST_FINDER -> new String[]{"Pest Finder", "Total alive: 0", "Infested plots: 1, 5 x3", "Spray / Repellent / Cooldown"};
             case GARDEN_OM_TRACKER -> new String[]{"Organic Matter Tracker", "Organic Matter: 0", "0.0/h | 0 items"};
             case GARDEN_PELT_TRACKER -> new String[]{"Pelt Tracker", "Pelts: 42 | Pelts/h: 120", "Cooldown: Ready!"};
         };

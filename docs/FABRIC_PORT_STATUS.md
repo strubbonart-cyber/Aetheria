@@ -119,3 +119,5 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Trevor Solver now parses quest announcements and rewards, highlights the original Aetheria candidate spawn blocks for Desert Settlement, Oasis, Mushroom Gorge and Overgrown Mushroom Cave, and marks a matching rarity/animal armor-stand when loaded nearby.
 - Trevor Pelt Tracker counts the server's pelt reward messages, estimates pelts/hour from active time, shows the 20-second new-quest cooldown, has an adjustable HUD layout, and includes a reset control.
 - Trevor's original automatic warp/confirm hotkeys and some visual polish are not included in this migration slice.
+
+- Garden Pest Finder information HUD parses the tablist's Alive, Plots, Spray, Repellent, Bonus, Cooldown, and Bonus Pest Chance fields. It lists infested plot numbers/counts and has independent enable and drag-position/scale settings. It is informational only; optional warp-to-infested-plot hotkeys remain unported.

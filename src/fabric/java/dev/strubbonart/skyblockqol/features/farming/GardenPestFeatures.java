@@ -40,6 +40,7 @@ public final class GardenPestFeatures {
     private static boolean trackerEnabled = true;
     private static boolean overlayVisible;
     private static boolean cooldownAlertEnabled;
+    private static boolean finderEnabled = true;
     private static int cooldownThreshold = 30;
     private static boolean cooldownArmed = true;
     private static long alertUntil;
@@ -51,6 +52,18 @@ public final class GardenPestFeatures {
     private static int hudX = 8;
     private static int hudY = 250;
     private static float hudScale = 1.0F;
+
+    private static int finderX = 8;
+    private static int finderY = 520;
+    private static float finderScale = 1.0F;
+    private static String gardenAlive = "-";
+    private static String gardenPlots = "-";
+    private static String gardenSpray = "-";
+    private static String gardenRepellent = "-";
+    private static String gardenBonus = "-";
+    private static String gardenCooldown = "-";
+    private static String gardenBonusPestChance = "-";
+    private static final Pattern PLOT_ENTRY = Pattern.compile("^(\\d+)(?:\\s*[xX]\\s*(\\d+))?$");
 
     private GardenPestFeatures() {}
 
@@ -119,6 +132,27 @@ public final class GardenPestFeatures {
     public static boolean isTrackerEnabled() { return trackerEnabled; }
     public static boolean isCooldownAlertEnabled() { return cooldownAlertEnabled; }
     public static int getCooldownThreshold() { return cooldownThreshold; }
+    public static boolean isFinderEnabled() { return finderEnabled; }
+    public static void setFinderEnabled(boolean value) { finderEnabled = value; save(); }
+
+    public static int getFinderLayoutX() { return finderX; }
+    public static int getFinderLayoutY() { return finderY; }
+    public static float getFinderLayoutScale() { return finderScale; }
+
+    public static void updateFinderLayout(int x, int y, float scale) {
+        finderX = Math.max(0, Math.min(5000, x));
+        finderY = Math.max(0, Math.min(5000, y));
+        finderScale = Math.max(0.5F, Math.min(3.0F, scale));
+    }
+
+    public static void saveFinderLayout() { save(); }
+
+    public static void resetFinderLayout() {
+        finderX = 8;
+        finderY = 520;
+        finderScale = 1.0F;
+        save();
+    }
 
     public static void setTrackerEnabled(boolean value) {
         trackerEnabled = value;
@@ -187,7 +221,10 @@ public final class GardenPestFeatures {
     }
 
     private static void tick() {
-        if (!cooldownAlertEnabled || !GardenFeatures.isInGarden()) {
+        boolean inGarden = GardenFeatures.isInGarden();
+        if (inGarden) readGardenTablistData();
+
+        if (!cooldownAlertEnabled || !inGarden) {
             cooldownArmed = true;
             lastCooldownMs = -1L;
             return;
@@ -272,6 +309,10 @@ public final class GardenPestFeatures {
             renderPanel(context, lines);
         }
 
+        if (finderEnabled) {
+            renderFinder(context);
+        }
+
         long now = System.currentTimeMillis();
         if (cooldownAlertEnabled && now < alertUntil) {
             long remaining = Math.max(0L, lastCooldownMs - (now - cooldownReadAt));
@@ -279,6 +320,88 @@ public final class GardenPestFeatures {
                     Text.literal("PEST ALERT  " + formatDuration(remaining)),
                     context.getScaledWindowWidth() / 2, context.getScaledWindowHeight() / 2 - 30, 0xFFFF5555);
         }
+    }
+
+    private static void readGardenTablistData() {
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.getNetworkHandler() == null) return;
+
+        Map<Integer, Integer> plots = new java.util.TreeMap<>();
+        for (PlayerListEntry entry : client.getNetworkHandler().getPlayerList()) {
+            Text display = entry.getDisplayName();
+            String line = stripFormatting(display == null
+                    ? entry.getProfile().getName() : display.getString()).trim();
+            if (line.startsWith("Alive: ")) {
+                gardenAlive = line.substring("Alive: ".length()).trim();
+            } else if (line.startsWith("Plots: ")) {
+                String value = line.substring("Plots: ".length()).trim();
+                for (String part : value.split(",")) {
+                    Matcher matcher = PLOT_ENTRY.matcher(part.trim());
+                    if (!matcher.matches()) continue;
+                    try {
+                        int plot = Integer.parseInt(matcher.group(1));
+                        int count = matcher.group(2) == null ? 1 : Integer.parseInt(matcher.group(2));
+                        if (plot >= 1 && plot <= 24 && count > 0) plots.put(plot, count);
+                    } catch (NumberFormatException ignored) {
+                        // Ignore malformed tablist plot values.
+                    }
+                }
+            } else if (line.startsWith("Spray: ")) {
+                gardenSpray = line.substring("Spray: ".length()).trim();
+            } else if (line.startsWith("Repellent: ")) {
+                gardenRepellent = line.substring("Repellent: ".length()).trim();
+            } else if (line.startsWith("Bonus: ")) {
+                gardenBonus = line.substring("Bonus: ".length()).trim();
+            } else if (line.startsWith("Cooldown: ")) {
+                gardenCooldown = line.substring("Cooldown: ".length()).trim();
+            } else if (line.startsWith("Bonus Pest Chance: ")) {
+                gardenBonusPestChance = line.substring("Bonus Pest Chance: ".length()).trim();
+            }
+        }
+
+        if (!plots.isEmpty()) {
+            StringBuilder text = new StringBuilder();
+            for (Map.Entry<Integer, Integer> entry : plots.entrySet()) {
+                if (text.length() > 0) text.append(", ");
+                text.append(entry.getKey());
+                if (entry.getValue() > 1) text.append(" x").append(entry.getValue());
+            }
+            gardenPlots = text.toString();
+        } else {
+            gardenPlots = "-";
+        }
+    }
+
+    private static void renderFinder(DrawContext context) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        String[] lines = {
+                "Pest Finder",
+                "Total alive: " + gardenAlive,
+                "Infested plots: " + gardenPlots,
+                "Spray: " + gardenSpray,
+                "Repellent: " + gardenRepellent,
+                "Bonus: " + gardenBonus,
+                "Cooldown: " + gardenCooldown,
+                "Bonus pest chance: " + gardenBonusPestChance
+        };
+        int width = 0;
+        for (String line : lines) width = Math.max(width, client.textRenderer.getWidth(line));
+        width += 14;
+        int height = lines.length * 12 + 8;
+
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(finderX, finderY, 0.0F);
+        matrices.scale(finderScale, finderScale, 1.0F);
+        context.fill(0, 0, width, height, 0xB91B2634);
+        context.fill(0, 0, width, 2, 0xFF68B8FF);
+        int y = 5;
+        for (int i = 0; i < lines.length; i++) {
+            context.drawTextWithShadow(client.textRenderer, lines[i], 7, y,
+                    i == 0 ? 0xFF8CCFFF : 0xFFD8E6F5);
+            y += 12;
+        }
+        matrices.pop();
     }
 
     private static void renderPanel(DrawContext context, String[] lines) {
@@ -327,12 +450,17 @@ public final class GardenPestFeatures {
             trackerEnabled = Boolean.parseBoolean(properties.getProperty("trackerEnabled", "true"));
             overlayVisible = Boolean.parseBoolean(properties.getProperty("overlayVisible", "false"));
             cooldownAlertEnabled = Boolean.parseBoolean(properties.getProperty("cooldownAlertEnabled", "false"));
+            finderEnabled = Boolean.parseBoolean(properties.getProperty("finderEnabled", "true"));
             cooldownThreshold = Math.max(5, Math.min(300,
                     Integer.parseInt(properties.getProperty("cooldownThreshold", "30"))));
             hudX = Integer.parseInt(properties.getProperty("hudX", "8"));
             hudY = Integer.parseInt(properties.getProperty("hudY", "250"));
             hudScale = Math.max(0.5F, Math.min(3.0F,
                     Float.parseFloat(properties.getProperty("hudScale", "1.0"))));
+            finderX = Integer.parseInt(properties.getProperty("finderX", "8"));
+            finderY = Integer.parseInt(properties.getProperty("finderY", "520"));
+            finderScale = Math.max(0.5F, Math.min(3.0F,
+                    Float.parseFloat(properties.getProperty("finderScale", "1.0"))));
             sessionStartedAt = System.currentTimeMillis();
             for (String key : properties.stringPropertyNames()) {
                 if (key.startsWith("kill.")) KILLS.put(key.substring(5), Long.parseLong(properties.getProperty(key, "0")));
@@ -349,6 +477,10 @@ public final class GardenPestFeatures {
         properties.setProperty("trackerEnabled", Boolean.toString(trackerEnabled));
         properties.setProperty("overlayVisible", Boolean.toString(overlayVisible));
         properties.setProperty("cooldownAlertEnabled", Boolean.toString(cooldownAlertEnabled));
+        properties.setProperty("finderEnabled", Boolean.toString(finderEnabled));
+        properties.setProperty("finderX", Integer.toString(finderX));
+        properties.setProperty("finderY", Integer.toString(finderY));
+        properties.setProperty("finderScale", Float.toString(finderScale));
         properties.setProperty("cooldownThreshold", Integer.toString(cooldownThreshold));
         properties.setProperty("hudX", Integer.toString(hudX));
         properties.setProperty("hudY", Integer.toString(hudY));
