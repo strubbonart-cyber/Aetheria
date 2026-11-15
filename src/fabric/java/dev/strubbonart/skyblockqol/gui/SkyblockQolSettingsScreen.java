@@ -8,6 +8,7 @@ import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
 import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.ProtectedItemFeature;
+import dev.strubbonart.skyblockqol.features.qol.InventoryButtonsFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
@@ -282,6 +283,14 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
             }
             case MORE -> {
+                addToggle("Inventory Buttons (" + InventoryButtonsFeature.getButtonCount() + ")",
+                        InventoryButtonsFeature.isEnabled(), left, y, 300,
+                        () -> InventoryButtonsFeature.setEnabled(!InventoryButtonsFeature.isEnabled()));
+                y += 28;
+                addToggle("Hide Inventory Buttons in terminals", InventoryButtonsFeature.isDisableInTerminals(),
+                        left, y, 300,
+                        () -> InventoryButtonsFeature.setDisableInTerminals(!InventoryButtonsFeature.isDisableInTerminals()));
+                y += 28;
                 addToggle("Item Protection (toggle held item with /asmprotect)", ProtectedItemFeature.isEnabled(),
                         left, y, 300, () -> ProtectedItemFeature.setEnabled(!ProtectedItemFeature.isEnabled()));
                 y += 28;
