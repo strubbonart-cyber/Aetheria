@@ -6,6 +6,7 @@ import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
+import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.qol.CursorResetFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemLogAlertsFeature;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonMapOverlay;
@@ -280,6 +281,15 @@ public final class SkyblockQolSettingsScreen extends Screen {
 
             }
             case MORE -> {
+                addToggle("Inventory Search Bar", InventorySearchFeature.isEnabled(),
+                        left, y, 300, () -> InventorySearchFeature.setEnabled(!InventorySearchFeature.isEnabled()));
+                y += 28;
+                addToggle("Persist inventory search text", InventorySearchFeature.isPersistSearchText(),
+                        left, y, 300, () -> InventorySearchFeature.setPersistSearchText(!InventorySearchFeature.isPersistSearchText()));
+                y += 28;
+                addButton("EDIT SEARCH BAR POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.SEARCH_BAR));
+                y += 32;
                 addToggle("Gyro Wand area ring", GyroWandFeature.isEnabled(),
                         left, y, 300,
                         () -> GyroWandFeature.setEnabled(!GyroWandFeature.isEnabled()));

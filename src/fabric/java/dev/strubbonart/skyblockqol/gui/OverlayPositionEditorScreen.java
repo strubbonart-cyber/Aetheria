@@ -16,6 +16,7 @@ import dev.strubbonart.skyblockqol.features.qol.RareDropTrackerFeature;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import dev.strubbonart.skyblockqol.features.fishing.FishingTimerFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemCooldownsFeature;
+import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.hud.PerformanceHud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -29,7 +30,7 @@ import net.minecraft.text.Text;
  */
 public final class OverlayPositionEditorScreen extends Screen {
     public enum Target {
-        PERFORMANCE_HUD, TROPHY_FISH, FISHING_TIMER, ITEM_COOLDOWNS, FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
+        PERFORMANCE_HUD, TROPHY_FISH, FISHING_TIMER, ITEM_COOLDOWNS, SEARCH_BAR, FETCHUR, POWDER, PRISTINE, GOLD, GHOST,
         DUNGEON_MAP, DUNGEON_TIMER, DUNGEON_SPLITS, DUNGEON_BREAKER, DUNGEON_ROOM,
         CURRENT_PET, GARDEN_BPS, GARDEN_TRACKER, GARDEN_PITCH_YAW, GARDEN_PEST_TRACKER, GARDEN_OM_TRACKER, GARDEN_PELT_TRACKER, GARDEN_PEST_FINDER, GARDEN_VISITOR_LIST, QOL_KILL_COMBO, QOL_ITEM_LOG, QOL_RARE_DROP
     }
@@ -168,6 +169,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.getX();
             case FISHING_TIMER -> FishingTimerFeature.getX();
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.getX();
+            case SEARCH_BAR -> InventorySearchFeature.getX(width);
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudX(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudX();
@@ -193,6 +195,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.getY();
             case FISHING_TIMER -> FishingTimerFeature.getY();
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.getY();
+            case SEARCH_BAR -> InventorySearchFeature.getY(height);
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudY(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudY();
@@ -218,6 +221,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.getScale();
             case FISHING_TIMER -> FishingTimerFeature.getScale();
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.getScale();
+            case SEARCH_BAR -> InventorySearchFeature.getScale();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.getHudScale(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.getHudScale();
@@ -247,6 +251,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.updateLayout(x, y, scale);
             case FISHING_TIMER -> FishingTimerFeature.updateLayout(x, y, scale);
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.updateLayout(x, y, scale);
+            case SEARCH_BAR -> InventorySearchFeature.updateLayout(x, y, scale);
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.updateHudLayout(target.name().toLowerCase(java.util.Locale.ROOT), x, y, scale);
             case GHOST -> GhostTrackerFeatures.updateHudLayout(x, y, scale);
@@ -273,6 +278,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.saveLayout();
             case FISHING_TIMER -> FishingTimerFeature.saveLayout();
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.saveLayout();
+            case SEARCH_BAR -> InventorySearchFeature.saveLayout();
             case FETCHUR, POWDER, PRISTINE, GOLD -> MiningFeatures.saveHudLayout();
             case GHOST -> GhostTrackerFeatures.saveHudLayout();
             case DUNGEON_MAP -> DungeonMapOverlay.saveLayout();
@@ -298,6 +304,7 @@ public final class OverlayPositionEditorScreen extends Screen {
             case TROPHY_FISH -> TrophyFishFeature.resetLayout();
             case FISHING_TIMER -> FishingTimerFeature.resetLayout();
             case ITEM_COOLDOWNS -> ItemCooldownsFeature.resetLayout();
+            case SEARCH_BAR -> InventorySearchFeature.resetLayout();
             case FETCHUR, POWDER, PRISTINE, GOLD ->
                     MiningFeatures.resetHudLayout(target.name().toLowerCase(java.util.Locale.ROOT));
             case GHOST -> GhostTrackerFeatures.resetHudLayout();
@@ -352,17 +359,22 @@ public final class OverlayPositionEditorScreen extends Screen {
         MinecraftClient mc = MinecraftClient.getInstance();
         int textWidth = 0;
         for (String line : getPreviewLines()) textWidth = Math.max(textWidth, mc.textRenderer.getWidth(line));
-        return target == Target.DUNGEON_MAP ? 128 : Math.max(112, Math.min(300, textWidth + 16));
+        if (target == Target.DUNGEON_MAP) return 128;
+        if (target == Target.SEARCH_BAR) return 164;
+        return Math.max(112, Math.min(300, textWidth + 16));
     }
 
     private int getPreviewHeight() {
-        return target == Target.DUNGEON_MAP ? 128 : Math.max(28, getPreviewLines().length * 11 + 12);
+        if (target == Target.DUNGEON_MAP) return 128;
+        if (target == Target.SEARCH_BAR) return 34;
+        return Math.max(28, getPreviewLines().length * 11 + 12);
     }
 
     private String[] getPreviewLines() {
         return switch (target) {
             case FISHING_TIMER -> new String[]{"Fishing Timer", "Fishing: 15.0s", "Alert at 15s"};
             case ITEM_COOLDOWNS -> new String[]{"Item Cooldowns", "Gyrokinetic Wand: 12.5s", "Bonzo's Mask: 45.0s"};
+            case SEARCH_BAR -> new String[]{"Search items...", "Type to filter slots"};
             case TROPHY_FISH -> new String[]{"Trophy Fish", "Lavahorse  8  5  2  1", "Soul Fish  40  20  1  0"};
             case PERFORMANCE_HUD -> new String[]{"Performance HUD", "FPS: 180 | Ping: 38 ms", "XYZ: 0 64 0", "Yaw: 90 | Pitch: 0"};
             case FETCHUR -> new String[]{"Fetchur: Example Item"};

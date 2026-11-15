@@ -8,6 +8,7 @@ import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
 import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import dev.strubbonart.skyblockqol.features.qol.ItemStackTipsFeature;
 import dev.strubbonart.skyblockqol.features.qol.SlotBindsFeature;
+import dev.strubbonart.skyblockqol.features.qol.InventorySearchFeature;
 import dev.strubbonart.skyblockqol.features.fishing.TrophyFishFeature;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -33,6 +34,7 @@ public abstract class HandledScreenMixin {
         AnvilCombineFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         PartyFinderFloorTip.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
         ItemStackTipsFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
+        InventorySearchFeature.renderSlot((HandledScreen<?>) (Object) this, context, slot, x, y);
     }
 
     @Inject(method = "render", at = @At("TAIL"))
