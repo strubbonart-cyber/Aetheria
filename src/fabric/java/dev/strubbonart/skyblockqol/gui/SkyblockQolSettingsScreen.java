@@ -31,7 +31,7 @@ import java.util.Locale;
  * persist changes to the config directory.
  */
 public final class SkyblockQolSettingsScreen extends Screen {
-    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS, PERFORMANCE, MORE }
+    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS, PERFORMANCE, MORE, COOLDOWNS }
     private enum LayoutTarget { FETCHUR, POWDER, PRISTINE, GOLD, GHOST, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
@@ -72,7 +72,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> open(Page.PERFORMANCE, LayoutTarget.POWDER));
                 addButton("MORE FEATURES", width / 2 - 110, y + 228, 220, 28,
                         () -> open(Page.MORE, LayoutTarget.POWDER));
-                addButton("DONE", width / 2 - 110, y + 266, 220, 24, this::close);
+                addButton("ITEM COOLDOWNS", width / 2 - 110, y + 266, 220, 24,
+                        () -> open(Page.COOLDOWNS, LayoutTarget.POWDER));
+                addButton("DONE", width / 2 - 110, y + 304, 220, 24, this::close);
             }
             case MINING -> {
                 addToggle("Powder chat filter", MiningFeatures.isPowderFilterEnabled(),
@@ -346,6 +348,20 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addButton("EDIT FISHING TIMER POSITION", left, y, 300, 20,
                         () -> openPositionEditor(OverlayPositionEditorScreen.Target.FISHING_TIMER));
             }
+            case COOLDOWNS -> {
+                addToggle("Item Cooldown HUD", ItemCooldownsFeature.isEnabled(),
+                        left, y, 300, () -> ItemCooldownsFeature.setEnabled(!ItemCooldownsFeature.isEnabled()));
+                y += 28;
+                addToggle("Show header when no cooldowns are active", ItemCooldownsFeature.isShowWhenEmpty(),
+                        left, y, 300, () -> ItemCooldownsFeature.setShowWhenEmpty(!ItemCooldownsFeature.isShowWhenEmpty()));
+                y += 32;
+                addButton("EDIT COOLDOWN HUD POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.ITEM_COOLDOWNS));
+                y += 28;
+                addButton("RESET POSITION", left, y, 300, 20, ItemCooldownsFeature::resetLayout);
+                y += 28;
+                addButton("RESET ACTIVE TIMERS", left, y, 300, 20, ItemCooldownsFeature::resetTimers);
+            }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),
                         left, y, 300,
@@ -451,7 +467,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             if (page == Page.FILTER) {
                 addButton("BACK TO MINING", left, height - 32, 300, 20,
                         () -> open(Page.MINING, LayoutTarget.POWDER));
-            } else if (page == Page.QOL || page == Page.PETS || page == Page.MORE || page == Page.PERFORMANCE) {
+            } else if (page == Page.QOL || page == Page.PETS || page == Page.MORE || page == Page.PERFORMANCE || page == Page.COOLDOWNS) {
                 addButton("BACK", left, height - 32, 300, 20,
                         () -> open(Page.HOME, LayoutTarget.POWDER));
             } else {
@@ -571,6 +587,7 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case PETS -> "Pets";
             case PERFORMANCE -> "Performance HUD";
             case MORE -> "More Features";
+            case COOLDOWNS -> "Item Cooldowns";
         };
         context.drawTextWithShadow(textRenderer, heading, width / 2 - textRenderer.getWidth(heading) / 2,
                 42, 0xFFFFFFFF);

@@ -77,6 +77,10 @@ public final class GyroWandFeature {
         matrices.push();
         matrices.translate(-camera.x, -camera.y, -camera.z);
 
+        boolean coolingDown = ItemCooldownsFeature.isOnCooldown("GYROKINETIC_WAND");
+        float red = coolingDown ? 1.0F : 0.72F;
+        float green = coolingDown ? 0.20F : 0.24F;
+        float blue = coolingDown ? 0.20F : 1.0F;
         VertexConsumer lines = context.consumers().getBuffer(RenderLayer.getLines());
         MatrixStack.Entry matrix = matrices.peek();
         for (int i = 0; i < STEPS; i++) {

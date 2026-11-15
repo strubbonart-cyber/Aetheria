@@ -3,5 +3,6 @@
   "category.skyblockqol": "Skyblock QoL",
   "key.skyblockqol.trapper_warp": "Trevor: Warp to Trapper after a hunt",
   "key.skyblockqol.pest_warp": "Garden: Warp to infested plot",
-  "key.skyblockqol.slot_bind": "Slot Binds: Set / remove a slot bind"
+  "key.skyblockqol.slot_bind": "Slot Binds: Set / remove a slot bind",
+  "item.skyblockqol.cooldowns": "Item Cooldowns"
 }
