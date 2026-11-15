@@ -292,6 +292,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         left, y, 300,
                         () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setItemStackTipsEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isItemStackTipsEnabled()));
+                y += 28;
+                addToggle("Damage Formatter (1,234,567 -> 1.2M)",
+                        dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDamageFormatterEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.setDamageFormatterEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.MiscQolFeatures.isDamageFormatterEnabled()));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),

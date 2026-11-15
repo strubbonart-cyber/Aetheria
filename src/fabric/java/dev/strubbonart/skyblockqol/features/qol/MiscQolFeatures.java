@@ -24,6 +24,7 @@ public final class MiscQolFeatures {
     private static boolean disableEntityFire;
     private static boolean noSwapAnimation;
     private static boolean itemStackTips = true;
+    private static boolean damageFormatter = true;
     private static String lastSkyblockXpAmount;
 
     private MiscQolFeatures() {}
@@ -58,6 +59,8 @@ public final class MiscQolFeatures {
     public static boolean isDisableEntityFireEnabled() { return disableEntityFire; }
     public static boolean isNoSwapAnimationEnabled() { return noSwapAnimation; }
     public static boolean isItemStackTipsEnabled() { return itemStackTips; }
+    public static boolean isDamageFormatterEnabled() { return damageFormatter; }
+    public static void setDamageFormatterEnabled(boolean value) { damageFormatter = value; save(); }
     public static void setItemStackTipsEnabled(boolean value) { itemStackTips = value; save(); }
     public static void setNoSwapAnimationEnabled(boolean value) { noSwapAnimation = value; save(); }
     public static void setDisableEntityFireEnabled(boolean value) {
@@ -74,11 +77,13 @@ public final class MiscQolFeatures {
             disableEntityFire = Boolean.parseBoolean(properties.getProperty("disableEntityFire", "false"));
             noSwapAnimation = Boolean.parseBoolean(properties.getProperty("noSwapAnimation", "false"));
             itemStackTips = Boolean.parseBoolean(properties.getProperty("itemStackTips", "true"));
+            damageFormatter = Boolean.parseBoolean(properties.getProperty("damageFormatter", "true"));
         } catch (IOException ignored) {
             skyblockXpInChat = false;
             disableEntityFire = false;
             noSwapAnimation = false;
             itemStackTips = true;
+            damageFormatter = true;
         }
     }
 
@@ -88,6 +93,7 @@ public final class MiscQolFeatures {
         properties.setProperty("disableEntityFire", Boolean.toString(disableEntityFire));
         properties.setProperty("noSwapAnimation", Boolean.toString(noSwapAnimation));
         properties.setProperty("itemStackTips", Boolean.toString(itemStackTips));
+        properties.setProperty("damageFormatter", Boolean.toString(damageFormatter));
         try {
             Files.createDirectories(FILE.getParent());
             try (OutputStream output = Files.newOutputStream(FILE)) {

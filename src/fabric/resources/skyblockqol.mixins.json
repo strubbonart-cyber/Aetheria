@@ -11,7 +11,8 @@
     "EntityLookMixin",
     "ChatScreenMixin",
     "EntityRenderDispatcherMixin",
-    "HeldItemRendererMixin"
+    "HeldItemRendererMixin",
+    "EntityDisplayNameMixin"
   ],
   "injectors": {
     "defaultRequire": 1
