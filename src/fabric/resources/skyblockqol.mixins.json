@@ -6,7 +6,8 @@
   "client": [
     "ItemStackMixin",
     "PlayerEntityMixin",
-    "GameMenuScreenMixin"
+    "GameMenuScreenMixin",
+    "HandledScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

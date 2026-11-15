@@ -2,6 +2,7 @@ package dev.strubbonart.skyblockqol.gui;
 
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenPlotNumbers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -29,6 +30,12 @@ public final class GardenSettingsScreen extends Screen {
         y += 28;
         addToggle("Precise yaw / pitch HUD", GardenFeatures.isPitchEnabled(), x, y,
                 () -> GardenFeatures.setPitchEnabled(!GardenFeatures.isPitchEnabled()));
+        y += 28;
+        addToggle("Garden plot numbers", GardenPlotNumbers.isEnabled(), x, y,
+                () -> GardenPlotNumbers.setEnabled(!GardenPlotNumbers.isEnabled()));
+        y += 28;
+        addToggle("Highlight unlocked / buyable plots", GardenPlotNumbers.isHighlightSlotsEnabled(), x, y,
+                () -> GardenPlotNumbers.setHighlightSlotsEnabled(!GardenPlotNumbers.isHighlightSlotsEnabled()));
         y += 28;
         addToggle("Pest Tracker", GardenPestFeatures.isTrackerEnabled(), x, y,
                 () -> GardenPestFeatures.setTrackerEnabled(!GardenPestFeatures.isTrackerEnabled()));

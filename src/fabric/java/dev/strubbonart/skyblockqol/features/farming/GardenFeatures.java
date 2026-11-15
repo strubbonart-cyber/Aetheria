@@ -48,6 +48,8 @@ public final class GardenFeatures {
     private static boolean bpsEnabled = true;
     private static boolean trackerEnabled = true;
     private static boolean pitchEnabled;
+    private static boolean plotNumbersEnabled = true;
+    private static boolean plotHighlightsEnabled = true;
     private static long totalHarvests;
     private static long sessionStartedAt = System.currentTimeMillis();
     private static long lastSaveAt;
@@ -98,6 +100,18 @@ public final class GardenFeatures {
     public static boolean isBpsEnabled() { return bpsEnabled; }
     public static boolean isTrackerEnabled() { return trackerEnabled; }
     public static boolean isPitchEnabled() { return pitchEnabled; }
+    public static boolean isPlotNumbersEnabled() { return plotNumbersEnabled; }
+    public static boolean isPlotHighlightsEnabled() { return plotHighlightsEnabled; }
+
+    public static void setPlotNumbersEnabled(boolean value) {
+        plotNumbersEnabled = value;
+        save();
+    }
+
+    public static void setPlotHighlightsEnabled(boolean value) {
+        plotHighlightsEnabled = value;
+        save();
+    }
 
     public static void setBpsEnabled(boolean enabled) {
         bpsEnabled = enabled;
@@ -275,6 +289,9 @@ public final class GardenFeatures {
             bpsEnabled = Boolean.parseBoolean(p.getProperty("bpsEnabled", "true"));
             trackerEnabled = Boolean.parseBoolean(p.getProperty("trackerEnabled", "true"));
             pitchEnabled = Boolean.parseBoolean(p.getProperty("pitchEnabled", "false"));
+            plotNumbersEnabled = Boolean.parseBoolean(p.getProperty("plotNumbersEnabled", "true"));
+            plotHighlightsEnabled = Boolean.parseBoolean(p.getProperty("plotHighlightsEnabled", "true"));
+            GardenPlotNumbers.loadSettings(plotNumbersEnabled, plotHighlightsEnabled);
             totalHarvests = Long.parseLong(p.getProperty("totalHarvests", "0"));
             sessionStartedAt = System.currentTimeMillis();
             for (String key : p.stringPropertyNames()) {
@@ -300,6 +317,8 @@ public final class GardenFeatures {
         p.setProperty("bpsEnabled", Boolean.toString(bpsEnabled));
         p.setProperty("trackerEnabled", Boolean.toString(trackerEnabled));
         p.setProperty("pitchEnabled", Boolean.toString(pitchEnabled));
+        p.setProperty("plotNumbersEnabled", Boolean.toString(plotNumbersEnabled));
+        p.setProperty("plotHighlightsEnabled", Boolean.toString(plotHighlightsEnabled));
         p.setProperty("totalHarvests", Long.toString(totalHarvests));
         for (Map.Entry<String, Long> entry : CROP_BREAKS.entrySet()) {
             p.setProperty("crop." + entry.getKey(), Long.toString(entry.getValue()));
