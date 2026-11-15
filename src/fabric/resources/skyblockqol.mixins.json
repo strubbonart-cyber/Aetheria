@@ -13,7 +13,8 @@
     "EntityRenderDispatcherMixin",
     "HeldItemRendererMixin",
     "EntityDisplayNameMixin",
-    "MouseCursorMixin"
+    "MouseCursorMixin",
+    "ScreenAccessorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

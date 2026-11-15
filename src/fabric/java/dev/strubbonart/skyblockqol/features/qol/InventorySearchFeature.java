@@ -1,5 +1,6 @@
 package dev.strubbonart.skyblockqol.features.qol;
 
+import dev.strubbonart.skyblockqol.mixin.ScreenAccessorMixin;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -64,7 +65,7 @@ public final class InventorySearchFeature {
                 query = value;
                 if (persistSearchText) save();
             });
-            screen.addDrawableChild(field);
+            ((ScreenAccessorMixin) (Object) screen).skyblockqol$addDrawableChild(field);
         });
     }
 
