@@ -6,6 +6,7 @@ import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
 import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenOrganicMatterTracker;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonFeatures;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonRunOverlay;
 import dev.strubbonart.skyblockqol.features.dungeons.DungeonPhaseTracker;
