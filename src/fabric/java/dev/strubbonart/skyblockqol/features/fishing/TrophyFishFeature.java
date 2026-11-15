@@ -168,7 +168,7 @@ public final class TrophyFishFeature {
         if (changed) save();
     }
 
-    private static void appendOdgerTotal(ItemStack stack, ItemStack.TooltipContext context,
+    private static void appendOdgerTotal(ItemStack stack, net.minecraft.item.Item.TooltipContext context,
                                          net.minecraft.item.tooltip.TooltipType type, List<Text> lines) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (!(client.currentScreen instanceof HandledScreen<?> screen)
@@ -289,7 +289,7 @@ public final class TrophyFishFeature {
                 if (!key.startsWith("fish.")) continue;
                 String[] parts = key.split("\\.");
                 if (parts.length != 3) continue;
-                String fish = properties.getProperty(key, "");
+                String fish = parts[1];
                 Rarity rarity;
                 try { rarity = Rarity.valueOf(parts[2]); } catch (IllegalArgumentException ignored) { continue; }
                 int count = Integer.parseInt(properties.getProperty(key, "0"));
