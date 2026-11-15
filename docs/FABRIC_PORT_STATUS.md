@@ -70,3 +70,17 @@ A successful GitHub Actions build confirms that Gradle compilation and remapping
 - Port features incrementally and update this status file only after the implementation exists.
 - Do not claim a feature is complete because a placeholder class or metadata entry exists.
 - Preserve original notices and AML-1.0 terms. Public distribution of compiled derivative builds requires written permission from the Original Author.
+
+## QoL and Pets migration (first slice)
+
+- SkyBlock item ID tooltip: reads the public `ExtraAttributes.id` entry from the item's custom-data component and appends `skyblock:<id>`. It does not alter item data. Toggle in the Quality of Life settings page.
+- Custom block selection highlight: renders a cyan filled/outline overlay around the block currently targeted by the crosshair. It is an additive highlight in this first slice; the vanilla outline remains visible. Toggle in the Quality of Life settings page.
+- Current Pet HUD: learns the active pet from the server's Autopet chat message or from the active pet item in the Pets menu (the item whose lore contains `Click to despawn`). The text HUD and its enabled state persist in the config folder. It does not automate pet selection or inventory actions.
+
+## QoL features still to port
+
+Enchant Parser and its layouts/chroma, Gyro Wand ring/cooldown helper, cursor reset prevention, disable enchant glint, Brewing Helper, Missing Enchants, Confirm Disconnect, Chat State Restore, Anvil Combine Helper, Slot Binds, Better Containers, Damage Formatter, Profile Parser, and Rare Drop Tracker remain unported or incomplete.
+
+## Pets, Wardrobe, and Garden remaining
+
+The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet collection/profile data, and Wardrobe profile/slot data are not yet ported. Garden work has not started on this branch. Planned Garden order: plot numbers, farming/organic-matter trackers, BPS and precision overlays, visitor shopping list, then pest finder/tracker/alerts and Trevor tools.

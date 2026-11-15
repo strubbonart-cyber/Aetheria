@@ -25,7 +25,7 @@ import java.util.Locale;
  * persist changes to the config directory.
  */
 public final class SkyblockQolSettingsScreen extends Screen {
-    private enum Page { HOME, MINING, FILTER, DUNGEONS }
+    private enum Page { HOME, MINING, FILTER, DUNGEONS, QOL, PETS }
     private enum LayoutTarget { FETCHUR, POWDER, PRISTINE, GOLD, GHOST, MAP, TIMER, SPLITS, BREAKER, ROOM }
 
     private final Screen parent;
@@ -56,7 +56,11 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> open(Page.MINING, LayoutTarget.POWDER));
                 addButton("DUNGEONS", width / 2 - 110, y + 38, 220, 28,
                         () -> open(Page.DUNGEONS, LayoutTarget.MAP));
-                addButton("DONE", width / 2 - 110, y + 76, 220, 24, this::close);
+                addButton("QUALITY OF LIFE", width / 2 - 110, y + 76, 220, 28,
+                        () -> open(Page.QOL, LayoutTarget.POWDER));
+                addButton("PETS & WARDROBE", width / 2 - 110, y + 114, 220, 28,
+                        () -> open(Page.PETS, LayoutTarget.POWDER));
+                addButton("DONE", width / 2 - 110, y + 152, 220, 24, this::close);
             }
             case MINING -> {
                 addToggle("Powder chat filter", MiningFeatures.isPowderFilterEnabled(),
@@ -113,6 +117,27 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addLayoutControlRow(left, y, target);
                 addButton("RESET SELECTED HUD LAYOUT", left, y + 26, 300, 20,
                         this::resetSelectedLayout);
+            }
+            case QOL -> {
+                addToggle("SkyBlock ID in item tooltip",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isShowSkyblockIdEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setShowSkyblockIdEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isShowSkyblockIdEnabled()));
+                y += 26;
+                addToggle("Custom block selection highlight",
+                        dev.strubbonart.skyblockqol.features.qol.QolFeatures.isBlockSelectionOverlayEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.QolFeatures.setBlockSelectionOverlayEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.QolFeatures.isBlockSelectionOverlayEnabled()));
+            }
+            case PETS -> {
+                addToggle("Current Pet HUD",
+                        dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature.isEnabled()));
+                y += 26;
             }
             case FILTER -> {
                 String[] names = {"chest", "already-looted", "breaking-power", "compact", "wrappers",
@@ -192,6 +217,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
             if (page == Page.FILTER) {
                 addButton("BACK TO MINING", left, height - 32, 300, 20,
                         () -> open(Page.MINING, LayoutTarget.POWDER));
+            } else if (page == Page.QOL || page == Page.PETS) {
+                addButton("BACK", left, height - 32, 300, 20,
+                        () -> open(Page.HOME, LayoutTarget.POWDER));
             } else {
                 addButton("BACK", left, height - 32, 300, 20,
                         () -> open(Page.HOME, LayoutTarget.POWDER));
@@ -306,6 +334,8 @@ public final class SkyblockQolSettingsScreen extends Screen {
             case MINING -> "Mining Settings";
             case FILTER -> "Powder Chat Filter";
             case DUNGEONS -> "Dungeon Settings";
+            case QOL -> "Quality of Life";
+            case PETS -> "Pets & Wardrobe";
         };
         context.drawTextWithShadow(textRenderer, heading, width / 2 - textRenderer.getWidth(heading) / 2,
                 42, 0xFFFFFFFF);
