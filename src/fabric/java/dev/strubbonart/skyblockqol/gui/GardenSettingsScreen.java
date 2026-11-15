@@ -1,6 +1,7 @@
 package dev.strubbonart.skyblockqol.gui;
 
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;
+import dev.strubbonart.skyblockqol.features.farming.GardenPestFeatures;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
