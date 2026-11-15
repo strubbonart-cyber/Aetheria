@@ -5,6 +5,7 @@ import dev.strubbonart.skyblockqol.features.farming.GardenVisitorFeatures;
 import dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature;
 import dev.strubbonart.skyblockqol.features.qol.PartyFinderFloorTip;
+import dev.strubbonart.skyblockqol.features.qol.BrewingStandFeature;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -31,6 +32,7 @@ public abstract class HandledScreenMixin {
     @Inject(method = "render", at = @At("TAIL"))
     private void skyblockqol$captureVisitorOffer(DrawContext context, int mouseX, int mouseY,
                                                  float delta, CallbackInfo ci) {
+        BrewingStandFeature.captureTimer((HandledScreen<?>) (Object) this);
         if (focusedSlot != null && !focusedSlot.getStack().isEmpty()) {
             GardenVisitorFeatures.captureOffer((HandledScreen<?>) (Object) this, focusedSlot.getStack());
         }

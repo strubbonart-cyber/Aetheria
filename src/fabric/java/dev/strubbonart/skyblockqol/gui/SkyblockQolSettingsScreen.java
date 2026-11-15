@@ -261,6 +261,10 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addToggle("Party Finder floor labels", PartyFinderFloorTip.isEnabled(),
                         left, y, 300,
                         () -> PartyFinderFloorTip.setEnabled(!PartyFinderFloorTip.isEnabled()));
+                y += 28;
+                addToggle("Brewing Stand timer highlight", BrewingStandFeature.isEnabled(),
+                        left, y, 300,
+                        () -> BrewingStandFeature.setEnabled(!BrewingStandFeature.isEnabled()));
             }
             case PERFORMANCE -> {
                 addToggle("Performance HUD", dev.strubbonart.skyblockqol.features.hud.PerformanceHud.isEnabled(),
