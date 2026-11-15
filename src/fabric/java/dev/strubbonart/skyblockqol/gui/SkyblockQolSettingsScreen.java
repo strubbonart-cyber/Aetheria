@@ -114,8 +114,9 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addButton(target == LayoutTarget.GHOST ? "[GHOST TRACKER]" : "GHOST TRACKER",
                         right, y, 146, 20, () -> open(Page.MINING, LayoutTarget.GHOST));
                 y += 24;
-                addLayoutControlRow(left, y, target);
-                addButton("RESET SELECTED HUD LAYOUT", left, y + 26, 300, 20,
+                addButton("EDIT POSITION", left, y, 146, 20,
+                        () -> openPositionEditor(positionTarget(target)));
+                addButton("RESET POSITION", right, y, 146, 20,
                         this::resetSelectedLayout);
             }
             case QOL -> {
@@ -174,6 +175,8 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature.setEnabled(
                                 !dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature.isEnabled()));
                 y += 26;
+                addButton("EDIT PET HUD POSITION", left, y, 300, 20,
+                        () -> openPositionEditor(OverlayPositionEditorScreen.Target.CURRENT_PET));
             }
             case FILTER -> {
                 String[] names = {"chest", "already-looted", "breaking-power", "compact", "wrappers",
@@ -241,10 +244,11 @@ public final class SkyblockQolSettingsScreen extends Screen {
                     addButton(label, bx, y, 56, 20, () -> open(Page.DUNGEONS, selected));
                     bx += 60;
                 }
-                addLayoutControlRow(left, y + 26, target);
-                addButton("RESET SELECTED LAYOUT", left, y + 52, 300, 20,
+                addButton("EDIT POSITION", left, y + 26, 146, 20,
+                        () -> openPositionEditor(positionTarget(target)));
+                addButton("RESET POSITION", right, y + 26, 146, 20,
                         this::resetSelectedLayout);
-                addButton("REFRESH ROOM / SECRET DATA", left, y + 76, 300, 20,
+                addButton("REFRESH ROOM / SECRET DATA", left, y + 52, 300, 20,
                         () -> dev.strubbonart.skyblockqol.features.dungeons.DungeonDataRepository.refresh());
             }
         }
@@ -260,26 +264,6 @@ public final class SkyblockQolSettingsScreen extends Screen {
                 addButton("BACK", left, height - 32, 300, 20,
                         () -> open(Page.HOME, LayoutTarget.POWDER));
             }
-        }
-    }
-
-    private void addLayoutControlRow(int x, int y, LayoutTarget selected) {
-        int buttonWidth = 48;
-        String[] labels = {"X -", "X +", "Y -", "Y +", "SIZE -", "SIZE +"};
-        int[][] changes = {{-10, 0}, {10, 0}, {0, -10}, {0, 10}, {0, 0}, {0, 0}};
-        for (int i = 0; i < labels.length; i++) {
-            final int index = i;
-            addButton(labels[i], x + i * 50, y, buttonWidth, 20, () -> {
-                float scaleDelta = index == 4 ? -0.1F : index == 5 ? 0.1F : 0.0F;
-                if (selected == LayoutTarget.GHOST) {
-                    GhostTrackerFeatures.adjustHudLayout(changes[index][0], changes[index][1], scaleDelta);
-                } else if (isMiningLayoutTarget(selected)) {
-                    MiningFeatures.adjustHudLayout(selected.name().toLowerCase(Locale.ROOT),
-                            changes[index][0], changes[index][1], scaleDelta);
-                } else {
-                    adjustDungeonLayout(selected, changes[index][0], changes[index][1], scaleDelta);
-                }
-            });
         }
     }
 
@@ -337,6 +321,25 @@ public final class SkyblockQolSettingsScreen extends Screen {
             };
             DungeonOverlaySettings.set(widget, x, y, 1.0F);
         }
+    }
+
+    private OverlayPositionEditorScreen.Target positionTarget(LayoutTarget selected) {
+        return switch (selected) {
+            case FETCHUR -> OverlayPositionEditorScreen.Target.FETCHUR;
+            case POWDER -> OverlayPositionEditorScreen.Target.POWDER;
+            case PRISTINE -> OverlayPositionEditorScreen.Target.PRISTINE;
+            case GOLD -> OverlayPositionEditorScreen.Target.GOLD;
+            case GHOST -> OverlayPositionEditorScreen.Target.GHOST;
+            case MAP -> OverlayPositionEditorScreen.Target.DUNGEON_MAP;
+            case TIMER -> OverlayPositionEditorScreen.Target.DUNGEON_TIMER;
+            case SPLITS -> OverlayPositionEditorScreen.Target.DUNGEON_SPLITS;
+            case BREAKER -> OverlayPositionEditorScreen.Target.DUNGEON_BREAKER;
+            case ROOM -> OverlayPositionEditorScreen.Target.DUNGEON_ROOM;
+        };
+    }
+
+    private void openPositionEditor(OverlayPositionEditorScreen.Target selected) {
+        MinecraftClient.getInstance().setScreen(new OverlayPositionEditorScreen(this, selected));
     }
 
     private void addToggle(String name, boolean active, int x, int y, int w, Runnable action) {

@@ -88,3 +88,9 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Mixin-backed QoL options: Disable Enchant Glint, Show Own Nametag, and Confirm Disconnect (first click asks for a second click within three seconds). All three settings are saved and individually configurable in the Quality of Life page.
 
 - Enchant tooltip first slice: uses the repository's bundled enchant metadata to color recognized enchant names by level tier (including separate ultimate-enchant coloring). The same data drives a Shift-held missing-enchant list, respecting item categories and mutually exclusive enchant pools. Toggle each behavior from Quality of Life settings. Advanced chroma animation, two-column/compressed layouts, exact legacy ordering, and every special-case lore format remain incomplete.
+
+## Shared HUD position editor
+
+- A common drag-and-drop editor is now used for every active HUD: Fetchur, Powder, Pristine, Gold, Ghost Tracker, Dungeon Map, Dungeon Timer, Dungeon Splits, Dungeon Breaker, Dungeon Room, and Current Pet.
+- Select an overlay in its feature page and choose **Edit Position**. Drag the preview with the left mouse button. The editor shows X/Y and scale, supports SIZE - / SIZE +, RESET, and DONE, and saves the position in the same configuration used by the live HUD.
+- Garden and future QoL overlays should register with this shared editor instead of implementing separate position controls.

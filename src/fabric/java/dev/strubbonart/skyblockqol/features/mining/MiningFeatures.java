@@ -300,6 +300,19 @@ public final class MiningFeatures {
     public static int getHudY(String panel) { return layout(panel).y; }
     public static float getHudScale(String panel) { return layout(panel).scale; }
 
+    public static void updateHudLayout(String panel, int x, int y, float scale) {
+        HudLayout value = layout(panel);
+        value.x = Math.max(0, Math.min(5000, x));
+        value.y = Math.max(0, Math.min(5000, y));
+        value.scale = Math.max(0.5F, Math.min(3.0F, scale));
+        syncLegacyHudLayout();
+    }
+
+    public static void saveHudLayout() {
+        syncLegacyHudLayout();
+        save();
+    }
+
     public static void adjustHudLayout(int dx, int dy, float scaleDelta) {
         adjustHudLayout("powder", dx, dy, scaleDelta);
     }

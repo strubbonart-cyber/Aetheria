@@ -71,6 +71,16 @@ public final class GhostTrackerFeatures {
     public static int getHudY() { return hudY; }
     public static float getHudScale() { return hudScale; }
 
+    public static void updateHudLayout(int x, int y, float scale) {
+        hudX = Math.max(0, Math.min(5000, x));
+        hudY = Math.max(0, Math.min(5000, y));
+        hudScale = Math.max(0.5F, Math.min(3.0F, scale));
+    }
+
+    public static void saveHudLayout() {
+        save();
+    }
+
     public static void adjustHudLayout(int dx, int dy, float scaleDelta) {
         hudX = Math.max(0, Math.min(5000, hudX + dx));
         hudY = Math.max(0, Math.min(5000, hudY + dy));

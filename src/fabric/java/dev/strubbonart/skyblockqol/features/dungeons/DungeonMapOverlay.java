@@ -137,6 +137,21 @@ public final class DungeonMapOverlay {
     public static int getPositionY() { return positionY; }
     public static float getScale() { return scale; }
 
+    public static int getResolvedPositionX(int screenWidth) {
+        return positionX < 0 ? Math.max(0, screenWidth - Math.round(BASE_SIZE * scale) - PADDING - 8)
+                : positionX;
+    }
+
+    public static void updateLayout(int x, int y, float value) {
+        positionX = Math.max(0, Math.min(10000, x));
+        positionY = Math.max(0, Math.min(10000, y));
+        scale = Math.max(0.5F, Math.min(2.0F, value));
+    }
+
+    public static void saveLayout() {
+        save();
+    }
+
     public static void adjustLayout(int dx, int dy, float scaleDelta) {
         if (positionX < 0) positionX = 8;
         positionX = Math.max(0, Math.min(10000, positionX + dx));
@@ -171,9 +186,7 @@ public final class DungeonMapOverlay {
         if (mapState == null) return;
 
         int mapSize = Math.round(BASE_SIZE * scale);
-        int x = positionX < 0
-                ? context.getScaledWindowWidth() - mapSize - PADDING - 8
-                : positionX;
+        int x = getResolvedPositionX(context.getScaledWindowWidth());
         int y = positionY;
 
         context.fill(x - 3, y - 3, x + mapSize + 3, y + mapSize + 3, 0x99000000);

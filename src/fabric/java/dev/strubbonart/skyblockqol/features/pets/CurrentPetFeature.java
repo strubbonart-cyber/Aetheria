@@ -41,6 +41,9 @@ public final class CurrentPetFeature {
     private static boolean enabled = true;
     private static String petName = "";
     private static int petLevel;
+    private static int hudX = 8;
+    private static int hudY = 72;
+    private static float hudScale = 1.0F;
     private static boolean initialized;
     private static long lastScan;
 
@@ -61,6 +64,27 @@ public final class CurrentPetFeature {
 
     public static int getPetLevel() {
         return petLevel;
+    }
+
+    public static int getHudX() { return hudX; }
+    public static int getHudY() { return hudY; }
+    public static float getHudScale() { return hudScale; }
+
+    public static void updateHudLayout(int x, int y, float scale) {
+        hudX = Math.max(0, Math.min(5000, x));
+        hudY = Math.max(0, Math.min(5000, y));
+        hudScale = Math.max(0.5F, Math.min(3.0F, scale));
+    }
+
+    public static void saveHudLayout() {
+        save();
+    }
+
+    public static void resetHudLayout() {
+        hudX = 8;
+        hudY = 72;
+        hudScale = 1.0F;
+        save();
     }
 
     public static void initialize() {
@@ -136,8 +160,13 @@ public final class CurrentPetFeature {
         if (!enabled || petName.isEmpty()) return;
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player == null || client.world == null || client.options.hudHidden) return;
+        var matrices = context.getMatrices();
+        matrices.push();
+        matrices.translate(hudX, hudY, 0.0F);
+        matrices.scale(hudScale, hudScale, 1.0F);
         context.drawTextWithShadow(client.textRenderer,
-                "Pet: [Lvl " + petLevel + "] " + petName, 8, 72, 0xFFFFAA);
+                "Pet: [Lvl " + petLevel + "] " + petName, 0, 0, 0xFFFFAA);
+        matrices.pop();
     }
 
     private static String strip(String value) {
@@ -152,10 +181,16 @@ public final class CurrentPetFeature {
             enabled = Boolean.parseBoolean(properties.getProperty("enabled", "true"));
             petName = properties.getProperty("petName", "");
             petLevel = Math.max(0, Integer.parseInt(properties.getProperty("petLevel", "0")));
+            hudX = Math.max(0, Math.min(5000, Integer.parseInt(properties.getProperty("hudX", "8"))));
+            hudY = Math.max(0, Math.min(5000, Integer.parseInt(properties.getProperty("hudY", "72"))));
+            hudScale = Math.max(0.5F, Math.min(3.0F, Float.parseFloat(properties.getProperty("hudScale", "1.0"))));
         } catch (Exception ignored) {
             enabled = true;
             petName = "";
             petLevel = 0;
+            hudX = 8;
+            hudY = 72;
+            hudScale = 1.0F;
         }
     }
 
@@ -164,6 +199,9 @@ public final class CurrentPetFeature {
         properties.setProperty("enabled", Boolean.toString(enabled));
         properties.setProperty("petName", petName);
         properties.setProperty("petLevel", Integer.toString(petLevel));
+        properties.setProperty("hudX", Integer.toString(hudX));
+        properties.setProperty("hudY", Integer.toString(hudY));
+        properties.setProperty("hudScale", Float.toString(hudScale));
         try {
             Files.createDirectories(SETTINGS_FILE.getParent());
             try (OutputStream output = Files.newOutputStream(SETTINGS_FILE)) {

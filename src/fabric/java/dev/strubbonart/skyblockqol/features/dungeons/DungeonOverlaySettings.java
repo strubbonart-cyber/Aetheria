@@ -96,15 +96,28 @@ public final class DungeonOverlaySettings {
         };
     }
 
-    public static void set(Widget widget, int x, int y, float scale) {
+    public static void updateLayout(Widget widget, int x, int y, float scale) {
         initialize();
         switch (widget) {
-            case TIMER -> { timerX = x; timerY = y; timerScale = scale; }
-            case SPLITS -> { splitsX = x; splitsY = y; splitsScale = scale; }
-            case BREAKER -> { breakerX = x; breakerY = y; breakerScale = scale; }
-            case ROOM -> { roomX = x; roomY = y; roomScale = scale; }
+            case TIMER -> { timerX = x; timerY = y; timerScale = boundedScale(scale); }
+            case SPLITS -> { splitsX = x; splitsY = y; splitsScale = boundedScale(scale); }
+            case BREAKER -> { breakerX = x; breakerY = y; breakerScale = boundedScale(scale); }
+            case ROOM -> { roomX = x; roomY = y; roomScale = boundedScale(scale); }
         }
+    }
+
+    public static void saveLayout() {
+        initialize();
         save();
+    }
+
+    public static void set(Widget widget, int x, int y, float scale) {
+        updateLayout(widget, x, y, scale);
+        save();
+    }
+
+    private static float boundedScale(float value) {
+        return Float.isFinite(value) ? Math.max(0.5F, Math.min(3.0F, value)) : 1.0F;
     }
 
     public static void reset() {
