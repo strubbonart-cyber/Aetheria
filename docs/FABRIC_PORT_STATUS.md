@@ -136,3 +136,5 @@ The Current Pet text HUD is only the first pet feature. Pet textures/cache, pet 
 - Kill Combo Tracker parses Hypixel `+N Kill Combo` milestone and expiry messages, accumulates stat bonuses, tracks the current/highest combo, and shows an independently draggable/scalable HUD. Use `/killcombo status|reset`.
 
 - DVD Screensaver: lightweight bouncing "DVD" HUD text with random edge colors, optional corner-hit notification, `/dvd` toggle, and `/dvd corner` reset. Disabled by default; size and speed are configurable in QOL settings. The original custom DVD logo texture is not included in this first pass.
+
+- Anvil Combine Helper: in the SkyBlock "Anvil" inventory, when exactly one input slot is occupied, matching player-inventory items with the same `ExtraAttributes.id` receive a green outline. It is toggleable from QOL settings. It matches by base SkyBlock ID, so enchanted-book effective-ID and special custom matching remain incomplete.

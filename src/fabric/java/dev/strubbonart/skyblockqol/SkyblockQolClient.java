@@ -6,6 +6,7 @@ import dev.strubbonart.skyblockqol.features.qol.EnchantTooltipFeature;
 import dev.strubbonart.skyblockqol.features.qol.ExtraQolFeatures;
 import dev.strubbonart.skyblockqol.features.qol.KillComboFeature;
 import dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature;
+import dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature;
 import dev.strubbonart.skyblockqol.features.pets.CurrentPetFeature;
 import dev.strubbonart.skyblockqol.features.pets.PetCollectionFeature;
 import dev.strubbonart.skyblockqol.features.farming.GardenFeatures;

@@ -204,6 +204,12 @@ public final class SkyblockQolSettingsScreen extends Screen {
                         () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.setEnabled(
                                 !dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.isEnabled()));
                 y += 26;
+                addToggle("Anvil Combine Helper",
+                        dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature.isEnabled(),
+                        left, y, 300,
+                        () -> dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature.setEnabled(
+                                !dev.strubbonart.skyblockqol.features.qol.AnvilCombineFeature.isEnabled()));
+                y += 26;
                 addButton("DVD size: " + dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.getSize() + "  (+/-)",
                         left, y, 146, 20,
                         () -> dev.strubbonart.skyblockqol.features.qol.DvdScreensaverFeature.adjustSize(12));
